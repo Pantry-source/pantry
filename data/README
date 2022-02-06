@@ -1,0 +1,22 @@
+Data import
+
+JSON is from http://world.openfoodfacts.org/ingredients.json
+to convert into CSV
+```
+in2csv -k tags ingredients.json > ingredients.csv
+```
+
+To filter to only English ingredients
+```
+csvgrep -c 1 -r "^en:" ingredients.csv > ingredients_en.csv
+```
+
+To use only id and name colums
+```
+csvcut -c 1,3 ingredients_en.csv > ingredients_en_filtered.csv
+```
+
+Remove e456 type of ingredients
+```
+csvgrep -c 1 -i -r "^en:e\d" ingredients_en_filtered.csv > ingredients_without_e.csv
+```
