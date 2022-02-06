@@ -27,6 +27,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         </Link>
         {
           user && (
+            <Link href="/my-pantries">
+              <span className="mr-6 cursor-pointer">My Pantries</span>
+            </Link>
+          )
+        }
+        {
+          user && (
             <Link href="/create-pantry">
               <span className="mr-6 cursor-pointer">Create Pantry</span>
             </Link>
