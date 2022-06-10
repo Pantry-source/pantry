@@ -16,7 +16,7 @@ export default function Home() {
     setLoading(false)
   }
   if (loading) return <p className="text-2xl">Loading ...</p>
-  if (!pantries.length) return <p className="text-2xl">No pantries.</p>
+  if (!pantries || !pantries.length) return <p className="text-2xl">No pantries.</p>
   return (
     <div>
       <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">Pantries</h1>
