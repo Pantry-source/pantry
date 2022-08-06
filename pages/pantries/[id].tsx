@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import { supabase } from '../../api'
+import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
@@ -53,7 +54,9 @@ export default function Pantry() {
         open={isAddingProducts} 
         onClose={() => setIsAddingProducts(false)} 
         title="New product"
-      /> : null
+        subtitle={`Fillout the information below to add a product to ${title}`}>
+          <ProductEditor />
+      </SlideOver> : null
     }
     </div>
   )
