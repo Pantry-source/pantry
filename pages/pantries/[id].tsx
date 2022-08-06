@@ -48,16 +48,15 @@ export default function Pantry() {
         </div>
       </div>
       </div>
-    {
-      isAddingProducts ?
+    
       <SlideOver 
         open={isAddingProducts} 
         onClose={() => setIsAddingProducts(false)} 
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
           <ProductEditor />
-      </SlideOver> : null
-    }
+      </SlideOver> 
+    
     </div>
   )
 }
