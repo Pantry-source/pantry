@@ -1,29 +1,44 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import ReactMarkdown from 'react-markdown'
 import { supabase } from '../../api'
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState(null)
+  const [pantry, setPantry] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [units, setUnits] = useState(null);
   const [isAddingProducts, setIsAddingProducts] = useState(false)
   const router = useRouter()
   const { id } = router.query
+  async function fetchPantry() {
+    if (!id) return
+    const { data } = await supabase
+      .from('pantries')
+      .select(`
+        *,
+        products(name)
+      `)
+      .filter('id', 'eq', id)
+      .single();
+    setPantry(data);
+  }
+  async function fetchCategories() {
+    const { data } = await supabase
+      .from('categories')
+      .select(`*`);
+    setCategories(data);
+  }
+  async function fetchQuantityUnits() {
+    const { data } = await supabase
+      .from('quantity_units')
+      .select(`*`);
+    setUnits(data);
+  }
   useEffect(() => {
-    fetchPantry()
-    async function fetchPantry() {
-      if (!id) return
-      const { data } = await supabase
-        .from('pantries')
-        .select(`
-          *,
-          products(name)
-        `)
-        .filter('id', 'eq', id)
-        .single()
-      setPantry(data)
-    }
+    fetchPantry();
+    fetchCategories();
+    fetchQuantityUnits();
   }, [id])
   if (!pantry) return null;
   const { description, title, user_email } = pantry;
@@ -54,7 +69,7 @@ export default function Pantry() {
         onClose={() => setIsAddingProducts(false)} 
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor />
+          <ProductEditor categories={categories} units={units} />
       </SlideOver> 
     
     </div>

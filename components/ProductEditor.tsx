@@ -2,7 +2,9 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 
-export default function ProductEditor() {
+export default function ProductEditor({ categories, units }) {
+  const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
+  const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
       
@@ -90,10 +92,7 @@ export default function ProductEditor() {
               id="unit"
               name="unit"
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
-              <option>item</option>
-              <option>lb</option>
-              <option>oz</option>
-              <option>kg</option>
+              {unitOptions}
             </select>
           </div>
         </div>
@@ -113,10 +112,8 @@ export default function ProductEditor() {
             id="category"
             name="category"
             className="w-full pl-3 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            defaultValue="Dry Goods">
-              <option>Dry Goods</option>
-              <option>Frozen</option>
-              <option>Produce</option>
+            defaultValue={categories[0].id}>
+              {categoryOptions}
           </select>
         </div>
       </div>
