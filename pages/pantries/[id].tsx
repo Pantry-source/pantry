@@ -8,7 +8,13 @@ export default function Pantry() {
   const [pantry, setPantry] = useState(null);
   const [categories, setCategories] = useState(null);
   const [units, setUnits] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false)
+  function onProductChange(e) {
+    // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
+    const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
+    setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }))
+  }
   const router = useRouter()
   const { id } = router.query
   async function fetchPantry() {
@@ -35,6 +41,12 @@ export default function Pantry() {
       .select(`*`);
     setUnits(data);
   }
+
+  function saveCurrentProduct(e) {
+    e.preventDefault();
+    console.log(currentProduct);
+  }
+
   useEffect(() => {
     fetchPantry();
     fetchCategories();
@@ -63,15 +75,18 @@ export default function Pantry() {
         </div>
       </div>
       </div>
-    
       <SlideOver 
         open={isAddingProducts} 
         onClose={() => setIsAddingProducts(false)} 
+        onSubmit={saveCurrentProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor categories={categories} units={units} />
+          <ProductEditor 
+            product={currentProduct}
+            categories={categories} 
+            units={units}
+            onProductChange={onProductChange} />
       </SlideOver> 
-    
     </div>
   )
 }

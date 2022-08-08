@@ -1,10 +1,8 @@
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { XIcon } from '@heroicons/react/outline'
-
-export default function ProductEditor({ categories, units }) {
+export default function ProductEditor({ categories, units, onProductChange, product }) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
+  const defaultUnitId = units[0].id, defaultCategory = categories[0].id;
+  const { name = '', quantity_amount = '', quantity_unit = defaultUnitId, category = defaultCategory, vendor = '' } = product;
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
       
@@ -20,8 +18,10 @@ export default function ProductEditor({ categories, units }) {
         <div className="sm:col-span-2">
           <input
             type="text"
-            name="product-name"
+            name="name"
             id="product-name"
+            value={name}
+            onChange={onProductChange}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
@@ -39,11 +39,12 @@ export default function ProductEditor({ categories, units }) {
               <div className="absolute flex h-5 items-center">
                 <input
                   id="is-essential"
-                  name="is-essential"
+                  name="is_essential"
+                  onChange={onProductChange}
                   aria-describedby="is-essential-description"
-                  type="radio"
+                  type="checkbox"
                   className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  defaultChecked/>
+                  defaultChecked={product.is_essential} />
               </div>
               <div className="pl-7 text-sm">
                 <label htmlFor="is-essential" className="font-medium text-gray-900">
@@ -52,20 +53,6 @@ export default function ProductEditor({ categories, units }) {
                 <p id="is-essential-description" className="text-gray-500">
                   Will be marked as "out of stock" when runs out
                 </p>
-              </div>
-            </div>
-            <div className="relative flex items-start">
-              <div className="absolute flex h-5 items-center">
-                <input
-                  id="not-essential"
-                  name="is-essential"
-                  type="radio"
-                  className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"/>
-              </div>
-              <div className="pl-7 text-sm">
-                <label htmlFor="not-essential" className="font-medium text-gray-900">
-                  No
-                </label>
               </div>
             </div>
           </div>
@@ -80,7 +67,9 @@ export default function ProductEditor({ categories, units }) {
         <div className="mt-1 relative rounded-md shadow-sm">
           <input
             type="text"
-            name="amount"
+            name="quantity_amount"
+            value={quantity_amount}
+            onChange={onProductChange}
             id="amount"
             className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
             placeholder="0"/>
@@ -90,7 +79,9 @@ export default function ProductEditor({ categories, units }) {
             </label>
             <select
               id="unit"
-              name="unit"
+              name="quantity_unit"
+              onChange={onProductChange}
+              value={quantity_unit}
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
               {unitOptions}
             </select>
@@ -111,8 +102,9 @@ export default function ProductEditor({ categories, units }) {
           <select
             id="category"
             name="category"
-            className="w-full pl-3 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            defaultValue={categories[0].id}>
+            value={category}
+            onChange={onProductChange}
+            className="w-full pl-3 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
               {categoryOptions}
           </select>
         </div>
@@ -131,6 +123,8 @@ export default function ProductEditor({ categories, units }) {
           <input
             type="text"
             name="vendor"
+            value={vendor}
+            onChange={onProductChange}
             id="vendor"
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />

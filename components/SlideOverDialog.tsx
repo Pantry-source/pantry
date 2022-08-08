@@ -6,11 +6,12 @@ interface SlideOverProps {
   title: string,
   subtitle?: string,
   onClose: () => void,
+  onSubmit: () => void,
   open: boolean,
   children: Element
 }
 
-export default function SlideOver({children, open = false, onClose, title, subtitle = ''}: SlideOverProps) {
+export default function SlideOver({children, open = false, onClose, onSubmit, title, subtitle = ''}: SlideOverProps) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -52,7 +53,7 @@ export default function SlideOver({children, open = false, onClose, title, subti
                       </div>
 
                       {children}
-                      
+
                     </div>
 
                     {/* Footer */}
@@ -66,7 +67,8 @@ export default function SlideOver({children, open = false, onClose, title, subti
                       </button>
                       <button
                         type="submit"
-                        className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        onClick={onSubmit}>
                         Save
                       </button>
                       </div>
