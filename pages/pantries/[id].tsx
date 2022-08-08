@@ -13,6 +13,7 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
+    console.log(e.target.name);
     setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }))
   }
   const router = useRouter()
@@ -23,11 +24,12 @@ export default function Pantry() {
       .from('pantries')
       .select(`
         *,
-        products(name)
+        products(*)
       `)
       .filter('id', 'eq', id)
       .single();
     setPantry(data);
+    setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }))
   }
   async function fetchCategories() {
     const { data } = await supabase
@@ -42,9 +44,13 @@ export default function Pantry() {
     setUnits(data);
   }
 
-  function saveCurrentProduct(e) {
+  async function saveCurrentProduct(e) {
     e.preventDefault();
     console.log(currentProduct);
+    const { data } = await supabase
+      .from('products')
+      .insert([currentProduct]);
+    console.log(data);
   }
 
   useEffect(() => {
