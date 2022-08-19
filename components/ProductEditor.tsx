@@ -51,7 +51,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
                   Yes
                 </label>
                 <p id="is-essential-description" className="text-gray-500">
-                  Will be marked as "out of stock" when runs out
+                  Will be marked as &quot;out of stock&quot; when runs out
                 </p>
               </div>
             </div>
