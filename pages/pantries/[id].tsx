@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../api'
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [categoriesMap, setCategoriesMap] = useState(null);
+  const [pantry, setPantry] = useState([null]);
+  const [categories, setCategories] = useState([]);
+  const [categoriesMap, setCategoriesMap] = useState([null]);
   const [units, setUnits] = useState(null);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
-  const [isAddingProducts, setIsAddingProducts] = useState(false)
+  const [isAddingProducts, setIsAddingProducts] = useState(false);
+  const [productsByCategory, setProductsByCategory] = useState({});
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
@@ -20,6 +21,7 @@ export default function Pantry() {
   }
   const router = useRouter()
   const { id } = router.query
+
   async function fetchPantry() {
     if (!id) return
     const { data } = await supabase
@@ -31,13 +33,17 @@ export default function Pantry() {
       .filter('id', 'eq', id)
       .single();
     setPantry(data);
+    // console.log('data',data)
     setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }))
   }
+
+
   async function fetchCategories() {
     const { data } = await supabase
       .from('categories')
       .select(`*`);
-    setCategories(data);
+    const dataWithProducts = addProductsToCategories(data);
+    setCategories(dataWithProducts);
     setCategoriesMap(data?.reduce((previous, category) => {
       return {
         ...previous,
@@ -45,6 +51,7 @@ export default function Pantry() {
       };
     }, {}));
   }
+
   async function fetchQuantityUnits() {
     const { data } = await supabase
       .from('quantity_units')
@@ -69,14 +76,69 @@ export default function Pantry() {
 
   useEffect(() => {
     fetchPantry();
-    fetchCategories();
+    // fetchCategories();
     fetchQuantityUnits();
   }, [id])
+
+  useEffect(() => {
+    updateProductsByCategories()
+  }, [pantry])
+
+  useEffect(() => {
+    fetchCategories();
+  }, [productsByCategory])
+
+
+  /** Maps product name to array of products.
+   * {
+   * Frozen food: [{...},{...}],
+   * Produce: [{...}]
+   * }
+   * returns object used to add products to categories state
+   */
+  function updateProductsByCategories() {
+    /* WIP: reads null before pantry populates even tho updateProductsByCategories() 
+    shouldn't run until pantry is modified (see useEffect above)
+    hence the [] so it doesn't crash.
+    */
+    const products = pantry.products || []; 
+    const currentProducts = products.reduce((productsByCategory, product) => {
+      console.log(categoriesMap[product.category_id])
+      let categoryName = categoriesMap[product.category_id]
+      productsByCategory[categoryName]
+        ? productsByCategory[categoryName].push(product)
+        : productsByCategory[categoryName] = [product];
+      return productsByCategory;
+    }, {})
+    setProductsByCategory(currentProducts);
+  }
+/**takes data obj from from fetchCAtegories(), adds products or null:
+ * {
+ *  "products" : [{...},{...}}]
+ * }
+ * 
+ * new data object is passed to setCategories
+ *  */
+  function addProductsToCategories(data) {
+    for (let product of data) {
+      productsByCategory[product.name]
+        ? product["products"] = productsByCategory[product.name]
+        : product["products"] = null;
+    }
+    return data;
+  }
+
   if (!pantry) return null;
-  const { description, title, products } = pantry;
+  const { description, title } = pantry;
   function addProducts() {
     setIsAddingProducts(true);
   }
+
+
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+  }
+
 
   return (
     <div>
@@ -95,64 +157,90 @@ export default function Pantry() {
             </button>
           </div>
         </div>
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead>
-            <tr>
-              <th
-                scope="col"
-                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
-              >
-                Product
-              </th>
-              <th
-                scope="col"
-                className="hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell"
-              >
-                Is essential
-              </th>
-              <th
-                scope="col"
-                className="hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 sm:table-cell"
-              >
-                Expires
-              </th>
-              <th
-                scope="col"
-                className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-gray-900 sm:pr-6 md:pr-0"
-              >
-                Vendor
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-b border-gray-200">
-                <td className="py-4 pl-4 pr-3 text-sm sm:pl-6 md:pl-0">
-                  <div className="font-medium text-gray-900">{product.name}</div>
-                  <div className="mt-0.5 text-gray-500">
-                    {product.quantity_amount} {unitsMap && unitsMap[product.quantity_unit]}
-                  </div>
-                </td>
-                <td className="hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell">{ product.is_essential ? 'yes' : 'no' }</td>
-                <td className="hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell">{ product.expires_at || 'not specified' }</td>
-                <td className="hidden py-4 px-3 text-right text-sm text-gray-500 sm:table-cell">{product.vendor || ''}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
-      <SlideOver 
-        open={isAddingProducts} 
-        onClose={() => setIsAddingProducts(false)} 
+      <div className="px-4 sm:px-6 lg:px-8">
+
+        <div className="mt-8 flex flex-col">
+          <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <table className="min-w-full">
+                  <thead className="bg-white">
+                    <tr>
+                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        Name
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Is Essential
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Expires
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Vendor
+                      </th>
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span className="sr-only">Edit</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {categories.map((product, productIdx) => (
+                      product.products &&
+                      <Fragment key={product.name}>
+                        <tr className="border-t border-gray-200">
+                          <th
+                            colSpan={5}
+                            scope="colgroup"
+                            className="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6"
+                          >
+                            {product.name}
+                          </th>
+
+                        </tr>
+                        {product.products.map((item) => (
+                          <tr
+                            key={item.name}
+                            className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}
+                          >
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                              {item.name}
+                            <div className="mt-0.5 text-gray-500">
+                              {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
+                              {console.log(unitsMap)}
+                            </div>
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
+                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                              <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                                Edit<span className="sr-only">, {item.name}</span>
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <SlideOver
+        open={isAddingProducts}
+        onClose={() => setIsAddingProducts(false)}
         onSubmit={saveCurrentProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor 
-            product={currentProduct}
-            categories={categories} 
-            units={units}
-            onProductChange={onProductChange} />
-      </SlideOver> 
+        <ProductEditor
+          product={currentProduct}
+          categories={categories}
+          units={units}
+          onProductChange={onProductChange} />
+      </SlideOver>
     </div>
   )
 }
