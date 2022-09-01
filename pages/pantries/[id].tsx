@@ -36,16 +36,12 @@ export default function Pantry() {
       .single();
     const { error, data } = response;
     try {
-      console.log('response in fetchPantry', response)
-      console.log('error in pantry?', !!error)
+
       if (error) throw new Error("no pantry data");
-      console.log('after throwing error', error)
       setPantry(data);
-      console.log('data in pantry', data);
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
       setIsPantryLoading(false);
     } catch (error) {
-      console.log('error while fetching pantry', error);
       setIsPantryLoading(true);
     }
     return response
@@ -57,7 +53,6 @@ export default function Pantry() {
       .select(`*`);
     const { error, data } = response;
     try {
-      console.log('response in fetchCategories', response)
       if (error) throw new Error("no categories data")
       setCategories(data);
       setCategoriesMap(data?.reduce((previous, category) => {
@@ -68,7 +63,6 @@ export default function Pantry() {
       }, {}));
       setIsCategoriesLoading(false);
     } catch (error) {
-      console.log('error while fetching categories error', error);
       setIsCategoriesLoading(true);
     }
     return response;
@@ -90,7 +84,6 @@ export default function Pantry() {
       }, {}));
       setIsUnitMapLoading(false);
     } catch (error) {
-      console.log('error while fetching quantity units', error);
       setIsUnitMapLoading(true);
     }
     return response;
