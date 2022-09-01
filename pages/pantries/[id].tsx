@@ -5,14 +5,16 @@ import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState([null]);
-  const [categories, setCategories] = useState([null]);
-  const [categoriesMap, setCategoriesMap] = useState([null]);
-  const [units, setUnits] = useState([null]);
+  const [pantry, setPantry] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [categoriesMap, setCategoriesMap] = useState([]);
+  const [units, setUnits] = useState([]);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPantryLoading, setIsPantryLoading] = useState(true);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+  const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -36,15 +38,15 @@ export default function Pantry() {
     try {
       console.log('response in fetchPantry', response)
       console.log('error in pantry?', !!error)
-      if (error) return new Error("no pantry data");
+      if (error) throw new Error("no pantry data");
       console.log('after throwing error', error)
       setPantry(data);
       console.log('data in pantry', data);
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
-      setIsLoading(false);
+      setIsPantryLoading(false);
     } catch (error) {
       console.log('error while fetching pantry', error);
-      setIsLoading(false);
+      setIsPantryLoading(true);
     }
     return response
   }
@@ -54,9 +56,9 @@ export default function Pantry() {
       .from('categories')
       .select(`*`);
     const { error, data } = response;
-    // try {
+    try {
       console.log('response in fetchCategories', response)
-      if (error) return new Error("no categories data")
+      if (error) throw new Error("no categories data")
       setCategories(data);
       setCategoriesMap(data?.reduce((previous, category) => {
         return {
@@ -64,11 +66,11 @@ export default function Pantry() {
           [category.id]: category.name
         };
       }, {}));
-    //   setIsLoading(false);
-    // } catch (error) {
-    //   console.log('error while fetching categories error', error);
-    //   setIsLoading(false);
-    // }
+      setIsCategoriesLoading(false);
+    } catch (error) {
+      console.log('error while fetching categories error', error);
+      setIsCategoriesLoading(true);
+    }
     return response;
   }
 
@@ -77,20 +79,20 @@ export default function Pantry() {
       .from('quantity_units')
       .select(`*`);
     const { error, data } = response;
-    // try {
-    //   if (error) return new Error("no quantity units data")
-    setUnits(data);
-    setUnitsMap(data?.reduce((previous, category) => {
-      return {
-        ...previous,
-        [category.id]: category.name
-      };
-    }, {}));
-    //   setIsLoading(false);
-    // } catch (error) {
-    //   console.log('error while fetching quantity units', error);
-    //   setIsLoading(false);
-    // }
+    try {
+      if (error) throw new Error("no quantity units data")
+      setUnits(data);
+      setUnitsMap(data?.reduce((previous, category) => {
+        return {
+          ...previous,
+          [category.id]: category.name
+        };
+      }, {}));
+      setIsUnitMapLoading(false);
+    } catch (error) {
+      console.log('error while fetching quantity units', error);
+      setIsUnitMapLoading(true);
+    }
     return response;
   }
 
@@ -109,29 +111,25 @@ export default function Pantry() {
     fetchQuantityUnits();
   }, [id])
 
-  console.log('pantry', pantry);
-  // console.log(isLoading);
-  if (isLoading) return <h1>loading...</h1>;
+  if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
+    return <h1>loading...</h1>;
+  }
 
-  // useEffect(() => {
-    const currentProducts = pantry.products.reduce((productsByCategory, product) => {
-      let categoryName = categoriesMap[product.category_id]
-      productsByCategory[categoryName]
+  const currentProducts = pantry.products.reduce((productsByCategory, product) => {
+    let categoryName = categoriesMap[product.category_id]
+    productsByCategory[categoryName]
       ? productsByCategory[categoryName].push(product)
       : productsByCategory[categoryName] = [product];
-      return productsByCategory;
-    }, {});
-    
-    const categoriesWithProduct = categories.forEach(category => {
-      console.log(category)
-      category["products"] = currentProducts[category.name] || null;
-    });
+    return productsByCategory;
+  }, {});
 
-    // setCategories(categoriesWithProduct);
+  /* below, forEach is mutating categories without using setCategories()
+  do we still want to use setCategories or does this work? 
+*/
+  categories.forEach(category => {
+    category["products"] = currentProducts[category.name] || null;
+  });
 
-  // },[pantry])
-  
-  if (!pantry) return null;
   const { description, title } = pantry;
   function addProducts() {
     setIsAddingProducts(true);
