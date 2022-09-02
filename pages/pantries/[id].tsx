@@ -112,7 +112,7 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
-  const categoriesWithProduct = categories.map(category => {
+  const categoriesWithProducts = categories.map(category => {
     category.products = currentProducts[category.name] || null;
     return category;
   });
@@ -125,7 +125,7 @@ export default function Pantry() {
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
-  
+
   return (
     <div>
       <div className="px-4 sm:px-6 lg:px-8">
@@ -170,7 +170,7 @@ export default function Pantry() {
                     </tr>
                   </thead>
                   <tbody className="bg-white">
-                    {categoriesWithProduct.map((category, productIdx) => (
+                    {categoriesWithProducts.map((category, productIdx) => (
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
