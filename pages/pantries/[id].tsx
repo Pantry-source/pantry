@@ -1,6 +1,6 @@
-import { useEffect, useState, Fragment } from 'react'
-import { useRouter } from 'next/router'
-import { supabase } from '../../api'
+import { useEffect, useState, Fragment } from 'react';
+import { useRouter } from 'next/router';
+import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
@@ -19,8 +19,7 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    console.log(e.target.name);
-    setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }))
+    setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }));
   }
   const router = useRouter();
   const { id } = router.query;
@@ -36,7 +35,6 @@ export default function Pantry() {
       .single();
     const { error, data } = response;
     try {
-
       if (error) throw new Error("no pantry data");
       setPantry(data);
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
@@ -44,7 +42,7 @@ export default function Pantry() {
     } catch (error) {
       setIsPantryLoading(true);
     }
-    return response
+    return response;
   }
 
   async function fetchCategories() {
@@ -53,7 +51,7 @@ export default function Pantry() {
       .select(`*`);
     const { error, data } = response;
     try {
-      if (error) throw new Error("no categories data")
+      if (error) throw new Error("no categories data");
       setCategories(data);
       setCategoriesMap(data?.reduce((previous, category) => {
         return {
@@ -74,7 +72,7 @@ export default function Pantry() {
       .select(`*`);
     const { error, data } = response;
     try {
-      if (error) throw new Error("no quantity units data")
+      if (error) throw new Error("no quantity units data");
       setUnits(data);
       setUnitsMap(data?.reduce((previous, category) => {
         return {
@@ -91,11 +89,9 @@ export default function Pantry() {
 
   async function saveCurrentProduct(e) {
     e.preventDefault();
-    console.log(currentProduct);
     const { data } = await supabase
       .from('products')
       .insert([currentProduct]);
-    console.log(data);
   }
 
   useEffect(() => {
@@ -108,19 +104,17 @@ export default function Pantry() {
     return <h1>loading...</h1>;
   }
 
-  const currentProducts = pantry.products.reduce((productsByCategory, product) => {
+  const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
     let categoryName = categoriesMap[product.category_id]
-    productsByCategory[categoryName]
-      ? productsByCategory[categoryName].push(product)
-      : productsByCategory[categoryName] = [product];
-    return productsByCategory;
+    categoryAndProducts[categoryName]
+      ? categoryAndProducts[categoryName].push(product)
+      : categoryAndProducts[categoryName] = [product];
+    return categoryAndProducts;
   }, {});
 
-  /* below, forEach is mutating categories without using setCategories()
-  do we still want to use setCategories or does this work? 
-*/
-  categories.forEach(category => {
-    category["products"] = currentProducts[category.name] || null;
+  const categoriesWithProduct = categories.map(category => {
+    category.products = currentProducts[category.name] || null;
+    return category;
   });
 
   const { description, title } = pantry;
@@ -131,6 +125,7 @@ export default function Pantry() {
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
+  
   return (
     <div>
       <div className="px-4 sm:px-6 lg:px-8">
@@ -150,7 +145,6 @@ export default function Pantry() {
         </div>
       </div>
       <div className="px-4 sm:px-6 lg:px-8">
-
         <div className="mt-8 flex flex-col">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -176,29 +170,25 @@ export default function Pantry() {
                     </tr>
                   </thead>
                   <tbody className="bg-white">
-                    {categories.map((category, productIdx) => (
+                    {categoriesWithProduct.map((category, productIdx) => (
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
                           <th
                             colSpan={5}
                             scope="colgroup"
-                            className="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6"
-                          >
+                            className="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6">
                             {category.name}
                           </th>
-
                         </tr>
                         {category.products.map((item) => (
                           <tr
                             key={item.name}
-                            className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}
-                          >
+                            className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                               {item.name}
                               <div className="mt-0.5 text-gray-500">
                                 {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
-                                {console.log(unitsMap)}
                               </div>
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
