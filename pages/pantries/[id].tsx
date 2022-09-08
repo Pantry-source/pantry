@@ -5,10 +5,10 @@ import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [categoriesMap, setCategoriesMap] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [pantry, setPantry] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [categoriesMap, setCategoriesMap] = useState(null);
+  const [units, setUnits] = useState(null);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
@@ -27,10 +27,7 @@ export default function Pantry() {
   async function fetchPantry() {
     const response = await supabase
       .from('pantries')
-      .select(`
-    *,
-    products(*)
-    `)
+      .select(`*, products(*)`)
       .filter('id', 'eq', id)
       .single();
     const { error, data } = response;
