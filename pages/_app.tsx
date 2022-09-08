@@ -43,7 +43,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <span className="mr-6 cursor-pointer">Profile</span>
         </Link>
       </nav>
-      <div className="py-8 px-16">
+      <div className="py-8 px-10">
         <Component {...pageProps} />
       </div>
     </div>

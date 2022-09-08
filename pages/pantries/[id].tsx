@@ -125,13 +125,13 @@ export default function Pantry() {
 
   return (
     <div>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:items-center">
-          <div className="sm:flex-auto">
+      <div>
+        <div className="flex items-top mb-6">
+          <div className="flex-auto">
             <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
             <p className="mt-2 text-sm text-gray-700">{description}</p>
           </div>
-          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <div className="mt-4 mt-0 ml-16 flex-none">
             <button
               type="button"
               onClick={addProducts}
