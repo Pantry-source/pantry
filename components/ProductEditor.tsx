@@ -1,4 +1,7 @@
-export default function ProductEditor({ categories, units, onProductChange, product }) {
+import AlertFormError from './AlertFormError';
+
+
+export default function ProductEditor({ categories, units, onProductChange, product, errorMessage }) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = categories[0].id;
@@ -130,6 +133,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
           />
         </div>
       </div>
+      {/* <AlertFormError message={errorMessage} /> */}
     </div>
   );
 };
