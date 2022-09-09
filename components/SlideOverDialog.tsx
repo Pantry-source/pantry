@@ -5,7 +5,7 @@ import { XIcon } from '@heroicons/react/outline'
 interface SlideOverProps {
   title: string,
   subtitle?: string,
-  onClose: () => void,
+  onClose: () => void,x
   onSubmit: () => void,
   open: boolean,
   children: Element

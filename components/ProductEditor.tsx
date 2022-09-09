@@ -1,5 +1,4 @@
-import AlertFormError from './AlertFormError';
-
+import {AlertFormError, AlertFormList}  from "./AlertComponents";
 
 export default function ProductEditor({ categories, units, onProductChange, product, errorMessage }) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
@@ -133,7 +132,8 @@ export default function ProductEditor({ categories, units, onProductChange, prod
           />
         </div>
       </div>
-      {/* <AlertFormError message={errorMessage} /> */}
+      <AlertFormError/>
+      <AlertFormList/> 
     </div>
   );
 };

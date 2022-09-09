@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { supabase } from '../../api'
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
+import AlertFormError from '../../components/AlertComponents';
 
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
@@ -153,7 +154,7 @@ export default function Pantry() {
             categories={categories} 
             units={units}
             onProductChange={onProductChange} />
-            message={addProductError}
+            {/* message={addProductError} */}
       </SlideOver> 
     </div>
   )
