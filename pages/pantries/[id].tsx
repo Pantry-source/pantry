@@ -5,10 +5,10 @@ import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [categoriesMap, setCategoriesMap] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [pantry, setPantry] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [categoriesMap, setCategoriesMap] = useState(null);
+  const [units, setUnits] = useState(null);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
@@ -27,10 +27,7 @@ export default function Pantry() {
   async function fetchPantry() {
     const response = await supabase
       .from('pantries')
-      .select(`
-    *,
-    products(*)
-    `)
+      .select(`*, products(*)`)
       .filter('id', 'eq', id)
       .single();
     const { error, data } = response;
@@ -128,13 +125,13 @@ export default function Pantry() {
 
   return (
     <div>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:items-center">
-          <div className="sm:flex-auto">
+      <div>
+        <div className="flex items-top mb-6">
+          <div className="flex-auto">
             <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
             <p className="mt-2 text-sm text-gray-700">{description}</p>
           </div>
-          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <div className="mt-4 mt-0 ml-16 flex-none">
             <button
               type="button"
               onClick={addProducts}
