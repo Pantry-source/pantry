@@ -84,6 +84,18 @@ export default function Pantry() {
     return response;
   }
 
+  async function updateProduct(product) {
+    setIsAddingProducts(true);
+    const { data, error } = await supabase
+      .from('products')
+      .update({ name: product.name })
+      .match({ name: product.name })
+    console.log('product', product)
+    console.log('data',data)
+    console.log('error',error)
+    setCurrentProduct(data)  
+  }
+
   async function saveCurrentProduct(e) {
     e.preventDefault();
     const { data } = await supabase
@@ -192,9 +204,13 @@ export default function Pantry() {
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                              <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                Edit<span className="sr-only">, {item.name}</span>
-                              </a>
+                              <button
+                                type="button"
+                                onClick={() => updateProduct(item)}
+                                className="text-indigo-600 hover:text-indigo-900">
+                                Edit<span className="sr-only">,{item.name}</span>
+                                {/* {console.log('current product', currentProduct)} */}
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -207,6 +223,7 @@ export default function Pantry() {
           </div>
         </div>
       </div>
+      {console.log('current product>>>>>>',currentProduct)}
       <SlideOver
         open={isAddingProducts}
         onClose={() => setIsAddingProducts(false)}
