@@ -35,6 +35,7 @@ export default function Pantry() {
       if (error) throw new Error("no pantry data");
       setPantry(data);
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
+      console.log('current product', currentProduct)
       setIsPantryLoading(false);
     } catch (error) {
       setIsPantryLoading(true);
@@ -96,16 +97,12 @@ export default function Pantry() {
 
   async function updateProduct(e) {
     e.preventDefault();
-    console.log('in updateProduct')
     const { data, error } = await supabase
       .from('products')
       .update({ name: currentProduct.name }) // updated product
-      // .match({ name: 'blueberries' })
       .eq('id', currentProduct.id) // existing product
-      console.log('data in updateProduct', data)
-      console.log('error in updateProduct', error)
-    // .single()
-    // setCurrentProduct(data)
+    console.log('data in updateProduct', data)
+    console.log('error in updateProduct', error)
   }
 
   async function saveCurrentProduct(e) {
@@ -113,9 +110,10 @@ export default function Pantry() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-      console.log('data in saveCurrentProduct', data)
-      console.log('error in saveCurrentProduct', error)
+    console.log('data in saveCurrentProduct', data)
+    console.log('error in saveCurrentProduct', error)
   }
+
 
   useEffect(() => {
     fetchPantry();
@@ -142,7 +140,7 @@ export default function Pantry() {
 
   const { description, title } = pantry;
   function addProducts() {
-    setCurrentProduct({})
+    setCurrentProduct(() => ({'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
 
@@ -224,7 +222,6 @@ export default function Pantry() {
                                 onClick={() => selectProduct(item)}
                                 className="text-indigo-600 hover:text-indigo-900">
                                 Edit<span className="sr-only">,{item.name}</span>
-                                {/* {console.log('current product', currentProduct)} */}
                               </button>
                             </td>
                           </tr>
@@ -239,36 +236,6 @@ export default function Pantry() {
         </div>
       </div>
       {console.log('current product>>>>>>', currentProduct.name)}
-      {/* {currentProduct.name
-        ?
-        <SlideOver
-          isInDatabase={currentProduct.name}
-          open={isAddingProducts}
-          onClose={() => setIsAddingProducts(false)}
-          onSubmit={updateProduct}
-          title="New product"
-          subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor
-            product={currentProduct}
-            categories={categories}
-            units={units}
-            onProductChange={onProductChange} />
-        </SlideOver>
-        :
-        <SlideOver
-          isInDatabase={currentProduct.name}
-          open={isAddingProducts}
-          onClose={() => setIsAddingProducts(false)}
-          onSubmit={saveCurrentProduct}
-          title="New product"
-          subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor
-            product={currentProduct}
-            categories={categories}
-            units={units}
-            onProductChange={onProductChange} />
-        </SlideOver>
-      } */}
       {console.log(currentProduct.id ? updateProduct : saveCurrentProduct)}
       <SlideOver
         isInDatabase={currentProduct.id}
