@@ -91,6 +91,15 @@ export default function Pantry() {
       .insert([currentProduct]);
   }
 
+  async function deleteProduct(item){
+    const { data, error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', item.id)
+      .single();
+      console.log(`${item.name} has been deleted`);
+  }
+
   useEffect(() => {
     fetchPantry();
     fetchCategories();
@@ -192,9 +201,16 @@ export default function Pantry() {
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                              <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                              <button href="#" className="text-indigo-600 hover:text-indigo-900">
                                 Edit<span className="sr-only">, {item.name}</span>
-                              </a>
+                              </button>
+                              <span>  </span>
+                              <button
+                                type="button"
+                                onClick={() => deleteProduct(item)}
+                                className="text-red-600 hover:text-red-900">
+                                Remove<span className="sr-only">,{item.name}</span>
+                              </button>
                             </td>
                           </tr>
                         ))}
