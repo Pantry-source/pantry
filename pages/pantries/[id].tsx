@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
+import Filter from '../../components/Filter';
 
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
@@ -146,6 +147,7 @@ export default function Pantry() {
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                  <Filter />
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
