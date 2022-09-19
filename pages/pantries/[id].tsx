@@ -89,13 +89,14 @@ export default function Pantry() {
     const { data } = await supabase
       .from('products')
       .insert([currentProduct]);
+      setIsAddingProducts(false);
   }
 
   useEffect(() => {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id])
+  }, [id, isAddingProducts])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
