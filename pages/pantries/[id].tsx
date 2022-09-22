@@ -89,6 +89,7 @@ export default function Pantry() {
     const { data } = await supabase
       .from('products')
       .insert([currentProduct]);
+      setIsAddingProducts(false);
   }
 
   async function deleteProduct(item){
@@ -104,7 +105,7 @@ export default function Pantry() {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id])
+  }, [id, isAddingProducts])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
