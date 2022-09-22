@@ -110,6 +110,7 @@ export default function Pantry() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
+      setIsAddingProducts(false);
     console.log('data in saveCurrentProduct', data)
     console.log('error in saveCurrentProduct', error)
   }
@@ -119,7 +120,7 @@ export default function Pantry() {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id])
+  }, [id, isAddingProducts])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
