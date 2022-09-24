@@ -132,7 +132,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
           />
         </div>
       </div>
-      <AlertFormError/>
+      {/* <AlertFormError/> */}
       <AlertFormList/> 
     </div>
   );
