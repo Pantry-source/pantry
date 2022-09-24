@@ -119,8 +119,8 @@ export default function Pantry() {
       fetchPantry();
   }
 
-  async function saveCurrentProduct(e) {
-    console.log('in saveCurrentProduct')
+  async function createProduct(e) {
+    console.log('in createProduct')
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
@@ -255,7 +255,7 @@ export default function Pantry() {
         isExistingProduct={currentProduct.id}
         open={isAddingProducts}
         onClose={() => setIsAddingProducts(false)}
-        onSubmit={currentProduct.id ? updateProduct : saveCurrentProduct}
+        onSubmit={currentProduct.id ? updateProduct : createProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
