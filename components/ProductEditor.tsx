@@ -132,8 +132,8 @@ export default function ProductEditor({ categories, units, onProductChange, prod
           />
         </div>
       </div>
-      <AlertFormError/>
-      {/* <AlertFormList/>  */}
+      {/* <AlertFormError/> */}
+      <AlertFormList/> 
     </div>
   );
 };
