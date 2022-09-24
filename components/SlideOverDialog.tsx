@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-// import { XIcon } from '@heroicons/react/outline'
 
 interface SlideOverProps {
   title: string,
@@ -46,7 +45,6 @@ export default function SlideOver({children, open = false, onClose, onSubmit, ti
                               className="text-gray-400 hover:text-gray-500"
                               onClick={onClose}>
                               <span className="sr-only">Close panel</span>
-                              {/* <XIcon className="h-6 w-6" aria-hidden="true" /> */}
                             </button>
                           </div>
                         </div>
