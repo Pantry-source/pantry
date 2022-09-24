@@ -19,6 +19,7 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
+    console.log('in onProductChange',currentProduct)
     setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }));
   }
   const router = useRouter();
@@ -34,8 +35,9 @@ export default function Pantry() {
     try {
       if (error) throw new Error("no pantry data");
       setPantry(data);
+      console.log('in fectchPantry BEFORE', currentProduct)
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
-      console.log('current product', currentProduct)
+      console.log('in fetchPantry AFTER', currentProduct)
       setIsPantryLoading(false);
     } catch (error) {
       setIsPantryLoading(true);
@@ -86,33 +88,45 @@ export default function Pantry() {
   }
 
   async function selectProduct(product) {
+    console.log('################BUTON CLICKED################')
+    console.log('in selectProduct')
     setIsAddingProducts(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('name', product.name)
       .single();
-    setCurrentProduct(data);
+      console.log('in selectProduct BEFORE', currentProduct)
+      setCurrentProduct(data);
+      console.log('in selectProduct AFTER', currentProduct)
   }
 
   async function updateProduct(e) {
+    console.log('in updateProduct')
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
-      .update({ name: currentProduct.name }) // updated product
+      .update({ 
+        name: currentProduct.name,
+        quantity_amount: currentProduct.quantity_amount,
+        is_essential: currentProduct.is_essential,
+        quantity_unit: currentProduct.quantity_unit,
+        vendor: currentProduct.vendor,
+        category_id: currentProduct.category_id
+       }) // updated product
       .eq('id', currentProduct.id) // existing product
-    console.log('data in updateProduct', data)
-    console.log('error in updateProduct', error)
+      setIsAddingProducts(false);
+      fetchPantry();
   }
 
   async function saveCurrentProduct(e) {
+    console.log('in saveCurrentProduct')
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
       setIsAddingProducts(false);
-    console.log('data in saveCurrentProduct', data)
-    console.log('error in saveCurrentProduct', error)
+      fetchPantry();
   }
 
 
@@ -120,7 +134,7 @@ export default function Pantry() {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id, isAddingProducts])
+  }, [id])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
@@ -141,6 +155,7 @@ export default function Pantry() {
 
   const { description, title } = pantry;
   function addProducts() {
+    console.log('in addProducts', currentProduct)
     setCurrentProduct(() => ({'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
@@ -236,10 +251,8 @@ export default function Pantry() {
           </div>
         </div>
       </div>
-      {console.log('current product>>>>>>', currentProduct.name)}
-      {console.log(currentProduct.id ? updateProduct : saveCurrentProduct)}
       <SlideOver
-        isInDatabase={currentProduct.id}
+        isExistingProduct={currentProduct.id}
         open={isAddingProducts}
         onClose={() => setIsAddingProducts(false)}
         onSubmit={currentProduct.id ? updateProduct : saveCurrentProduct}

@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 
 interface SlideOverProps {
-  isInDatabase: boolean,
+  isExistingProduct: boolean,
   title: string,
   subtitle?: string,
   onClose: () => void,
@@ -12,7 +12,7 @@ interface SlideOverProps {
   children: Element
 }
 
-export default function SlideOver({ children, open = false, onClose, onSubmit, title, subtitle = '', isInDatabase }: SlideOverProps) {
+export default function SlideOver({ children, open = false, onClose, onSubmit, title, subtitle = '', isExistingProduct }: SlideOverProps) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -70,7 +70,7 @@ export default function SlideOver({ children, open = false, onClose, onSubmit, t
                           type="submit"
                           className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                           onClick={onSubmit}>
-                          {isInDatabase ? "update" : "save"}
+                          {isExistingProduct ? "Update" : "save"}
                         </button>
                       </div>
                     </div>
