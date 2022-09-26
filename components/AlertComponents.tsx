@@ -1,22 +1,3 @@
-//can't find tailwind module
-
-// export function AlertFormError() {
-//   return (
-//     <div className="rounded-md bg-yellow-50 p-4">
-//       <div className="flex">
-//         <div className="ml-3">
-//           <h3 className="text-sm font-medium text-yellow-800">Attention needed</h3>
-//           <div className="mt-2 text-sm text-yellow-700">
-//             <p>
-//             null value in column "name" of relation "products" violates not-null constraint
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
 /* This example requires Tailwind CSS v2.0+ */
 
 export function AlertFormList() {
