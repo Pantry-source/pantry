@@ -97,10 +97,10 @@ export default function Filter() {
                             <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-sm text-gray-400">
                               <span className="font-medium text-gray-900">{section.name}</span>
                               <span className="ml-6 flex items-center">
-                                <ChevronDownIcon
+                                {/* <ChevronDownIcon
                                   className={classNames(open ? '-rotate-180' : 'rotate-0', 'h-5 w-5 transform')}
                                   aria-hidden="true"
-                                />
+                                /> */}
                               </span>
                             </Disclosure.Button>
                           </h3>
