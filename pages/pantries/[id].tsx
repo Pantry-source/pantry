@@ -24,6 +24,7 @@ export default function Pantry() {
     setCurrentProduct(() => ({ ...currentProduct, 
       [e.target.name]: value  === ''  ? null : value }));
   }
+  
   const router = useRouter();
   const { id } = router.query;
 

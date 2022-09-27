@@ -1,8 +1,5 @@
-import { useState, useRef } from "react";
 
 export default function ProductEditor({ categories, units, onProductChange, product }) {
-  const [selected, setSelected] = useState(null)
-  const ref = useRef(null)
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
