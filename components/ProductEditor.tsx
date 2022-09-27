@@ -1,15 +1,12 @@
+import { useState, useRef } from "react";
+
 export default function ProductEditor({ categories, units, onProductChange, product }) {
+  const [selected, setSelected] = useState(null)
+  const ref = useRef(null)
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
-  //below, defaultCategory is only used initially to set the category_id(this sets the number 1 not "1" and value on line 112 is still null)
-  //now users need to explicitly select their category. 
-  //defaultCategory = categories[0].id
-  console.log('categories[0]', categories[0].id)
   const { name = '', quantity_amount = '', quantity_unit = defaultUnitId, category_id = defaultCategory, vendor = '' } = product;
-  console.log("defaultCategory", defaultCategory)
-  console.log('defaultUnitId', defaultUnitId)
-  console.log('cat_id', category_id)
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
 
@@ -112,7 +109,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             value={category_id}
             onChange={onProductChange}
             className="w-full pl-3 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-            <option value="null">Select Category</option>
+            <option value=''>Select Category</option>
             {categoryOptions}
           </select>
         </div>
