@@ -19,9 +19,12 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }));
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      [e.target.name]: value === '' ? null : value
+    }));
   }
-  
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -92,24 +95,24 @@ export default function Pantry() {
       .select('*')
       .eq('name', product.name)
       .single();
-      setCurrentProduct(data);
+    setCurrentProduct(data);
   }
 
   async function updateProduct(e) {
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
-      .update({ 
+      .update({
         name: currentProduct.name,
         quantity_amount: currentProduct.quantity_amount,
         is_essential: currentProduct.is_essential,
         quantity_unit: currentProduct.quantity_unit,
         vendor: currentProduct.vendor,
         category_id: currentProduct.category_id
-       }) 
-      .eq('id', currentProduct.id) 
-      setIsAddingProducts(false);
-      fetchPantry();
+      })
+      .eq('id', currentProduct.id)
+    setIsAddingProducts(false);
+    fetchPantry();
   }
 
   async function createProduct(e) {
@@ -118,8 +121,8 @@ export default function Pantry() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-      setIsAddingProducts(false);
-      fetchPantry();
+    setIsAddingProducts(false);
+    fetchPantry();
   }
 
   useEffect(() => {
@@ -148,7 +151,7 @@ export default function Pantry() {
   const { description, title } = pantry;
   function addProducts() {
     console.log('in addProducts', currentProduct)
-    setCurrentProduct(() => ({'pantry_id': pantry.id }));
+    setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
 
