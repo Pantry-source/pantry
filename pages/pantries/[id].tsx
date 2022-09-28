@@ -19,9 +19,9 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    console.log('in onProductChange',currentProduct)
     setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }));
   }
+  
   const router = useRouter();
   const { id } = router.query;
 
@@ -35,9 +35,7 @@ export default function Pantry() {
     try {
       if (error) throw new Error("no pantry data");
       setPantry(data);
-      console.log('in fectchPantry BEFORE', currentProduct)
       setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
-      console.log('in fetchPantry AFTER', currentProduct)
       setIsPantryLoading(false);
     } catch (error) {
       setIsPantryLoading(true);
@@ -88,21 +86,16 @@ export default function Pantry() {
   }
 
   async function selectProduct(product) {
-    console.log('################BUTON CLICKED################')
-    console.log('in selectProduct')
     setIsAddingProducts(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('name', product.name)
       .single();
-      console.log('in selectProduct BEFORE', currentProduct)
       setCurrentProduct(data);
-      console.log('in selectProduct AFTER', currentProduct)
   }
 
   async function updateProduct(e) {
-    console.log('in updateProduct')
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
@@ -113,8 +106,8 @@ export default function Pantry() {
         quantity_unit: currentProduct.quantity_unit,
         vendor: currentProduct.vendor,
         category_id: currentProduct.category_id
-       }) // updated product
-      .eq('id', currentProduct.id) // existing product
+       }) 
+      .eq('id', currentProduct.id) 
       setIsAddingProducts(false);
       fetchPantry();
   }
@@ -128,7 +121,6 @@ export default function Pantry() {
       setIsAddingProducts(false);
       fetchPantry();
   }
-
 
   useEffect(() => {
     fetchPantry();
