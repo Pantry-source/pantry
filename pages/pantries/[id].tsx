@@ -12,11 +12,11 @@ export default function Pantry() {
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [addProductError, setAddProductError] = useState(null);
-  const [isAddingProducts, setIsAddingProducts] = useState(false)
+  const [isAddingProducts, setIsAddingProducts] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(undefined);
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    console.log(e.target.name);
     setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }))
   }
   const router = useRouter()
@@ -61,11 +61,10 @@ export default function Pantry() {
 
   async function saveCurrentProduct(e) {
     e.preventDefault();
-    console.log(currentProduct);
     const { error, data } = await supabase
       .from('products')
       .insert([currentProduct]);
-    console.log(error?.message);
+      if(error) setErrorMessage(error.message)
   }
 
   useEffect(() => {
@@ -152,7 +151,9 @@ export default function Pantry() {
             product={currentProduct}
             categories={categories} 
             units={units}
-            onProductChange={onProductChange} />
+            onProductChange={onProductChange} 
+            errorMessage={errorMessage}
+            />
       </SlideOver> 
     </div>
   )
