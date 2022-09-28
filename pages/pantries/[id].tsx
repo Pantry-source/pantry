@@ -15,12 +15,16 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+  const [selected, setSelected] = useState(null)
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    setCurrentProduct(() => ({ ...currentProduct, [e.target.name]: value }));
+    console.log('value selected', e.target.name, value)
+    setCurrentProduct(() => ({ ...currentProduct, 
+      [e.target.name]: value  === ''  ? null : value }));
   }
+  
   const router = useRouter();
   const { id } = router.query;
 
