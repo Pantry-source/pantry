@@ -89,13 +89,13 @@ export default function Pantry() {
   }
 
   async function selectProduct(product) {
-    setIsAddingProducts(true);
     const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('name', product.name)
-      .single();
+    .from('products')
+    .select('*')
+    .eq('name', product.name)
+    .single();
     setCurrentProduct(data);
+    setIsAddingProducts(true);
   }
 
   async function updateProduct(e) {
