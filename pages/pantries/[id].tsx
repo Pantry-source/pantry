@@ -11,13 +11,12 @@ export default function Pantry() {
   const [units, setUnits] = useState(null);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
-  const [addProductError, setAddProductError] = useState(null);
   const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(undefined);;
+  const [errorMessages, setErrorMessages] = useState([]);;
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [selected, setSelected] = useState(null)
+
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -95,14 +94,14 @@ export default function Pantry() {
     const { error, data } = await supabase
       .from('products')
       .insert([currentProduct]);
-      setIsAddingProducts(false);
+      setErrorMessages(errorMessages => [...errorMessages, error?.message]);
   }
 
   useEffect(() => {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id, isAddingProducts])
+  }, [id])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
@@ -216,7 +215,7 @@ export default function Pantry() {
       </div>
       <SlideOver
         open={isAddingProducts}
-        onClose={() => setIsAddingProducts(false)}
+        onClose={() => setIsAddingProducts(!errorMessages && false)}
         onSubmit={saveCurrentProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
@@ -225,7 +224,7 @@ export default function Pantry() {
             categories={categories} 
             units={units}
             onProductChange={onProductChange} 
-            errorMessage={errorMessage}
+            errorMessages={errorMessages}
             />
       </SlideOver> 
     </div>

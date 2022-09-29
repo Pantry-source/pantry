@@ -1,6 +1,6 @@
 import { AlertFormList }  from "./AlertComponents";
 
-export default function ProductEditor({ categories, units, onProductChange, product, errorMessage }) {
+export default function ProductEditor({ categories, units, onProductChange, product, errorMessages }) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
@@ -132,7 +132,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
         </div>
       </div>
-      {errorMessage && <AlertFormList errorMessage={errorMessage}/> }
+      {errorMessages[0] && <AlertFormList errorMessages={errorMessages}/> }
     </div>
   );
 };
