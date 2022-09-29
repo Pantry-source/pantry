@@ -22,10 +22,12 @@ export default function Pantry() {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
     console.log('value selected', e.target.name, value)
-    setCurrentProduct(() => ({ ...currentProduct, 
-      [e.target.name]: value  === ''  ? null : value }));
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      [e.target.name]: value === '' ? null : value
+    }));
   }
-  
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -94,7 +96,7 @@ export default function Pantry() {
     const { error, data } = await supabase
       .from('products')
       .insert([currentProduct]);
-      setErrorMessages(errorMessages => [...errorMessages, error?.message]);
+    setErrorMessages(errorMessages => [...errorMessages, error]);
   }
 
   useEffect(() => {
@@ -219,14 +221,14 @@ export default function Pantry() {
         onSubmit={saveCurrentProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
-          <ProductEditor 
-            product={currentProduct}
-            categories={categories} 
-            units={units}
-            onProductChange={onProductChange} 
-            errorMessages={errorMessages}
-            />
-      </SlideOver> 
+        <ProductEditor
+          product={currentProduct}
+          categories={categories}
+          units={units}
+          onProductChange={onProductChange}
+          errorMessages={errorMessages}
+        />
+      </SlideOver>
     </div>
   )
 }
