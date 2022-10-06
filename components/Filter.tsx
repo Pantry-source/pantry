@@ -12,7 +12,7 @@
   }
   ```
 */
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react'
 // import { XMarkIcon } from '@heroicons/react/24/outline'
 // import { ChevronDownIcon } from '@heroicons/react/20/solid'
@@ -22,54 +22,74 @@ import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react
 //   { name: 'Best Rating', href: '#', current: false },
 //   { name: 'Newest', href: '#', current: false },
 // ]
-const activeFilters = [{ value: 'objects', label: 'Objects' }]
+
+
+// const activeFilterSection = [
+//   { value: 'objects', label: 'Objects' },
+//   { value: 'objects', label: 'Objects' }
+// ]
+
+const filterSection =
+{
+  id: 'filters',
+  name: 'Filters',
+  options: [
+    { value: 'isEssential', label: 'Essential', checked: false },
+    { value: 'isOutOfStock', label: 'Out Of Stock', checked: false },
+    { value: 'isExpiring', label: 'Expiring Soon', checked: false },
+  ],
+}
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Filter( { categories } ) {
-  const [open, setOpen] = useState(false)
+export default function Filter({ validCategories }) {
+  const [open, setOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [filters, setFilters] = useState(filterSection.options);
+  const [categories, setCategories] = useState([]);
 
-  console.log('categories before massaging data',categories)
+  function onProductChange(e) {
+    console.log(e.target)
+    let field = e.target.id.split('-')[1]; // category or filter
+    let value = e.target.value;
+    let name = e.target.name;
+
+    let validFilter = { value: e.target.value, label: e.target.name };
+
+    setActiveFilters([...activeFilters, validFilter])
+    if (e.target.filed === 'category') {
+      setCategories((categories) =>
+        categories.map((option) =>
+          option.value === value
+            ? { ...option, checked: e.target.checked }
+            : option
+        )
+      );
+    }
+  }
+
+  const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
+    convertToCategoryOptionsFormat.push({
+      value: category.name.toLowerCase().split(' ').join('-'),
+      label: category.name,
+      checked: false
+    });
+    return convertToCategoryOptionsFormat;
+  }, [])
+
+  const categorySection =
+  {
+    id: 'category',
+    name: 'Category',
+    options: categoryOptions
+  }
 
 
-  const validCategories = categories.reduce((checkBoxCategories, category) => {
-    checkBoxCategories.push({value: category.name, label: category.name, checked: false});
-    return checkBoxCategories;
-  },[])
-  console.log('after massaging data',validCategories)
-
-  const filters = [
-    {
-      id: 'category',
-      name: 'Category',
-      options: validCategories,
-      //  [
-      //   { value: 'new-arrivals', label: 'All New Arrivals', checked: false },
-      //   { value: 'tees', label: 'Tees', checked: false },
-      //   { value: 'objects', label: 'Objects', checked: true },
-      // ],
-    },
-    {
-      id: 'filters',
-      name: 'Filters',
-      options: [
-        { value: 'isEssentials', label: 'Essential', checked: false },
-        { value: 'isOutofstock', label: 'Out Of Stock', checked: false },
-        { value: 'isExpiring', label: 'Expiring Soon', checked: false },
-      ],
-    },
-    // {
-    //   id: 'sizes',
-    //   name: 'Sizes',
-    //   options: [
-    //     { value: 's', label: 'S', checked: false },
-    //     { value: 'm', label: 'M', checked: false },
-    //     { value: 'l', label: 'L', checked: false },
-    //   ],
-    // },
-  ]
+  useEffect(() => {
+    setCategories(categoryOptions);
+  }, []);
 
   return (
     <div className="bg-white">
@@ -104,16 +124,15 @@ export default function Filter( { categories } ) {
                   <button
                     type="button"
                     className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                    onClick={() => setOpen(false)}
-                  >
+                    onClick={() => setOpen(false)}>
                     <span className="sr-only">Close menu</span>
                     {/* <XMarkIcon className="h-6 w-6" aria-hidden="true" /> */}
                   </button>
                 </div>
 
-                {/* Filters */}
+                {/* Filters Mobile */}
                 <form className="mt-4">
-                  {filters.map((section) => (
+                  {[categorySection, filterSection].map((section) => (
                     <Disclosure as="div" key={section.name} className="border-t border-gray-200 px-4 py-6">
                       {({ open }) => (
                         <>
@@ -121,10 +140,10 @@ export default function Filter( { categories } ) {
                             <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-sm text-gray-400">
                               <span className="font-medium text-gray-900">{section.name}</span>
                               <span className="ml-6 flex items-center">
-                                <ChevronDownIcon
+                                {/* <ChevronDownIcon
                                   className={classNames(open ? '-rotate-180' : 'rotate-0', 'h-5 w-5 transform')}
                                   aria-hidden="true"
-                                />
+                                /> */}
                               </span>
                             </Disclosure.Button>
                           </h3>
@@ -138,12 +157,10 @@ export default function Filter( { categories } ) {
                                     defaultValue={option.value}
                                     type="checkbox"
                                     defaultChecked={option.checked}
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                  />
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                                   <label
                                     htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                                    className="ml-3 text-sm text-gray-500"
-                                  >
+                                    className="ml-3 text-sm text-gray-500">
                                     {option.label}
                                   </label>
                                 </div>
@@ -161,7 +178,7 @@ export default function Filter( { categories } ) {
         </Dialog>
       </Transition.Root>
 
-      {/* Filters */}
+      {/* Filters Desktop */}
       <section aria-labelledby="filter-heading">
         <h2 id="filter-heading" className="sr-only">
           Filters
@@ -215,16 +232,16 @@ export default function Filter( { categories } ) {
             <button
               type="button"
               className="inline-block text-sm font-medium text-gray-700 hover:text-gray-900 sm:hidden"
-              onClick={() => setOpen(true)}
-            >
+              onClick={() => setOpen(true)}>
               Filters
             </button>
 
             <div className="hidden sm:block">
               <div className="flow-root">
                 <Popover.Group className="-mx-4 flex items-center divide-x divide-gray-200">
-                  {filters.map((section, sectionIdx) => (
+                  {[categorySection, filterSection].map((section, sectionIdx) => (
                     <Popover key={section.name} className="relative inline-block px-4 text-left">
+                      {/* {console.log('section', section)} */}
                       <Popover.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                         <span>{section.name}</span>
                         {sectionIdx === 0 ? (
@@ -253,8 +270,10 @@ export default function Filter( { categories } ) {
                               <div key={option.value} className="flex items-center">
                                 <input
                                   id={`filter-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
+                                  // name={`${section.id}[]`}
+                                  name={option.label}
                                   defaultValue={option.value}
+                                  onChange={onProductChange}
                                   type="checkbox"
                                   defaultChecked={option.checked}
                                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -293,13 +312,11 @@ export default function Filter( { categories } ) {
                 {activeFilters.map((activeFilter) => (
                   <span
                     key={activeFilter.value}
-                    className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
-                  >
+                    className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900">
                     <span>{activeFilter.label}</span>
                     <button
                       type="button"
-                      className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
-                    >
+                      className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500">
                       <span className="sr-only">Remove filter for {activeFilter.label}</span>
                       <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
                         <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
