@@ -1,8 +1,9 @@
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
+import Checkbox from '../../components/Checkbox'
 
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
@@ -15,6 +16,11 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+
+  const checkbox = useRef()
+  const [checked, setChecked] = useState(false)
+  const [indeterminate, setIndeterminate] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState([])
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -124,9 +130,39 @@ export default function Pantry() {
     return category;
   });
 
+  console.log('categories with products', categoriesWithProducts)
+
   const { description, title } = pantry;
   function addProducts() {
     setIsAddingProducts(true);
+  }
+
+  // ################ checkbox logic ##################
+
+  const products = categoriesWithProducts.reduce((acc, category) => {
+    console.log('category.products',category.products)
+    if(category.products){
+      category.products.map((product) => {
+       console.log('acc',acc)
+       acc.push(product);
+      })
+    }
+    return acc
+  },[])
+
+  console.log('products', products)
+
+  // useLayoutEffect(() => {
+  //   const isIndeterminate = selectedProduct.length > 0 && selectedProduct.length < categoriesWithProducts.products.length
+  //   setChecked(selectedProduct.length === categoriesWithProducts.products.length)
+  //   setIndeterminate(isIndeterminate)
+  //   checkbox.current.indeterminate = isIndeterminate
+  // }, [selectedProduct])
+
+  function toggleAll() {
+    setSelectedProduct(checked || indeterminate ? [] : products)
+    setChecked(!checked && !indeterminate)
+    setIndeterminate(false)
   }
 
   function classNames(...classes) {
@@ -155,10 +191,32 @@ export default function Pantry() {
         <div className="mt-8 flex flex-col">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                {selectedProduct.length > 0 && (
+                  <div className="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
+                    <button
+                      type="button"
+                      className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
+                      Out Of Stock
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
+                      Delete all
+                    </button>
+                  </div>
+                )}
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
+                      <th scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8">
+                        <input
+                          type="checkbox"
+                          className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                          ref={checkbox}
+                          checked={checked}
+                          onChange={toggleAll} />
+                      </th>
                       <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                         Name
                       </th>
@@ -192,6 +250,24 @@ export default function Pantry() {
                           <tr
                             key={item.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
+                            <td className="relative w-12 px-6 sm:w-16 sm:px-8">
+                              {selectedProduct.includes(category) && (
+                                <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
+                              )}
+                              <input
+                                type="checkbox"
+                                className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                                value={category.email}
+                                checked={selectedProduct.includes(category)}
+                                onChange={(e) =>
+                                  setSelectedProduct(
+                                    e.target.checked
+                                      ? [...selectedProduct, category]
+                                      : selectedProduct.filter((p) => p !== category)
+                                  )
+                                }
+                              />
+                            </td>
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                               {item.name}
                               <div className="mt-0.5 text-gray-500">
@@ -206,12 +282,12 @@ export default function Pantry() {
                                 Edit<span className="sr-only">, {item.name}</span>
                               </button>
                               <span>  </span>
-                              <button
+                              {/* <button
                                 type="button"
                                 onClick={() => deleteProduct(item)}
                                 className="text-red-600 hover:text-red-900">
                                 Remove<span className="sr-only">,{item.name}</span>
-                              </button>
+                              </button> */}
                             </td>
                           </tr>
                         ))}
