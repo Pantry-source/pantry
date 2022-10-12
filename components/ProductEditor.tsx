@@ -84,6 +84,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
               onChange={onProductChange}
               value={quantity_unit}
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
+                <option value=''>Select Unit</option>
               {unitOptions}
             </select>
           </div>
