@@ -116,7 +116,6 @@ export default function Pantry() {
   }
 
   async function createProduct(e) {
-    console.log('in createProduct')
     e.preventDefault();
     const { data, error } = await supabase
       .from('products')
@@ -150,7 +149,6 @@ export default function Pantry() {
 
   const { description, title } = pantry;
   function addProducts() {
-    console.log('in addProducts', currentProduct)
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
