@@ -113,8 +113,13 @@ export default function Pantry() {
         category_id: currentProduct.category_id
       })
       .eq('id', currentProduct.id)
-    setIsAddingProducts(false);
-    fetchPantry();
+      if(error){
+        setErrorMessages(errorMessages => [...errorMessages, error]);
+      } else {
+        setErrorMessages([]);
+        setIsAddingProducts(false);
+        fetchPantry();
+      }
   }
 
   async function createProduct(e) {
@@ -122,7 +127,12 @@ export default function Pantry() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-    setErrorMessages(errorMessages => [...errorMessages, error]);
+    if(error){
+      setErrorMessages(errorMessages => [...errorMessages, error]);
+    } else {
+      setIsAddingProducts(false);
+      fetchPantry();
+    }
   }
 
   useEffect(() => {
