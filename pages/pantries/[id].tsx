@@ -139,14 +139,6 @@ export default function Pantry() {
       console.log(`${item.name} has been deleted`);
   }
 
-  async function deleteProduct(item){
-    const { data, error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', item.id)
-      .single();
-      console.log(`${item.name} has been deleted`);
-  }
 
   useEffect(() => {
     fetchPantry();
