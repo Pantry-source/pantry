@@ -59,9 +59,19 @@ export default function Filter({ validCategories }) {
     let validFilter = { value: e.target.value, label: e.target.name };
 
     setActiveFilters([...activeFilters, validFilter])
-    if (e.target.filed === 'category') {
+    if (field === 'category') {
+      console.log('filed', field)
       setCategories((categories) =>
         categories.map((option) =>
+          option.value === value
+            ? { ...option, checked: e.target.checked }
+            : option
+        )
+      );
+    }
+    if (field === 'filters') {
+      setFilters((filters) =>
+        filters.map((option) =>
           option.value === value
             ? { ...option, checked: e.target.checked }
             : option
@@ -185,7 +195,7 @@ export default function Filter({ validCategories }) {
         </h2>
 
         <div className="border-b border-gray-200 bg-white pb-4">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{paddingTop: ".625rem"}}>
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -233,7 +243,7 @@ export default function Filter({ validCategories }) {
               type="button"
               className="inline-block text-sm font-medium text-gray-700 hover:text-gray-900 sm:hidden"
               onClick={() => setOpen(true)}>
-              Filters
+              Filter
             </button>
 
             <div className="hidden sm:block">
@@ -241,14 +251,18 @@ export default function Filter({ validCategories }) {
                 <Popover.Group className="-mx-4 flex items-center divide-x divide-gray-200">
                   {[categorySection, filterSection].map((section, sectionIdx) => (
                     <Popover key={section.name} className="relative inline-block px-4 text-left">
-                      {/* {console.log('section', section)} */}
                       <Popover.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                         <span>{section.name}</span>
-                        {sectionIdx === 0 ? (
-                          <span className="ml-1.5 rounded bg-gray-200 py-0.5 px-1.5 text-xs font-semibold tabular-nums text-gray-700">
-                            1
-                          </span>
-                        ) : null}
+                        <span className="ml-1.5 rounded bg-gray-200 py-0.5 px-1.5 text-xs font-semibold tabular-nums text-gray-700">
+                          {console.log('section id', section.id)}
+                          {
+                            section.id === 'filters'
+                              ? filters.filter(option => option.checked).length
+                              : categories.filter(option => option.checked).length
+                          }
+                        </span>
+                        {/* {sectionIdx === 0 ? (
+                        ) : null} */}
                         {/* <ChevronDownIcon
                           className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                           aria-hidden="true"
@@ -262,8 +276,7 @@ export default function Filter({ validCategories }) {
                         enterTo="transform opacity-100 scale-100"
                         leave="transition ease-in duration-75"
                         leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
+                        leaveTo="transform opacity-0 scale-95">
                         <Popover.Panel className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white p-4 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <form className="space-y-4">
                             {section.options.map((option, optionIdx) => (
@@ -276,12 +289,10 @@ export default function Filter({ validCategories }) {
                                   onChange={onProductChange}
                                   type="checkbox"
                                   defaultChecked={option.checked}
-                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                />
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                                 <label
                                   htmlFor={`filter-${section.id}-${optionIdx}`}
-                                  className="ml-3 whitespace-nowrap pr-6 text-sm font-medium text-gray-900"
-                                >
+                                  className="ml-3 whitespace-nowrap pr-6 text-sm font-medium text-gray-900">
                                   {option.label}
                                 </label>
                               </div>
@@ -298,8 +309,8 @@ export default function Filter({ validCategories }) {
         </div>
 
         {/* Active filters */}
-        <div className="bg-gray-100">
-          <div className="mx-auto max-w-7xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
+        {activeFilters.length > 0 && <div className="bg-gray-100">
+          <div className="mx-auto max-w-1xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
             <h3 className="text-sm font-medium text-gray-500">
               Filters
               <span className="sr-only">, active</span>
@@ -327,7 +338,7 @@ export default function Filter({ validCategories }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
       </section>
     </div>
   )
