@@ -15,16 +15,16 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [selected, setSelected] = useState(null)
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    console.log('value selected', e.target.name, value)
-    setCurrentProduct(() => ({ ...currentProduct, 
-      [e.target.name]: value  === ''  ? null : value }));
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      [e.target.name]: value === '' ? null : value
+    }));
   }
-  
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -88,19 +88,47 @@ export default function Pantry() {
     return response;
   }
 
-  async function saveCurrentProduct(e) {
+  async function selectProduct(product) {
+    const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('name', product.name)
+    .single();
+    setCurrentProduct(data);
+    setIsAddingProducts(true);
+  }
+
+  async function updateProduct(e) {
     e.preventDefault();
-    const { data } = await supabase
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        name: currentProduct.name,
+        quantity_amount: currentProduct.quantity_amount,
+        is_essential: currentProduct.is_essential,
+        quantity_unit: currentProduct.quantity_unit,
+        vendor: currentProduct.vendor,
+        category_id: currentProduct.category_id
+      })
+      .eq('id', currentProduct.id)
+    setIsAddingProducts(false);
+    fetchPantry();
+  }
+
+  async function createProduct(e) {
+    e.preventDefault();
+    const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-      setIsAddingProducts(false);
+    setIsAddingProducts(false);
+    fetchPantry();
   }
 
   useEffect(() => {
     fetchPantry();
     fetchCategories();
     fetchQuantityUnits();
-  }, [id, isAddingProducts])
+  }, [id])
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
@@ -121,6 +149,7 @@ export default function Pantry() {
 
   const { description, title } = pantry;
   function addProducts() {
+    setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
 
@@ -197,9 +226,12 @@ export default function Pantry() {
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                              <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                Edit<span className="sr-only">, {item.name}</span>
-                              </a>
+                              <button
+                                type="button"
+                                onClick={() => selectProduct(item)}
+                                className="text-indigo-600 hover:text-indigo-900">
+                                Edit<span className="sr-only">,{item.name}</span>
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -213,9 +245,10 @@ export default function Pantry() {
         </div>
       </div>
       <SlideOver
+        isExistingProduct={currentProduct.id}
         open={isAddingProducts}
         onClose={() => setIsAddingProducts(false)}
-        onSubmit={saveCurrentProduct}
+        onSubmit={currentProduct.id ? updateProduct : createProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
