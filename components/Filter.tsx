@@ -195,7 +195,7 @@ export default function Filter({ validCategories }) {
         </h2>
 
         <div className="border-b border-gray-200 bg-white pb-4">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{paddingTop: ".625rem"}}>
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{ paddingTop: ".625rem", marginRight: "0.3125rem"}}>
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -239,14 +239,15 @@ export default function Filter({ validCategories }) {
               </Transition>
             </Menu>
 
-            <button
+            {/* <button
               type="button"
               className="inline-block text-sm font-medium text-gray-700 hover:text-gray-900 sm:hidden"
               onClick={() => setOpen(true)}>
               Filter
-            </button>
-
-            <div className="hidden sm:block">
+            </button> */}
+                  
+            {/* <div className="hidden sm:block"> hides filter/category section on small viewport */}
+            <div>
               <div className="flow-root">
                 <Popover.Group className="-mx-4 flex items-center divide-x divide-gray-200">
                   {[categorySection, filterSection].map((section, sectionIdx) => (
@@ -254,7 +255,6 @@ export default function Filter({ validCategories }) {
                       <Popover.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                         <span>{section.name}</span>
                         <span className="ml-1.5 rounded bg-gray-200 py-0.5 px-1.5 text-xs font-semibold tabular-nums text-gray-700">
-                          {console.log('section id', section.id)}
                           {
                             section.id === 'filters'
                               ? filters.filter(option => option.checked).length
