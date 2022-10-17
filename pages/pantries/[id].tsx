@@ -116,7 +116,6 @@ export default function Pantry() {
       if(error){
         setErrorMessages(errorMessages => [...errorMessages, error]);
       } else {
-        setErrorMessages([]);
         setIsAddingProducts(false);
         fetchPantry();
       }
@@ -162,6 +161,7 @@ export default function Pantry() {
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
+    setErrorMessages([]);
   }
 
   function classNames(...classes) {
@@ -258,7 +258,10 @@ export default function Pantry() {
       <SlideOver
         isExistingProduct={currentProduct.id}
         open={isAddingProducts}
-        onClose={() => setIsAddingProducts(!errorMessages && false)}
+        onClose={() => {
+          setIsAddingProducts(!errorMessages && false);
+          setErrorMessages([])}
+        }
         onSubmit={currentProduct.id ? updateProduct : createProduct}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
