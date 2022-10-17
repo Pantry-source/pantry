@@ -92,16 +92,15 @@ export default function Pantry() {
 
   async function selectProduct(product) {
     const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('name', product.name)
-    .single();
+      .from('products')
+      .select('*')
+      .eq('name', product.name)
+      .single();
     setCurrentProduct(data);
     setIsAddingProducts(true);
   }
 
-  async function updateProduct(e) {
-    e.preventDefault();
+  async function updateProduct() {
     const { data, error } = await supabase
       .from('products')
       .update({
@@ -113,20 +112,19 @@ export default function Pantry() {
         category_id: currentProduct.category_id
       })
       .eq('id', currentProduct.id)
-      if(error){
-        setErrorMessages(errorMessages => [...errorMessages, error]);
-      } else {
-        setIsAddingProducts(false);
-        fetchPantry();
-      }
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error]);
+    } else {
+      setIsAddingProducts(false);
+      fetchPantry();
+    }
   }
 
-  async function createProduct(e) {
-    e.preventDefault();
+  async function createProduct() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-    if(error){
+    if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
       setIsAddingProducts(false);
@@ -161,7 +159,17 @@ export default function Pantry() {
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
+  }
+
+  function onSubmitProduct(e) {
+    e.preventDefault();
     setErrorMessages([]);
+    currentProduct.id ? updateProduct() : createProduct();
+  }
+
+  function onCloseProductForm() {
+    setIsAddingProducts(false);
+    setErrorMessages([])
   }
 
   function classNames(...classes) {
@@ -258,11 +266,8 @@ export default function Pantry() {
       <SlideOver
         isExistingProduct={currentProduct.id}
         open={isAddingProducts}
-        onClose={() => {
-          setIsAddingProducts(!errorMessages && false);
-          setErrorMessages([])}
-        }
-        onSubmit={currentProduct.id ? updateProduct : createProduct}
+        onClose={onCloseProductForm}
+        onSubmit={(e) => onSubmitProduct(e)}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
