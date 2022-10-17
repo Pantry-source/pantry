@@ -2,8 +2,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
-  const { name = '', quantity_amount = '', quantity_unit = defaultUnitId, category_id = defaultCategory, vendor = '' } = product;
-  
+  const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
       
@@ -84,6 +83,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
               onChange={onProductChange}
               value={quantity_unit}
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
+                <option value=''>Select Unit</option>
               {unitOptions}
             </select>
           </div>
