@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
-import Filter from '../../components/Filter';
 
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
@@ -13,9 +12,11 @@ export default function Pantry() {
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);;
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -91,16 +92,15 @@ export default function Pantry() {
 
   async function selectProduct(product) {
     const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('name', product.name)
-    .single();
+      .from('products')
+      .select('*')
+      .eq('name', product.name)
+      .single();
     setCurrentProduct(data);
     setIsAddingProducts(true);
   }
 
-  async function updateProduct(e) {
-    e.preventDefault();
+  async function updateProduct() {
     const { data, error } = await supabase
       .from('products')
       .update({
@@ -112,17 +112,24 @@ export default function Pantry() {
         category_id: currentProduct.category_id
       })
       .eq('id', currentProduct.id)
-    setIsAddingProducts(false);
-    fetchPantry();
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error]);
+    } else {
+      setIsAddingProducts(false);
+      fetchPantry();
+    }
   }
 
-  async function createProduct(e) {
-    e.preventDefault();
+  async function createProduct() {
     const { data, error } = await supabase
       .from('products')
       .insert([currentProduct]);
-    setIsAddingProducts(false);
-    fetchPantry();
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error]);
+    } else {
+      setIsAddingProducts(false);
+      fetchPantry();
+    }
   }
 
   useEffect(() => {
@@ -154,6 +161,17 @@ export default function Pantry() {
     setIsAddingProducts(true);
   }
 
+  function onSubmitProduct(e) {
+    e.preventDefault();
+    setErrorMessages([]);
+    currentProduct.id ? updateProduct() : createProduct();
+  }
+
+  function onCloseProductForm() {
+    setIsAddingProducts(false);
+    setErrorMessages([])
+  }
+
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
@@ -181,7 +199,6 @@ export default function Pantry() {
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                  <Filter validCategories={categories.filter(category => category.products)}/>
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
@@ -249,15 +266,17 @@ export default function Pantry() {
       <SlideOver
         isExistingProduct={currentProduct.id}
         open={isAddingProducts}
-        onClose={() => setIsAddingProducts(false)}
-        onSubmit={currentProduct.id ? updateProduct : createProduct}
+        onClose={onCloseProductForm}
+        onSubmit={(e) => onSubmitProduct(e)}
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
           product={currentProduct}
           categories={categories}
           units={units}
-          onProductChange={onProductChange} />
+          onProductChange={onProductChange}
+          errorMessages={errorMessages}
+        />
       </SlideOver>
     </div>
   )
