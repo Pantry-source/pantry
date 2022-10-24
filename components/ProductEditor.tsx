@@ -1,13 +1,29 @@
-import { AlertFormList }  from "./AlertComponents";
+import { useState } from "react";
+import { AlertFormList } from "./AlertComponents";
+import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid'
+import { PlusIcon as PlusIconOutline } from '@heroicons/react/24/outline'
+import { text } from "stream/consumers";
 
-export default function ProductEditor({ categories, units, onProductChange, product, errorMessages }) {
+export default function ProductEditor({ userId, onCategoryChange, createCategory, categories, units, onProductChange, product, errorMessages }) {
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
-  const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
+  const categoryOptions = categories.reduce((userCategoryOptions, category) => {
+    if (userId === category.user_id || category.user_id === null) {
+      userCategoryOptions.push(<option value={category.id} key={category.id}>{category.name}</option>)
+    }
+    return userCategoryOptions;
+  }, []);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
   const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
+
+  function addCategory() {
+    createCategory();
+    setIsAddingCategory(false);
+  }
+
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-            
+
       {/* Product name */}
       <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
         <div>
@@ -66,6 +82,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
         <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
           Quantity
         </label>
+
         <div className="mt-1 relative rounded-md shadow-sm">
           <input
             type="text"
@@ -85,7 +102,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
               onChange={onProductChange}
               value={quantity_unit}
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
-                <option value=''>Select Unit</option>
+              <option value=''>Select Unit</option>
               {unitOptions}
             </select>
           </div>
@@ -101,7 +118,8 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             Category
           </label>
         </div>
-        <div className="sm:col-span-2">
+
+        <div className="sm:col-span-1">
           <select
             id="category"
             name="category_id"
@@ -112,7 +130,32 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             {categoryOptions}
           </select>
         </div>
+        
+        <button
+          onClick={!isAddingCategory ? () => setIsAddingCategory(true) : () => addCategory()}
+          type="button"
+          className="inline-flex items-center rounded-full border border-transparent bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          {/* <PlusIconMini className="h-5 w-5" aria-hidden="true" /> */}
+          {isAddingCategory ? "Create category" : "Add category"}
+        </button>
+
+        <div>
+          {isAddingCategory &&
+            <div className="mt-1">
+              <input
+                onChange={onCategoryChange}
+                type="text"
+                // rows={4}
+                name="custom-category"
+                id="custom-category"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                // defaultValue={''}
+                placeholder='Add your category' />
+            </div>
+          }
+        </div>
       </div>
+
 
       {/* Vendor */}
       <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -130,10 +173,10 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             value={vendor}
             onChange={onProductChange}
             id="vendor"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         </div>
       </div>
-      {errorMessages[0] && <AlertFormList errorMessages={errorMessages}/> }
+      {errorMessages[0] && <AlertFormList errorMessages={errorMessages} />}
     </div>
   );
 };

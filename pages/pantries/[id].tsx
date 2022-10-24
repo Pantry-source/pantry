@@ -13,10 +13,11 @@ export default function Pantry() {
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);;
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+  const [category, setCategory] = useState(null);
 
 
   function onProductChange(e) {
@@ -26,6 +27,12 @@ export default function Pantry() {
       ...currentProduct,
       [e.target.name]: value === '' ? null : value
     }));
+  }
+
+  function onCategoryChange(e) {
+    const value = e.target.value
+    console.log(e.target)
+    setCategory(value);
   }
 
   const router = useRouter();
@@ -130,6 +137,19 @@ export default function Pantry() {
     } else {
       setIsAddingProducts(false);
       fetchPantry();
+    }
+  }
+
+  async function createCategory() {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([
+        { user_id: pantry.user_id, name: category },
+      ]);
+    if(error) {
+      setErrorMessages(errorMessages => [...errorMessages, error])
+    } else {
+      fetchCategories();
     }
   }
 
@@ -273,6 +293,9 @@ export default function Pantry() {
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
+          userId={pantry.user_id}
+          onCategoryChange={onCategoryChange}
+          createCategory={createCategory}
           product={currentProduct}
           categories={categories}
           units={units}
