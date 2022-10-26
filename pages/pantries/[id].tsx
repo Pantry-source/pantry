@@ -17,13 +17,16 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [category, setCategory] = useState(null);
 
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    setCurrentProduct(() => ({
+    setCurrentProduct(() => (
+      // if(selectedCategory) {category_id = categoriesMap[selectedCategory]};
+      {
       ...currentProduct,
       [e.target.name]: value === '' ? null : value
     }));
@@ -295,7 +298,8 @@ export default function Pantry() {
         <ProductEditor
           userId={pantry.user_id}
           onCategoryChange={onCategoryChange}
-          createCategory={createCategory}
+          // createCategory={createCategory}
+          setSelectedCategory={setSelectedCategory}
           product={currentProduct}
           categories={categories}
           units={units}

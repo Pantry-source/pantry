@@ -3,8 +3,9 @@ import { AlertFormList } from "./AlertComponents";
 import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid'
 import { PlusIcon as PlusIconOutline } from '@heroicons/react/24/outline'
 import { text } from "stream/consumers";
+import Combobox from "./Combobox";
 
-export default function ProductEditor({ userId, onCategoryChange, createCategory, categories, units, onProductChange, product, errorMessages }) {
+export default function ProductEditor({ setSelectedCategory, userId, onCategoryChange, createCategory, categories, units, onProductChange, product, errorMessages }) {
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.reduce((userCategoryOptions, category) => {
@@ -119,7 +120,12 @@ export default function ProductEditor({ userId, onCategoryChange, createCategory
           </label>
         </div>
 
-        <div className="sm:col-span-1">
+        <Combobox 
+        categories={categories} 
+        onCategoryChange={onCategoryChange}
+        setSelectedCategory={setSelectedCategory} />
+
+        {/* <div className="sm:col-span-1">
           <select
             id="category"
             name="category_id"
@@ -129,17 +135,17 @@ export default function ProductEditor({ userId, onCategoryChange, createCategory
             <option value=''>Select Category</option>
             {categoryOptions}
           </select>
-        </div>
-        
+        </div> */}
+{/*         
         <button
           onClick={!isAddingCategory ? () => setIsAddingCategory(true) : () => addCategory()}
           type="button"
           className="inline-flex items-center rounded-full border border-transparent bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           {/* <PlusIconMini className="h-5 w-5" aria-hidden="true" /> */}
-          {isAddingCategory ? "Create category" : "Add category"}
-        </button>
+          {/* {isAddingCategory ? "Create category" : "Add category"} */}
+        {/* </button> */} 
 
-        <div>
+        {/* <div>
           {isAddingCategory &&
             <div className="mt-1">
               <input
@@ -153,7 +159,7 @@ export default function ProductEditor({ userId, onCategoryChange, createCategory
                 placeholder='Add your category' />
             </div>
           }
-        </div>
+        </div> */}
       </div>
 
 
