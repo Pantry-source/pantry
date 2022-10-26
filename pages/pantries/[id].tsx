@@ -24,12 +24,18 @@ export default function Pantry() {
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    setCurrentProduct(() => (
-      // if(selectedCategory) {category_id = categoriesMap[selectedCategory]};
-      {
+    setCurrentProduct(() => ({
+        ...currentProduct,
+        [e.target.name]: value === '' ? null : value
+      }));
+    }
+    
+    // if(selectedCategory) {category_id = categoriesMap[selectedCategory]};
+  function onCategorySelect(category){
+    setCurrentProduct(() => ({
       ...currentProduct,
-      [e.target.name]: value === '' ? null : value
-    }));
+      'category_id': categoriesMap[selectedCategory]
+    }))
   }
 
   function onCategoryChange(e) {
@@ -299,7 +305,7 @@ export default function Pantry() {
           userId={pantry.user_id}
           onCategoryChange={onCategoryChange}
           // createCategory={createCategory}
-          setSelectedCategory={setSelectedCategory}
+          setSelectedCategory={onCategorySelect}
           product={currentProduct}
           categories={categories}
           units={units}
