@@ -17,31 +17,27 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [category, setCategory] = useState(null);
 
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
     setCurrentProduct(() => ({
-        ...currentProduct,
-        [e.target.name]: value === '' ? null : value
-      }));
-    }
-    
-    // if(selectedCategory) {category_id = categoriesMap[selectedCategory]};
-  function onCategorySelect(category){
-    setCurrentProduct(() => ({
       ...currentProduct,
-      'category_id': categoriesMap[selectedCategory]
-    }))
+      [e.target.name]: value === '' ? null : value
+    }));
   }
 
-  function onCategoryChange(e) {
-    const value = e.target.value
-    console.log(e.target)
-    setCategory(value);
+  function onCategoryChange(id) {
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      'category_id': id
+    }));
+}
+
+/**Receives selected option from Combobox */
+  function onCategorySelect(category) {
+    onCategoryChange(category.id);
   }
 
   const router = useRouter();
@@ -155,7 +151,7 @@ export default function Pantry() {
       .insert([
         { user_id: pantry.user_id, name: category },
       ]);
-    if(error) {
+    if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error])
     } else {
       fetchCategories();
@@ -303,9 +299,7 @@ export default function Pantry() {
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
           userId={pantry.user_id}
-          onCategoryChange={onCategoryChange}
-          // createCategory={createCategory}
-          setSelectedCategory={onCategorySelect}
+          onCategorySelect={onCategorySelect}
           product={currentProduct}
           categories={categories}
           units={units}

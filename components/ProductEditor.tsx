@@ -5,22 +5,30 @@ import { PlusIcon as PlusIconOutline } from '@heroicons/react/24/outline'
 import { text } from "stream/consumers";
 import Combobox from "./Combobox";
 
-export default function ProductEditor({ setSelectedCategory, userId, onCategoryChange, createCategory, categories, units, onProductChange, product, errorMessages }) {
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
+export default function ProductEditor({
+  userId,
+  onCategorySelect,
+  categories,
+  units,
+  onProductChange,
+  product,
+  errorMessages
+}) {
+  // const [isAddingCategory, setIsAddingCategory] = useState(false);
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.reduce((userCategoryOptions, category) => {
     if (userId === category.user_id || category.user_id === null) {
-      userCategoryOptions.push(<option value={category.id} key={category.id}>{category.name}</option>)
+      userCategoryOptions.push(category)
     }
     return userCategoryOptions;
   }, []);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
   const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
 
-  function addCategory() {
-    createCategory();
-    setIsAddingCategory(false);
-  }
+  // function addCategory() {
+  //   createCategory();
+  //   setIsAddingCategory(false);
+  // }
 
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
@@ -120,10 +128,10 @@ export default function ProductEditor({ setSelectedCategory, userId, onCategoryC
           </label>
         </div>
 
-        <Combobox 
-        categories={categories} 
-        onCategoryChange={onCategoryChange}
-        setSelectedCategory={setSelectedCategory} />
+        <Combobox
+          options={categoryOptions}
+          onSelect={onCategorySelect}
+          />
 
         {/* <div className="sm:col-span-1">
           <select
@@ -136,14 +144,14 @@ export default function ProductEditor({ setSelectedCategory, userId, onCategoryC
             {categoryOptions}
           </select>
         </div> */}
-{/*         
+        {/*         
         <button
           onClick={!isAddingCategory ? () => setIsAddingCategory(true) : () => addCategory()}
           type="button"
           className="inline-flex items-center rounded-full border border-transparent bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           {/* <PlusIconMini className="h-5 w-5" aria-hidden="true" /> */}
-          {/* {isAddingCategory ? "Create category" : "Add category"} */}
-        {/* </button> */} 
+        {/* {isAddingCategory ? "Create category" : "Add category"} */}
+        {/* </button> */}
 
         {/* <div>
           {isAddingCategory &&
