@@ -7,6 +7,7 @@ import Combobox from "./Combobox";
 
 export default function ProductEditor({
   userId,
+  createCategory,
   onCategorySelect,
   categories,
   units,
@@ -131,7 +132,7 @@ export default function ProductEditor({
         <Combobox
           options={categoryOptions}
           onSelect={onCategorySelect}
-          />
+          createOption={createCategory}/>
 
         {/* <div className="sm:col-span-1">
           <select
