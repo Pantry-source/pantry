@@ -27,7 +27,9 @@ export default function Dropdown({ options, onSelect, createOption }) {
       }, []);
 
   function setCategory() {
-    onSelect(selected);
+    setTimeout(()=>{
+      onSelect(selected);
+    },1000)
   }
 
   useEffect(() => {
