@@ -21,6 +21,7 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+  const [createdCategory, setCreatedCategory] = useState(null);
 
 
   function onProductChange(e) {
@@ -103,25 +104,26 @@ export default function Pantry() {
     return response;
   }
 
-  async function fetchId(categoryName) {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('name', categoryName)
-      .single()
-    if (data) return data.id
-  }
+  // async function fetchCategoryId() {
+  //   cl('createdCategory', createdCategory)
+  //   const { data, error } = await supabase
+  //     .from('categories')
+  //     .select('*')
+  //     .eq('name', createdCategory)
+  //     .single()
+  //   try {
+  //     if (error) throw new Error('no category id data')
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   return data
+  // }
 
   /** Receives selected option(category object) from Combobox 
    * if category id === false, fetch id for newly created category
     */
   async function onCategorySelect(category) {
-    // cl('category', category)
-    let id = await fetchId(category.name);
-      cl('id', id) //these are console logs, got tired of writing out console.log :`)
-      category.id === undefined
-        ? onCategoryChange(id)
-        : onCategoryChange(category.id)
+    if (category.name) onCategoryChange(category.id)
   }
 
   async function selectProduct(product) {
@@ -167,17 +169,20 @@ export default function Pantry() {
   }
 
   async function createCategory(category) {
-    console.log('created category =>', category)
-    const { data, error } = await supabase
+    const response = await supabase
       .from('categories')
       .insert([
         { user_id: pantry.user_id, name: category },
-      ]);
+      ])
+      .single();
+    const { data, error } = response;
     if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error])
     } else {
       fetchCategories();
     }
+    onCategoryChange(data.id)
+    return data
   }
 
   useEffect(() => {
@@ -185,6 +190,14 @@ export default function Pantry() {
     fetchCategories();
     fetchQuantityUnits();
   }, [id])
+
+  // useEffect(function fetchIdWhenCategoriesUpdates() {
+  //   async function fetchId() {
+  //     const id = await fetchCategoryId();
+  //     cl('id in useEffect', id)
+  //   }
+  //   fetchId();
+  // }, [categories]);
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
