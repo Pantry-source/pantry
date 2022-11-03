@@ -1,12 +1,13 @@
-export default function ProductEditor({ categories, units, onProductChange, product }) {
+import { AlertFormList }  from "./AlertComponents";
+
+export default function ProductEditor({ categories, units, onProductChange, product, errorMessages }) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const categoryOptions = categories.map(category => <option value={category.id} key={category.id}>{category.name}</option>);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
-  const { name = '', quantity_amount = '', quantity_unit = defaultUnitId, category_id = defaultCategory, vendor = '' } = product;
-  
+  const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-      
+            
       {/* Product name */}
       <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
         <div>
@@ -84,6 +85,7 @@ export default function ProductEditor({ categories, units, onProductChange, prod
               onChange={onProductChange}
               value={quantity_unit}
               className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md">
+                <option value=''>Select Unit</option>
               {unitOptions}
             </select>
           </div>
@@ -128,10 +130,10 @@ export default function ProductEditor({ categories, units, onProductChange, prod
             value={vendor}
             onChange={onProductChange}
             id="vendor"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
         </div>
       </div>
+      {errorMessages[0] && <AlertFormList errorMessages={errorMessages}/> }
     </div>
   );
 };
