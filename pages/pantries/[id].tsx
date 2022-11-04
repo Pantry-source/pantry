@@ -138,13 +138,13 @@ export default function Pantry() {
     }
   }
 
-  async function deleteProduct(item){
+  async function deleteProduct(product){
     const { data, error } = await supabase
       .from('products')
       .delete()
-      .eq('id', item.id)
+      .eq('id', product.id)
       .single();
-      console.log(`${item.name} has been deleted`);
+      console.log(`${product.name} has been deleted`);
   }
 
 
@@ -300,43 +300,44 @@ export default function Pantry() {
                             {category.name}
                           </th>
                         </tr>
-                        {category.products.map((item) => (
+                        {category.products.map((product) => (
                           <tr
-                            key={item.name}
+                            key={product.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
                             <td className="relative w-12 px-6 sm:w-16 sm:px-8">
-                              {selectedProduct.includes(category) && (
+                              {selectedProduct.includes(product) && (
                                 <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
                               )}
+                              {console.log('+++++',product)}
                               <input
                                 type="checkbox"
                                 className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-                                value={category.email}
-                                checked={selectedProduct.includes(category)}
+                                value={product.name}
+                                checked={selectedProduct.includes(product)}
                                 onChange={(e) =>
                                   setSelectedProduct(
                                     e.target.checked
-                                      ? [...selectedProduct, category]
-                                      : selectedProduct.filter((p) => p !== category)
+                                      ? [...selectedProduct, product]
+                                      : selectedProduct.filter((p) => p !== product)
                                   )
                                 }
                               />
                             </td>
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                              {item.name}
+                              {product.name}
                               <div className="mt-0.5 text-gray-500">
-                                {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
+                                {product.quantity_amount} {unitsMap && unitsMap[product.quantity_unit]}
                               </div>
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.expires_at || 'not specified'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.vendor || ''}</td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button
                                 type="button"
-                                onClick={() => selectProduct(item)}
+                                onClick={() => selectProduct(product)}
                                 className="text-indigo-600 hover:text-indigo-900">
-                                Edit<span className="sr-only">,{item.name}</span>
+                                Edit<span className="sr-only">,{product.name}</span>
                               </button>
                             </td>
                           </tr>
