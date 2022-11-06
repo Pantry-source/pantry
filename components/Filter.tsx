@@ -3,6 +3,9 @@ import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
+function cl(x, y) {
+  console.log(x, y)
+}
 // const sortOptions = [
 //   { name: 'Most Popular', href: '#', current: true },
 //   { name: 'Best Rating', href: '#', current: false },
@@ -292,9 +295,9 @@ export default function Filter({ validCategories }) {
                         leave="transition ease-in duration-75"
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95">
-                        <Popover.Panel className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white p-4 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Popover.Panel unmount={false} className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white p-4 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <form className="space-y-4">
-                            {section.options.map((option, optionIdx) => (
+                            {(section.name === 'Filters' ? filters : categories).map((option, optionIdx) => (
                               <div key={option.value} className="flex items-center">
                                 <input
                                   id={`filter-${section.id}-${optionIdx}`}
