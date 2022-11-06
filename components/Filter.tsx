@@ -57,9 +57,8 @@ export default function Filter({ validCategories }) {
   }
 
   /** toggles checkbox for filter options depending on which field is passed */
-
   function toggleCheckbox(e, field, value) {
-    // updates category options
+
     if (field === 'category') {
       setCategories((categories) =>
         categories.map((option) =>
@@ -69,7 +68,7 @@ export default function Filter({ validCategories }) {
         )
       );
     }
-    // updates filter options
+
     if (field === 'filters') {
       setFilters((filters) =>
         filters.map((option) =>
