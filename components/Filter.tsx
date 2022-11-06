@@ -41,17 +41,25 @@ export default function Filter({ validCategories }) {
 
   /** updates activeFilters by selected category or filters */
   function onChange(e) {
+    cl('------->',e.target);
     console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter
     let value = e.target.value;
     let name = e.target.name;
     let isChecked = e.target.checked
 
+    //massaging data to be sent to activeFilters
     let validFilter = { value: e.target.value, label: e.target.name };
 
-
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
-    // updates category filter
+
+    toggleCheckbox(event, field, value);
+  }
+
+  /** toggles checkbox for filter options depending on which field is passed */
+
+  function toggleCheckbox(e, field, value) {
+    // updates category options
     if (field === 'category') {
       setCategories((categories) =>
         categories.map((option) =>
@@ -61,7 +69,7 @@ export default function Filter({ validCategories }) {
         )
       );
     }
-    // updates filter
+    // updates filter options
     if (field === 'filters') {
       setFilters((filters) =>
         filters.map((option) =>
@@ -73,35 +81,15 @@ export default function Filter({ validCategories }) {
     }
   }
 
-
-  function remove(value) {
-    console.log('value',value)
-    setActiveFilters(currentFilters => 
-      currentFilters.filter((f) => f.value !== value))
+  function remove(filter) {
+    // cl('======>', e)
+    // data being passed doesn't have id just value and label
+    // let field = e.target.id.split('-')[1]; // category or filter
+    // let value = e.target.value;
+    // toggleCheckbox(e, field, value)
+    setActiveFilters(currentFilters =>
+      currentFilters.filter((f) => f.value !== filter.value))
   }
-  // function updateFilters(field, value, name) {
-  //   setActiveFilters([...activeFilters, validFilter])
-  //   // updates category filter
-  //   if (field === 'category') {
-  //     setCategories((categories) =>
-  //       categories.map((option) =>
-  //         option.value === value
-  //           ? { ...option, checked: e.target.checked }
-  //           : option
-  //       )
-  //     );
-  //   }
-  //   // updates filter
-  //   if (field === 'filters') {
-  //     setFilters((filters) =>
-  //       filters.map((option) =>
-  //         option.value === value
-  //           ? { ...option, checked: e.target.checked }
-  //           : option
-  //       )
-  //     );
-  //   }
-  // }
 
   const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
     convertToCategoryOptionsFormat.push({
@@ -348,7 +336,7 @@ export default function Filter({ validCategories }) {
                     className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900">
                     <span>{activeFilter.label}</span>
                     <button
-                      onClick={()=>remove(activeFilter.value)}
+                      onClick={()=>remove(activeFilter)}
                       type="button"
                       className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500">
                       <span className="sr-only">Remove filter for{activeFilter.label}</span>
