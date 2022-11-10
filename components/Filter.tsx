@@ -51,6 +51,8 @@ export default function Filter({ validCategories }) {
     let validFilter = { value: e.target.value, label: e.target.name };
 
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
+    if(!isChecked) setActiveFilters(currentFilters => 
+      currentFilters.filter(f => f.value !== value))
 
     toggleCheckbox(event, field, value);
   }
@@ -124,7 +126,7 @@ export default function Filter({ validCategories }) {
   }, []);
 
   useEffect(() =>{
-    
+
   })
 
   return (
