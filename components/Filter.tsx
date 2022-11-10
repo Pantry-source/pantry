@@ -41,7 +41,6 @@ export default function Filter({ validCategories }) {
 
   /** updates activeFilters by selected category or filters */
   function onChange(e) {
-    cl('------->', e.target);
     console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter
     let value = e.target.value;
@@ -59,38 +58,32 @@ export default function Filter({ validCategories }) {
   /** toggles checkbox for filter options depending on which field is passed */
   function toggleCheckbox(e, field, value) {
 
-    if (field === 'category') {
-      setCategories((categories) =>
-        categories.map((option) =>
-          option.value === value
-            ? { ...option, checked: e.target.checked }
-            : option
-        )
-      );
-    }
+    if (field === 'category') toggle(e, setCategories, categories, value);
+    
+    if (field === 'filters') toggle(e, setFilters, filters, value);
 
-    if (field === 'filters') {
-      setFilters((filters) =>
-        filters.map((option) =>
-          option.value === value
-            ? { ...option, checked: e.target.checked }
-            : option
-        )
-      );
-    }
   }
+
+  /** toggles checkbox for either option  */
+  function toggle(e, setState, field, value) {
+    setState((field) =>
+      field.map((option) =>
+        option.value === value
+          ? { ...option, checked: e.target.checked }
+          : option
+      )
+    )
+  };
 
   /** retrieves option ID from corresponding activeFilter value*/
   function retrieveOptionProperties(optionSection, value) {
     const optionProperties = optionSection.options.reduce((properties, option) => {
-      cl('option', optionSection)
       if (option.value === value) {
         properties['value'] = option.value,
           properties['field'] = optionSection.id;
       }
       return properties;
     }, {})
-    cl('optionProperties', optionProperties)
     return optionProperties
   }
 
@@ -129,6 +122,10 @@ export default function Filter({ validCategories }) {
   useEffect(() => {
     setCategories(categoryOptions);
   }, []);
+
+  useEffect(() =>{
+    
+  })
 
   return (
     <div className="bg-white">
