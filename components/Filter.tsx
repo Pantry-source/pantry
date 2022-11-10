@@ -41,7 +41,7 @@ export default function Filter({ validCategories }) {
 
   /** updates activeFilters by selected category or filters */
   function onChange(e) {
-    cl('------->',e.target);
+    cl('------->', e.target);
     console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter
     let value = e.target.value;
@@ -80,12 +80,31 @@ export default function Filter({ validCategories }) {
     }
   }
 
-  function remove(filter) {
-    // cl('======>', e)
-    // data being passed doesn't have id just value and label
-    // let field = e.target.id.split('-')[1]; // category or filter
-    // let value = e.target.value;
-    // toggleCheckbox(e, field, value)
+  /** retrieves option ID from corresponding activeFilter value*/
+  function retrieveOptionProperties(optionSection, value) {
+    const optionProperties = optionSection.options.reduce((properties, option) => {
+      cl('option', optionSection)
+      if (option.value === value) {
+        properties['value'] = option.value,
+          properties['field'] = optionSection.id;
+      }
+      return properties;
+    }, {})
+    cl('optionProperties', optionProperties)
+    return optionProperties
+  }
+
+  /** removes active filter & retrieves value from active filter to uncheck option */
+  function remove(e, filter) {
+
+    let categoryProperties = retrieveOptionProperties(categorySection, filter.value);
+    let filterProperties = retrieveOptionProperties(filterSection, filter.value);
+
+    let { field, value } = Object.keys(categoryProperties).length === 0
+      ? filterProperties
+      : categoryProperties;
+
+    toggleCheckbox(e, field, value)
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
   }
@@ -335,7 +354,7 @@ export default function Filter({ validCategories }) {
                     className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900">
                     <span>{activeFilter.label}</span>
                     <button
-                      onClick={()=>remove(activeFilter)}
+                      onClick={(e) => remove(e, activeFilter)}
                       type="button"
                       className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500">
                       <span className="sr-only">Remove filter for{activeFilter.label}</span>
