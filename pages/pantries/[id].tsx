@@ -5,6 +5,10 @@ import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
 
+function cl(...a) {
+  console.log(a)
+}
+
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -17,7 +21,7 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-
+  const [filterProperties, setFilterProperties] = useState({});
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -151,16 +155,47 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
-  const categoriesWithProducts = categories.map(category => {
+  const categoriesWithProducts = categories.filter(category => {
+    // if (category.name === 'Produce') {
     category.products = currentProducts[category.name] || null;
     return category;
+    // }
   });
 
+  cl('categoriesWithProducts', categoriesWithProducts)
   const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
+
+  //NOTE: consider using Set data structure ds
+  /** Retrieves activeFilters from Filter and updates FilterProperties state  */
+  function updateFilters(filter) {
+    // const filterValues = filters.reduce((values, filter) => {
+    //   values[filter.label] = filter.value;
+    //   return values;
+    // },{});
+    // cl('filterValues', filterValues);
+    // setFilterProperties([...filters, filterValues]);
+
+    if (filterProperties[filter.label]){
+
+      setFilterProperties((current) => {
+        const copy = {...current};
+        delete copy[filter.label];  
+        cl('copy',copy)
+        setFilterProperties(copy);
+        return copy;
+      })
+    }
+    cl('filter', filter)
+
+    setFilterProperties(filterProperties =>
+      ({ ...filterProperties, [filter.label]: filter.value }));
+  }
+
+  // setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
 
   function onSubmitProduct(e) {
     e.preventDefault();
@@ -200,7 +235,9 @@ export default function Pantry() {
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <Filter validCategories={categories.filter(category => category.products)} />
+                <Filter
+                  updateFilters={updateFilters}
+                  validCategories={categories.filter(category => category.products)} />
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>

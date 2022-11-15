@@ -33,7 +33,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Filter({ validCategories }) {
+export default function Filter({ updateFilters, validCategories }) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
   const [filters, setFilters] = useState(filterSection.options);
@@ -50,6 +50,8 @@ export default function Filter({ validCategories }) {
     //massaging data to be sent to activeFilters
     let validFilter = { value: e.target.value, label: e.target.name };
 
+    updateFilters(validFilter)
+
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
     if(!isChecked) setActiveFilters(currentFilters => 
       currentFilters.filter(f => f.value !== value))
@@ -59,7 +61,7 @@ export default function Filter({ validCategories }) {
 
   /** toggles checkbox for filter options depending on which field is passed */
   function toggleCheckbox(e, field, value) {
-
+    
     if (field === 'category') toggle(e, setCategories, categories, value);
     
     if (field === 'filters') toggle(e, setFilters, filters, value);
@@ -120,15 +122,10 @@ export default function Filter({ validCategories }) {
     options: categoryOptions
   }
 
-
   useEffect(() => {
     setCategories(categoryOptions);
   }, []);
-
-  useEffect(() =>{
-
-  })
-
+  
   return (
     <div className="bg-white">
       {/* Mobile filter dialog */}
