@@ -155,12 +155,27 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
-  const categoriesWithProducts = categories.filter(category => {
-    // if (category.name === 'Produce') {
-    category.products = currentProducts[category.name] || null;
-    return category;
-    // }
-  });
+    const categoriesWithProducts = categories.filter(category => {
+      cl('filterProperties[category.name]', filterProperties[category.name])
+      if(filterProperties[category.name]) {
+        category.products = currentProducts[category.name] || null;
+        return category;
+      } else if(Object.keys(filterProperties).length === 0){
+        category.products = currentProducts[category.name] || null;
+        return category;
+      }
+  })
+
+  function allCategoriesWithProducts(categoryList) {
+    categoryList.filter(category => {
+      category.products = currentProducts[category.name] || null;
+      return category;
+    });
+  }
+
+  // function filterCategories(categories, categoryOptions) {
+  //         return categories.filter(category => categoryOptions[category.name])
+  //       }
 
   cl('categoriesWithProducts', categoriesWithProducts)
   const { description, title } = pantry;
@@ -172,24 +187,15 @@ export default function Pantry() {
   //NOTE: consider using Set data structure ds
   /** Retrieves activeFilters from Filter and updates FilterProperties state  */
   function updateFilters(filter) {
-    // const filterValues = filters.reduce((values, filter) => {
-    //   values[filter.label] = filter.value;
-    //   return values;
-    // },{});
-    // cl('filterValues', filterValues);
-    // setFilterProperties([...filters, filterValues]);
 
-    if (filterProperties[filter.label]){
-
-      setFilterProperties((current) => {
-        const copy = {...current};
-        delete copy[filter.label];  
-        cl('copy',copy)
+    if (filterProperties[filter.label]) {
+      setFilterProperties(current => {
+        const copy = { ...current };
+        delete copy[filter.label];
         setFilterProperties(copy);
         return copy;
       })
     }
-    cl('filter', filter)
 
     setFilterProperties(filterProperties =>
       ({ ...filterProperties, [filter.label]: filter.value }));
@@ -260,6 +266,7 @@ export default function Pantry() {
                   </thead>
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
+                      // category.products && filterProperties[category.name] &&
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
@@ -271,6 +278,7 @@ export default function Pantry() {
                           </th>
                         </tr>
                         {category.products.map((item) => (
+                          category.name !== item.name &&
                           <tr
                             key={item.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
