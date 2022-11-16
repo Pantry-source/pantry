@@ -39,7 +39,9 @@ export default function Filter({ updateFilters, validCategories }) {
   const [filters, setFilters] = useState(filterSection.options);
   const [categories, setCategories] = useState([]);
 
-  /** updates activeFilters by selected category or filters */
+  /** updates activeFilters by selected category or filters then adds/removes filter
+   * if it's checked/unchecked
+  */
   function onChange(e) {
     console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter

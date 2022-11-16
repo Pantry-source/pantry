@@ -155,29 +155,47 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
-    const categoriesWithProducts = categories.filter(category => {
-      cl('filterProperties[category.name]', filterProperties[category.name])
-      if(filterProperties[category.name]) {
-        category.products = currentProducts[category.name] || null;
-        return category;
-      } else if(Object.keys(filterProperties).length === 0){
+  /** filter product list by category options & filter options */
+  const categoriesWithProducts = categories.filter(category => {
+    const filterMap = {
+      'Essential': "isEssential",
+      'Out Of Stock': "isOutOfStock",
+      'Expiring Soon': "isExpiring"
+    }
+
+    //the data being passed in to match filter options doens't line up with the data
+    //that it's checking. 
+    cl('category.name', category.name)
+    cl('filterProperties', filterProperties)
+    if (filterProperties[category.name]) { //<<< filter options never === true
+      //selects products by filter
+      cl('filterMap[category.name]', filterMap[category.name])
+      if (filterMap[category.name]) { // this is always false
+        category.options.map(option => {
+          // category.products = currentProducts[category.name] || null;
+          option = currentProduct[option.name] || null;
+          cl('in filter')
+          return option;
+        }) 
+        //selects products by category 
+      } else {
         category.products = currentProducts[category.name] || null;
         return category;
       }
-  })
-
-  function allCategoriesWithProducts(categoryList) {
-    categoryList.filter(category => {
+      //selects all products
+    } else if (Object.keys(filterProperties).length === 0) {
       category.products = currentProducts[category.name] || null;
       return category;
-    });
+    }
+  })
+
+  //if i use this helper method in categoriesWithProduct it doesn't update properly
+  // it fails to call this function and nothing renders
+  function filterCategoriesWithProducts(category) {
+    category.products = currentProducts[category.name] || null;
+    return category;
   }
 
-  // function filterCategories(categories, categoryOptions) {
-  //         return categories.filter(category => categoryOptions[category.name])
-  //       }
-
-  cl('categoriesWithProducts', categoriesWithProducts)
   const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
