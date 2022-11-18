@@ -166,6 +166,16 @@ export default function Pantry() {
     if (essentialProducts.length > 0) return essentialProducts;
   }
 
+  /** selects filter options for Out Of Stock products */
+  function selectOosProducts(category) {
+    const oosProducts = category.products.reduce((oosProducts, product) => {
+      if (product.quantity_amount === 0) {
+        oosProducts.push(product)
+      }
+      return category.products = oosProducts;
+    }, [])
+    if (oosProducts.length > 0) return oosProducts;
+  }
 
   /** builds product list by category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
