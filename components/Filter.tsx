@@ -3,8 +3,8 @@ import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
-function cl(x, y) {
-  console.log(x, y)
+function cl(...a) {
+  console.log(a)
 }
 // const sortOptions = [
 //   { name: 'Most Popular', href: '#', current: true },

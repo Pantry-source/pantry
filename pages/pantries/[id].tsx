@@ -155,33 +155,32 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
-  /** filter product list by category options & filter options */
-  const categoriesWithProducts = categories.filter(category => {
-    const filterMap = {
-      'Essential': "isEssential",
-      'Out Of Stock': "isOutOfStock",
-      'Expiring Soon': "isExpiring"
-    }
-
-    //the data being passed in to match filter options doens't line up with the data
-    //that it's checking. 
-    cl('category.name', category.name)
-    cl('filterProperties', filterProperties)
-    if (filterProperties[category.name]) { //<<< filter options never === true
-      //selects products by filter
-      cl('filterMap[category.name]', filterMap[category.name])
-      if (filterMap[category.name]) { // this is always false
-        category.options.map(option => {
-          // category.products = currentProducts[category.name] || null;
-          option = currentProduct[option.name] || null;
-          cl('in filter')
-          return option;
-        }) 
-        //selects products by category 
-      } else {
-        category.products = currentProducts[category.name] || null;
-        return category;
+  /** selects filter options for essential products */
+  function selectEssentialProducts(category) {
+    const essentialProducts = category.products.reduce((essentialProducts, product) => {
+      if (product.is_essential) {
+        essentialProducts.push(product)
       }
+      return category.products = essentialProducts;
+    }, [])
+    if (essentialProducts.length > 0) return essentialProducts;
+  }
+
+
+  /** builds product list by category options & filter options */
+  const categoriesWithProducts = categories.filter(category => {
+
+    if (filterProperties['Out Of Stock'] && category.products){
+      return selectOosProducts(category);
+    }
+    //select essential products
+    if (filterProperties.Essential && category.products) {
+      return selectEssentialProducts(category);
+    }
+    //selects by category option
+    if (filterProperties[category.name]) {
+      category.products = currentProducts[category.name] || null;
+      return category;
       //selects all products
     } else if (Object.keys(filterProperties).length === 0) {
       category.products = currentProducts[category.name] || null;
@@ -202,7 +201,7 @@ export default function Pantry() {
     setIsAddingProducts(true);
   }
 
-  //NOTE: consider using Set data structure ds
+  //NOTE: consider using Set data structure?
   /** Retrieves activeFilters from Filter and updates FilterProperties state  */
   function updateFilters(filter) {
 
