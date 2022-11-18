@@ -198,13 +198,6 @@ export default function Pantry() {
     }
   })
 
-  //if i use this helper method in categoriesWithProduct it doesn't update properly
-  // it fails to call this function and nothing renders
-  function filterCategoriesWithProducts(category) {
-    category.products = currentProducts[category.name] || null;
-    return category;
-  }
-
   const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
@@ -227,8 +220,6 @@ export default function Pantry() {
     setFilterProperties(filterProperties =>
       ({ ...filterProperties, [filter.label]: filter.value }));
   }
-
-  // setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
 
   function onSubmitProduct(e) {
     e.preventDefault();
