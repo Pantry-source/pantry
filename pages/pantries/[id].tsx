@@ -4,6 +4,11 @@ import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
+import PillButton from '../../components/PillButton'
+
+function cl(a){
+  console.log(a);
+}
 
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
@@ -121,6 +126,19 @@ export default function Pantry() {
     }
   }
 
+  async function updateQuantity(id, currentProductQuantity){
+    const { data, error } = await supabase
+    .from('products')
+    .update({quantity_amount: currentProductQuantity})
+    .eq('id',id)
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error]);
+    } else {
+      console.log('>>>>>>', id , currentProductQuantity)
+      fetchPantry();
+    }
+  }
+
   async function createProduct() {
     const { data, error } = await supabase
       .from('products')
@@ -208,6 +226,8 @@ export default function Pantry() {
                         Name
                       </th>
                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Is Essential
                       </th>
                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -237,12 +257,17 @@ export default function Pantry() {
                           <tr
                             key={item.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 flex">
+                              <div>
+
                               {item.name}
                               <div className="mt-0.5 text-gray-500">
                                 {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
                               </div>
+                              </div>
+
                             </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><td><PillButton id={item.id} updateQuantity={updateQuantity} quantity={item.quantity_amount}/></td></td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
