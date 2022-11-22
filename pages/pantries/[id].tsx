@@ -6,7 +6,7 @@ import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
 import PillButton from '../../components/PillButton'
 
-function cl(a){
+function cl(...a) {
   console.log(a);
 }
 
@@ -41,6 +41,7 @@ export default function Pantry() {
       .from('pantries')
       .select(`*, products(*)`)
       .filter('id', 'eq', id)
+      .order(`id`, { foreignTable: 'products' })
       .single();
     const { error, data } = response;
     try {
@@ -126,15 +127,15 @@ export default function Pantry() {
     }
   }
 
-  async function updateQuantity(id, currentProductQuantity){
+  async function updateQuantity(id, currentProductQuantity) {
     const { data, error } = await supabase
-    .from('products')
-    .update({quantity_amount: currentProductQuantity})
-    .eq('id',id)
+      .from('products')
+      .update({ quantity_amount: currentProductQuantity })
+      .eq('id', id)
     if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
-      console.log('>>>>>>', id , currentProductQuantity)
+      console.log('>>>>>>', id, currentProductQuantity)
       fetchPantry();
     }
   }
@@ -161,6 +162,7 @@ export default function Pantry() {
     return <h1>loading...</h1>;
   }
 
+  // retrieves products and assigns products array to corresponding category key
   const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
     let categoryName = categoriesMap[product.category_id]
     categoryAndProducts[categoryName]
@@ -260,14 +262,19 @@ export default function Pantry() {
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 flex">
                               <div>
 
-                              {item.name}
-                              <div className="mt-0.5 text-gray-500">
-                                {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
-                              </div>
+                                {item.name}
+                                <div className="mt-0.5 text-gray-500">
+                                  {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
+                                </div>
                               </div>
 
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"><td><PillButton id={item.id} updateQuantity={updateQuantity} quantity={item.quantity_amount}/></td></td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              <PillButton
+                                id={item.id}
+                                updateQuantity={updateQuantity}
+                                quantity={item.quantity_amount} />
+                            </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
