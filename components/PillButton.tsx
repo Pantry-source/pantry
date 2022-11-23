@@ -16,7 +16,7 @@ function PillButton({ id, quantity, updateQuantity }) {
   }
 
   return (
-    <div className='rounded-full' style={{ backgroundColor: 'transparent', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+    <div className='rounded-full' style={{ backgroundColor: 'transparent', border: '1px solid rgba(0, 0, 0, 0.05)', width: 'fit-content' }}>
       <button
         onClick={decrement}
         type="button"
