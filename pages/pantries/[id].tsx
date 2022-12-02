@@ -158,7 +158,7 @@ export default function Pantry() {
 
   const { description, title } = pantry;
   function addProducts() {
-    setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
+    setCurrentProduct(() => ({ 'pantry_id': pantry.id, "is_essential": false }));
     setIsAddingProducts(true);
   }
 
