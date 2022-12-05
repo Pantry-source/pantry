@@ -263,14 +263,16 @@ export default function Pantry() {
                               <div>
 
                                 {item.name}
-                                <div className="mt-0.5 text-gray-500">
+                                {/* <div className="mt-0.5 text-gray-500">
                                   {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
-                                </div>
+                                </div> */}
                               </div>
 
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               <PillButton
+
+                                unit={unitsMap[item.quantity_unit]}
                                 id={item.id}
                                 updateQuantity={updateQuantity}
                                 quantity={item.quantity_amount} />
