@@ -1,4 +1,4 @@
-Pantry is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It uses [`Supabase`](https://supabase.com/), an open source Firebase alternative.
+Pantry is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It uses [`Supabase`](https://supabase.com/), an open source Firebase alternative. The UI is implemented using [Tailwind UI](https://tailwindui.com/).
 
 ## Getting Started
 
