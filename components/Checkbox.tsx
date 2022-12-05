@@ -1,19 +1,3 @@
-/*
-  This example requires Tailwind CSS v3.0+
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { useLayoutEffect, useRef, useState } from 'react'
 
 const people = [

@@ -138,15 +138,19 @@ export default function Pantry() {
     }
   }
 
-  async function deleteProduct(product){
-    const { data, error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', product.id)
-      .single();
-      console.log(`${product.name} has been deleted`);
-  }
+  /** removes selected product(s) from database and rerenders updated category list */
+  async function deleteProduct() {
+    for (let product of selectedProduct) {
+      const { data, error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', product.id)
+        .single();
 
+        setSelectedProduct(products => [])
+      }
+      fetchPantry();
+  }
 
   useEffect(() => {
     fetchPantry();
@@ -171,8 +175,6 @@ export default function Pantry() {
     return category;
   });
 
-  console.log('categories with products', categoriesWithProducts)
-
   const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
@@ -181,25 +183,14 @@ export default function Pantry() {
 
   // ################ checkbox logic ##################
 
-  const products = categoriesWithProducts.reduce((acc, category) => {
-    console.log('category.products',category.products)
-    if(category.products){
-      category.products.map((product) => {
-       console.log('acc',acc)
-       acc.push(product);
-      })
-    }
-    return acc
-  },[])
-
-  console.log('products', products)
-
   // useLayoutEffect(() => {
   //   const isIndeterminate = selectedProduct.length > 0 && selectedProduct.length < categoriesWithProducts.products.length
   //   setChecked(selectedProduct.length === categoriesWithProducts.products.length)
   //   setIndeterminate(isIndeterminate)
   //   checkbox.current.indeterminate = isIndeterminate
   // }, [selectedProduct])
+
+  const products = pantry.products
 
   function toggleAll() {
     setSelectedProduct(checked || indeterminate ? [] : products)
@@ -245,8 +236,16 @@ export default function Pantry() {
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8" style={{ top: "1.5625em" }}> {/* 25px */}
+                  <input
+                    type="checkbox"
+                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                    ref={checkbox}
+                    checked={checked}
+                    onChange={toggleAll} />
+                </div>
                 {selectedProduct.length > 0 && (
-                  <div className="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
+                  <div className="absolute top-0 left-12 flex h-12 items-center space-x-3  sm:left-16">
                     <button
                       type="button"
                       className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
@@ -254,8 +253,9 @@ export default function Pantry() {
                     </button>
                     <button
                       type="button"
+                      onClick={deleteProduct}
                       className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
-                      Delete all
+                      {pantry.products.length === selectedProduct.length ? "Delete all" : "Delete"}
                     </button>
                   </div>
                 )}
@@ -264,12 +264,6 @@ export default function Pantry() {
                   <thead className="bg-white">
                     <tr>
                       <th scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8">
-                        <input
-                          type="checkbox"
-                          className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-                          ref={checkbox}
-                          checked={checked}
-                          onChange={toggleAll} />
                       </th>
                       <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                         Name
@@ -293,6 +287,7 @@ export default function Pantry() {
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
+                          <td className='bg-gray-50'></td>
                           <th
                             colSpan={5}
                             scope="colgroup"
@@ -308,7 +303,6 @@ export default function Pantry() {
                               {selectedProduct.includes(product) && (
                                 <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
                               )}
-                              {console.log('+++++',product)}
                               <input
                                 type="checkbox"
                                 className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
