@@ -259,13 +259,9 @@ export default function Pantry() {
                           <tr
                             key={item.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 flex">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"> 
                               <div>
-
                                 {item.name}
-                                {/* <div className="mt-0.5 text-gray-500">
-                                  {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
-                                </div> */}
                               </div>
 
                             </td>

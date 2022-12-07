@@ -4,11 +4,11 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
   const [amount, setAmount] = useState(quantity);
 
   function increment() {
-    setAmount(amount => amount + 1);
+    setAmount(amount => amount + 1.0);
   }
 
   function decrement() {
-    setAmount(amount => amount - 1);
+    setAmount(amount => amount - 1.0);
   }
 
   useEffect(() => updateQuantity(id, amount), [amount])
