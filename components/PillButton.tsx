@@ -21,14 +21,14 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
         onClick={decrement}
         type="button"
         name="decrement-button"
-        className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-offset-2"
         style={{ justifyContent: 'center', fontSize: '1.2500em'}}>
         -
       </button>
       <button
         type="button"
         name='default-number-dropdown'
-        className="h-5 w-5 hover:text-black inline-flex items-center p-5 hover:font-bold focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className="h-5 w-5 hover:text-black inline-flex items-center p-5 hover:font-bold focus:outline-none focus:ring-offset-2"
         style={{ justifyContent: 'center'}}>
         {quantity} {unit}
       </button>
@@ -36,7 +36,7 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
         onClick={increment}
         type="button"
         name='increment-button'
-        className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-offset-2"
         style={{ justifyContent: 'center', fontSize: '1.2500em' }}>
         +
       </button>
