@@ -8,7 +8,7 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
   }
 
   function decrement() {
-    setAmount(amount => amount - 1.0);
+    setAmount(amount => amount - (amount < 1.0 ? amount : 1.0));
   }
 
   useEffect(() => updateQuantity(id, amount), [amount])
@@ -18,6 +18,7 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
 
     <div className='rounded-full' style={{ backgroundColor: 'transparent', border: '1px solid rgba(0, 0, 0, 0.05)', width: 'fit-content' }}>
       <button
+        disabled={amount ? false : true}
         onClick={decrement}
         type="button"
         name="decrement-button"

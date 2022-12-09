@@ -1,33 +1,8 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react'
-// import { XMarkIcon } from '@heroicons/react/24/outline'
-// import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
-// const sortOptions = [
-//   { name: 'Most Popular', href: '#', current: true },
-//   { name: 'Best Rating', href: '#', current: false },
-//   { name: 'Newest', href: '#', current: false },
-// ]
-
-
-// const activeFilterSection = [
-//   { value: 'objects', label: 'Objects' },
-//   { value: 'objects', label: 'Objects' }
-// ]
 
 const filterSection =
 {
@@ -51,7 +26,6 @@ export default function Filter({ validCategories }) {
   const [categories, setCategories] = useState([]);
 
   function onProductChange(e) {
-    console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter
     let value = e.target.value;
     let name = e.target.name;
@@ -60,7 +34,6 @@ export default function Filter({ validCategories }) {
 
     setActiveFilters([...activeFilters, validFilter])
     if (field === 'category') {
-      console.log('filed', field)
       setCategories((categories) =>
         categories.map((option) =>
           option.value === value
@@ -200,10 +173,6 @@ export default function Filter({ validCategories }) {
               <div>
                 <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                   {/* Sort */}
-                  {/* <ChevronDownIcon
-                    className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                    aria-hidden="true"
-                  /> */}
                 </Menu.Button>
               </div>
 
@@ -239,12 +208,12 @@ export default function Filter({ validCategories }) {
               </Transition>
             </Menu>
 
-            {/* <button
+            <button
               type="button"
               className="inline-block text-sm font-medium text-gray-700 hover:text-gray-900 sm:hidden"
               onClick={() => setOpen(true)}>
               Filter
-            </button> */}
+            </button>
                   
             {/* <div className="hidden sm:block"> hides filter/category section on small viewport */}
             <div>
@@ -263,10 +232,10 @@ export default function Filter({ validCategories }) {
                         </span>
                         {/* {sectionIdx === 0 ? (
                         ) : null} */}
-                        {/* <ChevronDownIcon
+                        <ChevronDownIcon
                           className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                           aria-hidden="true"
-                        /> */}
+                        />
                       </Popover.Button>
 
                       <Transition

@@ -6,10 +6,6 @@ import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
 import PillButton from '../../components/PillButton'
 
-function cl(...a) {
-  console.log(a);
-}
-
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -135,7 +131,6 @@ export default function Pantry() {
     if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
-      console.log('>>>>>>', id, currentProductQuantity)
       fetchPantry();
     }
   }
