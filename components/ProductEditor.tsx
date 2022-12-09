@@ -128,11 +128,14 @@ export default function ProductEditor({
             Category
           </label>
         </div>
+        <div className="sm:col-span-2">
 
-        <Combobox
-          options={categoryOptions}
-          onSelect={onCategorySelect}
-          createOption={createCategory}/>
+          <Combobox
+            options={categoryOptions}
+            onSelect={onCategorySelect}
+            createOption={createCategory}
+          />
+        </div>
 
         {/* <div className="sm:col-span-1">
           <select

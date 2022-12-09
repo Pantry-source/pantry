@@ -17,13 +17,14 @@ export default function Dropdown({ options, onSelect, createOption }) {
   const filteredOptions =
     query === ''
       ? options
-      : options.reduce((available, option) => {
-        if (option.name.toLowerCase().includes(query.toLowerCase())) available.push(option);
+      : options.reduce((currentOptions, option) => {
+        let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
+        if (isOptionAvailable) currentOptions.push(option);
         //renders "+ create category" option if query value doesn't exist. eg: category doesn't exist"
-        if (available.length < 1
-          && !option.name.toLowerCase().includes(query.toLowerCase())
-        ) available.push({ id: undefined, name: '+ create option' });
-        return available;
+        if (currentOptions.length < 1
+          && !isOptionAvailable
+        ) currentOptions.push({ id: undefined, name: '+ create....' });
+        return currentOptions;
       }, []);
 
   function setCategory() {
@@ -49,19 +50,24 @@ export default function Dropdown({ options, onSelect, createOption }) {
 
         {filteredOptions.length > 0 && (
           <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {console.log('filteredOptions', filteredOptions)}
             {filteredOptions.map(option => (
               option.id === undefined
                 ?
-                <option
+                <Combobox.Option
                   key={option.id}
                   value={option}
+                  className={({ active }) =>
+                    classNames(
+                      'relative cursor-default select-none py-2 pl-3 pr-9',
+                      active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                    )
+                  }
                   onClick={() => {
                     createOption(query);
                     setSelected({ name: query });
                   }}>
                   {option.name}
-                </option>
+                </Combobox.Option>
                 :
                 <Combobox.Option
                   key={option.id}
