@@ -32,6 +32,8 @@ const filterSection =
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
+// filter {value: 'fruit', label: 'fruit'}
+//filter {value: 'fruit', label: 'fruit'}
 
 export default function Filter({ updateFilters, validCategories }) {
   const [open, setOpen] = useState(false);
@@ -43,7 +45,6 @@ export default function Filter({ updateFilters, validCategories }) {
    * if it's checked/unchecked
   */
   function onChange(e) {
-    console.log(e.target)
     let field = e.target.id.split('-')[1]; // category or filter
     let value = e.target.value;
     let name = e.target.name;
@@ -55,7 +56,7 @@ export default function Filter({ updateFilters, validCategories }) {
     updateFilters(validFilter)
 
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
-    if(!isChecked) setActiveFilters(currentFilters => 
+    if (!isChecked) setActiveFilters(currentFilters =>
       currentFilters.filter(f => f.value !== value))
 
     toggleCheckbox(event, field, value);
@@ -63,19 +64,18 @@ export default function Filter({ updateFilters, validCategories }) {
 
   /** toggles checkbox for filter options depending on which field is passed */
   function toggleCheckbox(e, field, value) {
-    
     if (field === 'category') toggle(e, setCategories, categories, value);
-    
+
     if (field === 'filters') toggle(e, setFilters, filters, value);
 
   }
 
-  /** toggles checkbox for either option  */
+  /** toggles checkbox for category or filter option  */
   function toggle(e, setState, field, value) {
     setState((field) =>
       field.map((option) =>
         option.value === value
-          ? { ...option, checked: e.target.checked }
+          ? { ...option, checked: e.target.checked || false }
           : option
       )
     )
@@ -106,6 +106,7 @@ export default function Filter({ updateFilters, validCategories }) {
     toggleCheckbox(e, field, value)
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
+    updateFilters(filter)
   }
 
   const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
@@ -127,7 +128,7 @@ export default function Filter({ updateFilters, validCategories }) {
   useEffect(() => {
     setCategories(categoryOptions);
   }, []);
-  
+
   return (
     <div className="bg-white">
       {/* Mobile filter dialog */}
@@ -341,11 +342,11 @@ export default function Filter({ updateFilters, validCategories }) {
               Filters
               <span className="sr-only">, active</span>
             </h3>
-
             <div aria-hidden="true" className="hidden h-5 w-px bg-gray-300 sm:ml-4 sm:block" />
-
             <div className="mt-2 sm:mt-0 sm:ml-4">
               <div className="-m-1 flex flex-wrap items-center">
+
+                {/* pill button */}
                 {activeFilters.map((activeFilter) => (
                   <span
                     key={activeFilter.value}
@@ -366,7 +367,7 @@ export default function Filter({ updateFilters, validCategories }) {
             </div>
           </div>
         </div>}
-      </section>
-    </div>
+      </section >
+    </div >
   )
 }

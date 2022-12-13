@@ -180,7 +180,7 @@ export default function Pantry() {
   /** builds product list by category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
 
-    if (filterProperties['Out Of Stock'] && category.products){
+    if (filterProperties['Out Of Stock'] && category.products) {
       return selectOosProducts(category);
     }
     //select essential products
@@ -205,20 +205,18 @@ export default function Pantry() {
   }
 
   //NOTE: consider using Set data structure?
-  /** Retrieves activeFilters from Filter and updates FilterProperties state  */
+  /** Retrieves activeFilters from Filter and updates FilterProperties state 
+   */
   function updateFilters(filter) {
-
-    if (filterProperties[filter.label]) {
-      setFilterProperties(current => {
+    filterProperties[filter.label]
+      ? setFilterProperties(current => {
         const copy = { ...current };
         delete copy[filter.label];
         setFilterProperties(copy);
         return copy;
       })
-    }
-
-    setFilterProperties(filterProperties =>
-      ({ ...filterProperties, [filter.label]: filter.value }));
+      : setFilterProperties(filterProperties =>
+        ({ ...filterProperties, [filter.label]: filter.value }));
   }
 
   function onSubmitProduct(e) {
