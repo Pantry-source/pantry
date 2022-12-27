@@ -81,7 +81,7 @@ export default function Filter({ updateFilters, validCategories }) {
     )
   };
 
-  /** retrieves option ID from corresponding activeFilter value*/
+  /** massages data:retrieves and adds option ID from corresponding activeFilter value*/
   function retrieveOptionProperties(optionSection, value) {
     const optionProperties = optionSection.options.reduce((properties, option) => {
       if (option.value === value) {

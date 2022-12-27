@@ -177,9 +177,19 @@ export default function Pantry() {
     if (oosProducts.length > 0) return oosProducts;
   }
 
-  /** builds product list by category options & filter options */
+  /** builds product list by chosen category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
-
+    //selects by category option
+    if (filterProperties[category.name]) {
+      category.products = currentProducts[category.name] || null;
+      return category;
+      // temp.push(category);
+      //selects all products
+    } else if (Object.keys(filterProperties).length === 0) {
+      category.products = currentProducts[category.name] || null;
+      return category;
+    }
+    //select out of stock products
     if (filterProperties['Out Of Stock'] && category.products) {
       return selectOosProducts(category);
     }
@@ -187,16 +197,9 @@ export default function Pantry() {
     if (filterProperties.Essential && category.products) {
       return selectEssentialProducts(category);
     }
-    //selects by category option
-    if (filterProperties[category.name]) {
-      category.products = currentProducts[category.name] || null;
-      return category;
-      //selects all products
-    } else if (Object.keys(filterProperties).length === 0) {
-      category.products = currentProducts[category.name] || null;
-      return category;
-    }
   })
+
+  console.log(categoriesWithProducts);
 
   const { description, title } = pantry;
   function addProducts() {
@@ -282,7 +285,6 @@ export default function Pantry() {
                   </thead>
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
-                      // category.products && filterProperties[category.name] &&
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
