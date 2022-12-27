@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
-import Checkbox from '../../components/Checkbox'
 import Filter from '../../components/Filter';
 
 export default function Pantry() {
@@ -180,15 +179,6 @@ export default function Pantry() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
     setIsAddingProducts(true);
   }
-
-  // ################ checkbox logic ##################
-
-  // useLayoutEffect(() => {
-  //   const isIndeterminate = selectedProduct.length > 0 && selectedProduct.length < categoriesWithProducts.products.length
-  //   setChecked(selectedProduct.length === categoriesWithProducts.products.length)
-  //   setIndeterminate(isIndeterminate)
-  //   checkbox.current.indeterminate = isIndeterminate
-  // }, [selectedProduct])
 
   const products = pantry.products
 
