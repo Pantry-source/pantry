@@ -5,10 +5,6 @@ import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
 
-function cl(x, y) {
-  console.log(x, y)
-}
-
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -127,7 +123,9 @@ export default function Pantry() {
    * if category id === false, fetch id for newly created category
     */
   async function onCategorySelect(category) {
-    if (category.name) onCategoryChange(category.id)
+    if (category.id) {
+      onCategoryChange(category.id);
+    }
   }
 
   async function selectProduct(product) {
@@ -208,14 +206,6 @@ export default function Pantry() {
     fetchCategories();
     fetchQuantityUnits();
   }, [id])
-
-  // useEffect(function fetchIdWhenCategoriesUpdates() {
-  //   async function fetchId() {
-  //     const id = await fetchCategoryId();
-  //     cl('id in useEffect', id)
-  //   }
-  //   fetchId();
-  // }, [categories]);
 
   if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;

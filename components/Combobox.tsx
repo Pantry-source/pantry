@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react';
-
-// const options = [
-//   { id: 1, name: 'Leslie Alexander' },
-// ]
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -27,12 +23,8 @@ export default function Dropdown({ options, onSelect, createOption }) {
         return currentOptions;
       }, []);
 
-  function setCategory() {
-      onSelect(selected);
-  }
-
   useEffect(() => {
-    setCategory()
+    onSelect(selected);
   }, [selected])
 
   return (
@@ -54,7 +46,7 @@ export default function Dropdown({ options, onSelect, createOption }) {
               option.id === undefined
                 ?
                 <Combobox.Option
-                  key={option.id}
+                  key="create"
                   value={option}
                   className={({ active }) =>
                     classNames(

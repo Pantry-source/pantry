@@ -25,12 +25,6 @@ export default function ProductEditor({
   }, []);
   const defaultUnitId = units[0].id, defaultCategory = undefined;
   const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
-
-  // function addCategory() {
-  //   createCategory();
-  //   setIsAddingCategory(false);
-  // }
-
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
 
@@ -136,42 +130,6 @@ export default function ProductEditor({
             createOption={createCategory}
           />
         </div>
-
-        {/* <div className="sm:col-span-1">
-          <select
-            id="category"
-            name="category_id"
-            value={category_id}
-            onChange={onProductChange}
-            className="w-full pl-3 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-            <option value=''>Select Category</option>
-            {categoryOptions}
-          </select>
-        </div> */}
-        {/*         
-        <button
-          onClick={!isAddingCategory ? () => setIsAddingCategory(true) : () => addCategory()}
-          type="button"
-          className="inline-flex items-center rounded-full border border-transparent bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-          {/* <PlusIconMini className="h-5 w-5" aria-hidden="true" /> */}
-        {/* {isAddingCategory ? "Create category" : "Add category"} */}
-        {/* </button> */}
-
-        {/* <div>
-          {isAddingCategory &&
-            <div className="mt-1">
-              <input
-                onChange={onCategoryChange}
-                type="text"
-                // rows={4}
-                name="custom-category"
-                id="custom-category"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                // defaultValue={''}
-                placeholder='Add your category' />
-            </div>
-          }
-        </div> */}
       </div>
 
 
