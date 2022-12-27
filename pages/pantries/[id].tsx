@@ -13,10 +13,11 @@ export default function Pantry() {
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);;
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
+  const [createdCategory, setCreatedCategory] = useState(null);
 
   const checkbox = useRef()
   const [checked, setChecked] = useState(false)
@@ -29,6 +30,14 @@ export default function Pantry() {
     setCurrentProduct(() => ({
       ...currentProduct,
       [e.target.name]: value === '' ? null : value
+    }));
+  }
+
+  /** adds selected Category id to currentProduct */
+  function onCategoryChange(id) {
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      'category_id': id
     }));
   }
 
@@ -95,6 +104,30 @@ export default function Pantry() {
     return response;
   }
 
+  // async function fetchCategoryId() {
+  //   cl('createdCategory', createdCategory)
+  //   const { data, error } = await supabase
+  //     .from('categories')
+  //     .select('*')
+  //     .eq('name', createdCategory)
+  //     .single()
+  //   try {
+  //     if (error) throw new Error('no category id data')
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   return data
+  // }
+
+  /** Receives selected option(category object) from Combobox
+   * if category id === false, fetch id for newly created category
+    */
+  async function onCategorySelect(category) {
+    if (category.id) {
+      onCategoryChange(category.id);
+    }
+  }
+
   async function selectProduct(product) {
     const { data, error } = await supabase
       .from('products')
@@ -149,6 +182,23 @@ export default function Pantry() {
         setSelectedProduct(products => [])
       }
       fetchPantry();
+  }
+
+  async function createCategory(category) {
+    const response = await supabase
+      .from('categories')
+      .insert([
+        { user_id: pantry.user_id, name: category },
+      ])
+      .single();
+    const { data, error } = response;
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error])
+    } else {
+      fetchCategories();
+    }
+    onCategoryChange(data.id)
+    return data
   }
 
   useEffect(() => {
@@ -343,6 +393,9 @@ export default function Pantry() {
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
+          userId={pantry.user_id}
+          createCategory={createCategory}
+          onCategorySelect={onCategorySelect}
           product={currentProduct}
           categories={categories}
           units={units}
