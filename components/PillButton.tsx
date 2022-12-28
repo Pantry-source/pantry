@@ -23,8 +23,8 @@ function PillButton({ id, quantity, unit, updateQuantity }) {
         type="button"
         name="decrement-button"
         className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-offset-2"
-        style={{ justifyContent: 'center', fontSize: '1.2500em'}}>
-        -
+        style={{ justifyContent: 'center', fontSize: '1.2500em', paddingTop: '0'}}>
+        {amount ? '-' : ''}
       </button>
       <button
         type="button"
