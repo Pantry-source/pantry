@@ -128,11 +128,7 @@ export default function Pantry() {
       .from('products')
       .update({ quantity_amount: currentProductQuantity })
       .eq('id', id)
-    if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error]);
-    } else {
       fetchPantry();
-    }
   }
 
   async function createProduct() {
