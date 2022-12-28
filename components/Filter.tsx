@@ -3,17 +3,6 @@ import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
-// const sortOptions = [
-//   { name: 'Most Popular', href: '#', current: true },
-//   { name: 'Best Rating', href: '#', current: false },
-//   { name: 'Newest', href: '#', current: false },
-// ]
-
-
-// const activeFilterSection = [
-//   { value: 'objects', label: 'Objects' },
-//   { value: 'objects', label: 'Objects' }
-// ]
 
 const filterSection =
 {
@@ -221,13 +210,13 @@ export default function Filter({ validCategories }) {
               </Transition>
             </Menu>
 
-            {/* <button
+            <button
               type="button"
               className="inline-block text-sm font-medium text-gray-700 hover:text-gray-900 sm:hidden"
               onClick={() => setOpen(true)}>
               Filter
-            </button> */}
-
+            </button>
+                  
             {/* <div className="hidden sm:block"> hides filter/category section on small viewport */}
             <div>
               <div className="flow-root">
