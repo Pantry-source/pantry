@@ -163,6 +163,7 @@ export default function Pantry() {
       }
       return category.products = essentialProducts;
     }, [])
+    console.log('essentialProducts', essentialProducts)
     if (essentialProducts.length > 0) return essentialProducts;
   }
 
@@ -177,29 +178,36 @@ export default function Pantry() {
     if (oosProducts.length > 0) return oosProducts;
   }
 
+  function isFilterPropertiesEmpty() {
+    return Object.keys(filterProperties).length === 0
+  }
+
   /** builds product list by chosen category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
-    //selects by category option
-    if (filterProperties[category.name]) {
+    // console.log('category.products', category)
+
+    //selects all products
+    if (isFilterPropertiesEmpty()) {
       category.products = currentProducts[category.name] || null;
       return category;
-      // temp.push(category);
-      //selects all products
-    } else if (Object.keys(filterProperties).length === 0) {
+    }
+    //selects by category option
+    if (filterProperties[category.name]
+      && !(filterProperties['Out Of Stock'] && category.products)
+      && !(filterProperties.Essential && category.products)) {
       category.products = currentProducts[category.name] || null;
       return category;
     }
     //select out of stock products
-    if (filterProperties['Out Of Stock'] && category.products) {
+    if (filterProperties['Out Of Stock'] && category.products && filterProperties[category.name]) {
       return selectOosProducts(category);
     }
     //select essential products
-    if (filterProperties.Essential && category.products) {
+
+    if ((filterProperties.Essential && category.products && filterProperties[category.name])) {
       return selectEssentialProducts(category);
     }
   })
-
-  console.log(categoriesWithProducts);
 
   const { description, title } = pantry;
   function addProducts() {
