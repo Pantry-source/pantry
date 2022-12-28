@@ -8,7 +8,6 @@ import Filter from '../../components/Filter';
 export default function Pantry() {
   const [pantry, setPantry] = useState(null);
   const [categories, setCategories] = useState(null);
-  const [categoriesMap, setCategoriesMap] = useState(null);
   const [units, setUnits] = useState(null);
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
@@ -45,61 +44,51 @@ export default function Pantry() {
   const { id } = router.query;
 
   async function fetchPantry() {
-    const response = await supabase
+    if (id) {
+      setIsPantryLoading(true);
+      const response = await supabase
       .from('pantries')
       .select(`*, products(*)`)
       .filter('id', 'eq', id)
       .single();
-    const { error, data } = response;
-    try {
-      if (error) throw new Error("no pantry data");
-      setPantry(data);
-      setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
-      setIsPantryLoading(false);
-    } catch (error) {
-      setIsPantryLoading(true);
+      const { error, data } = response;
+      if (!error) {
+        setPantry(data);
+        setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
+        setIsPantryLoading(false);
+      }
+      return response;
     }
-    return response;
   }
 
   async function fetchCategories() {
+    setIsCategoriesLoading(true);
     const response = await supabase
       .from('categories')
       .select(`*`);
     const { error, data } = response;
-    try {
-      if (error) throw new Error("no categories data");
+    if (!error && data) {
       setCategories(data);
-      setCategoriesMap(data?.reduce((previous, category) => {
-        return {
-          ...previous,
-          [category.id]: category.name
-        };
-      }, {}));
       setIsCategoriesLoading(false);
-    } catch (error) {
-      setIsCategoriesLoading(true);
     }
     return response;
   }
 
   async function fetchQuantityUnits() {
+    setIsUnitMapLoading(true);
     const response = await supabase
       .from('quantity_units')
       .select(`*`);
     const { error, data } = response;
-    try {
-      if (error) throw new Error("no quantity units data");
+    if (!error && data) {
       setUnits(data);
-      setUnitsMap(data?.reduce((previous, category) => {
+      setUnitsMap(data.reduce((previous, category) => {
         return {
           ...previous,
           [category.id]: category.name
         };
       }, {}));
       setIsUnitMapLoading(false);
-    } catch (error) {
-      setIsUnitMapLoading(true);
     }
     return response;
   }
@@ -201,39 +190,13 @@ export default function Pantry() {
     return data
   }
 
-  useEffect(() => {
-    fetchPantry();
-    fetchCategories();
-    fetchQuantityUnits();
-  }, [id])
-
-  if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
-    return <h1>loading...</h1>;
-  }
-
-  const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
-    let categoryName = categoriesMap[product.category_id]
-    categoryAndProducts[categoryName]
-      ? categoryAndProducts[categoryName].push(product)
-      : categoryAndProducts[categoryName] = [product];
-    return categoryAndProducts;
-  }, {});
-
-  const categoriesWithProducts = categories.map(category => {
-    category.products = currentProducts[category.name] || null;
-    return category;
-  });
-
-  const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id, "is_essential": false }));
     setIsAddingProducts(true);
   }
 
-  const products = pantry.products
-
   function toggleAll() {
-    setSelectedProduct(checked || indeterminate ? [] : products)
+    setSelectedProduct(checked || indeterminate ? [] : pantry.products)
     setChecked(!checked && !indeterminate)
     setIndeterminate(false)
   }
@@ -252,6 +215,28 @@ export default function Pantry() {
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
+
+  useEffect(() => {
+    fetchPantry();
+    fetchCategories();
+    fetchQuantityUnits();
+  }, [id])
+
+  if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
+    return <h1>loading...</h1>;
+  }
+
+  const { description, products, title } = pantry;
+  const categoriesWithProducts = categories.reduce((previous, category) => {
+    const productsInCategory = products.filter(p => p.category_id === category.id);
+    if (productsInCategory.length) {
+      previous.push({
+        ...category,
+        products: productsInCategory
+      });
+    }
+    return previous;
+  }, []);
 
   return (
     <div>
@@ -276,7 +261,7 @@ export default function Pantry() {
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <div scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8" style={{ top: "1.5625em" }}> {/* 25px */}
+                <div className="relative w-12 px-6 sm:w-16 sm:px-8" style={{ top: "1.5625em" }}> {/* 25px */}
                   <input
                     type="checkbox"
                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
@@ -299,7 +284,7 @@ export default function Pantry() {
                     </button>
                   </div>
                 )}
-                <Filter validCategories={categories.filter(category => category.products)} />
+                <Filter validCategories={categoriesWithProducts} />
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
