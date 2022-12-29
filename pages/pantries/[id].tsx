@@ -184,7 +184,6 @@ export default function Pantry() {
 
   /** builds product list by chosen category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
-    // console.log('category.products', category)
 
     //selects all products
     if (isFilterPropertiesEmpty()) {
