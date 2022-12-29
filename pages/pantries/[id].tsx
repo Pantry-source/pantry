@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
@@ -17,11 +17,16 @@ export default function Pantry() {
   const [unitsMap, setUnitsMap] = useState(null);
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);;
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [filterProperties, setFilterProperties] = useState({});
+  const [createdCategory, setCreatedCategory] = useState(null);
+
+  const checkbox = useRef()
+  const [checked, setChecked] = useState(false)
+  const [indeterminate, setIndeterminate] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState([])
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -29,6 +34,14 @@ export default function Pantry() {
     setCurrentProduct(() => ({
       ...currentProduct,
       [e.target.name]: value === '' ? null : value
+    }));
+  }
+
+  /** adds selected Category id to currentProduct */
+  function onCategoryChange(id) {
+    setCurrentProduct(() => ({
+      ...currentProduct,
+      'category_id': id
     }));
   }
 
@@ -95,6 +108,30 @@ export default function Pantry() {
     return response;
   }
 
+  // async function fetchCategoryId() {
+  //   cl('createdCategory', createdCategory)
+  //   const { data, error } = await supabase
+  //     .from('categories')
+  //     .select('*')
+  //     .eq('name', createdCategory)
+  //     .single()
+  //   try {
+  //     if (error) throw new Error('no category id data')
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   return data
+  // }
+
+  /** Receives selected option(category object) from Combobox
+   * if category id === false, fetch id for newly created category
+    */
+  async function onCategorySelect(category) {
+    if (category.id) {
+      onCategoryChange(category.id);
+    }
+  }
+
   async function selectProduct(product) {
     const { data, error } = await supabase
       .from('products')
@@ -135,6 +172,37 @@ export default function Pantry() {
       setIsAddingProducts(false);
       fetchPantry();
     }
+  }
+
+  /** removes selected product(s) from database and rerenders updated category list */
+  async function deleteProduct() {
+    for (let product of selectedProduct) {
+      const { data, error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', product.id)
+        .single();
+
+        setSelectedProduct(products => [])
+      }
+      fetchPantry();
+  }
+
+  async function createCategory(category) {
+    const response = await supabase
+      .from('categories')
+      .insert([
+        { user_id: pantry.user_id, name: category },
+      ])
+      .single();
+    const { data, error } = response;
+    if (error) {
+      setErrorMessages(errorMessages => [...errorMessages, error])
+    } else {
+      fetchCategories();
+    }
+    onCategoryChange(data.id)
+    return data
   }
 
   useEffect(() => {
@@ -185,48 +253,63 @@ export default function Pantry() {
   /** builds product list by chosen category options & filter options */
   const categoriesWithProducts = categories.filter(category => {
 
-    //selects all products
-    if (isFilterPropertiesEmpty()) {
-      category.products = currentProducts[category.name] || null;
-      return category;
-    }
-    //selects by category option
-    if (filterProperties[category.name]
-      && !(filterProperties['Out Of Stock'] && category.products)
-      && !(filterProperties.Essential && category.products)) {
-      category.products = currentProducts[category.name] || null;
-      return category;
-    }
-    //select out of stock products
-    if (filterProperties['Out Of Stock'] && category.products && filterProperties[category.name]) {
-      return selectOosProducts(category);
-    }
-    //select essential products
 
-    if ((filterProperties.Essential && category.products && filterProperties[category.name])) {
-      return selectEssentialProducts(category);
-    }
+    //REMOVE
+    //selects all products
+    // if (isFilterPropertiesEmpty()) {
+    //   category.products = currentProducts[category.name] || null;
+    //   return category;
+    // }
+
+
+    //REMOVE
+    //selects by category option
+  //   if (filterProperties[category.name]
+  //     && !(filterProperties['Out Of Stock'] && category.products)
+  //     && !(filterProperties.Essential && category.products)) {
+  //     category.products = currentProducts[category.name] || null;
+  //     return category;
+  //   }
+  //   //select out of stock products
+  //   if (filterProperties['Out Of Stock'] && category.products && filterProperties[category.name]) {
+  //     return selectOosProducts(category);
+  //   }
+  //   //select essential products
+
+  //   if ((filterProperties.Essential && category.products && filterProperties[category.name])) {
+  //     return selectEssentialProducts(category);
+  //   }
   })
 
   const { description, title } = pantry;
   function addProducts() {
-    setCurrentProduct(() => ({ 'pantry_id': pantry.id }));
+    setCurrentProduct(() => ({ 'pantry_id': pantry.id, "is_essential": false }));
     setIsAddingProducts(true);
   }
 
+
+  //REMOVE
   //NOTE: consider using Set data structure?
   /** Retrieves activeFilters from Filter and updates FilterProperties state 
    */
-  function updateFilters(filter) {
-    filterProperties[filter.label]
-      ? setFilterProperties(current => {
-        const copy = { ...current };
-        delete copy[filter.label];
-        setFilterProperties(copy);
-        return copy;
-      })
-      : setFilterProperties(filterProperties =>
-        ({ ...filterProperties, [filter.label]: filter.value }));
+  // function updateFilters(filter) {
+  //   filterProperties[filter.label]
+  //     ? setFilterProperties(current => {
+  //       const copy = { ...current };
+  //       delete copy[filter.label];
+  //       setFilterProperties(copy);
+  //       return copy;
+  //     })
+  //     : setFilterProperties(filterProperties =>
+  //       ({ ...filterProperties, [filter.label]: filter.value }));
+  // }
+
+  const products = pantry.products
+
+  function toggleAll() {
+    setSelectedProduct(checked || indeterminate ? [] : products)
+    setChecked(!checked && !indeterminate)
+    setIndeterminate(false)
   }
 
   function onSubmitProduct(e) {
@@ -266,13 +349,37 @@ export default function Pantry() {
         <div className="mt-8 flex flex-col">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8" style={{ top: "1.5625em" }}> {/* 25px */}
+                  <input
+                    type="checkbox"
+                    className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                    ref={checkbox}
+                    checked={checked}
+                    onChange={toggleAll} />
+                </div>
+                {selectedProduct.length > 0 && (
+                  <div className="absolute top-0 left-12 flex h-12 items-center space-x-3  sm:left-16">
+                    <button
+                      type="button"
+                      className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
+                      Out Of Stock
+                    </button>
+                    <button
+                      type="button"
+                      onClick={deleteProduct}
+                      className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
+                      {pantry.products.length === selectedProduct.length ? "Delete all" : "Delete"}
+                    </button>
+                  </div>
+                )}
                 <Filter
-                  updateFilters={updateFilters}
                   validCategories={categories.filter(category => category.products)} />
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
+                      <th scope="col" className="relative w-12 px-6 sm:w-16 sm:px-8">
+                      </th>
                       <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                         Name
                       </th>
@@ -295,6 +402,7 @@ export default function Pantry() {
                       category.products &&
                       <Fragment key={category.name}>
                         <tr className="border-t border-gray-200">
+                          <td className='bg-gray-50'></td>
                           <th
                             colSpan={5}
                             scope="colgroup"
@@ -302,26 +410,43 @@ export default function Pantry() {
                             {category.name}
                           </th>
                         </tr>
-                        {category.products.map((item) => (
-                          category.name !== item.name &&
+                        {category.products.map((product) => (
                           <tr
-                            key={item.name}
+                            key={product.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
+                            <td className="relative w-12 px-6 sm:w-16 sm:px-8">
+                              {selectedProduct.includes(product) && (
+                                <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
+                              )}
+                              <input
+                                type="checkbox"
+                                className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                                value={product.name}
+                                checked={selectedProduct.includes(product)}
+                                onChange={(e) =>
+                                  setSelectedProduct(
+                                    e.target.checked
+                                      ? [...selectedProduct, product]
+                                      : selectedProduct.filter((p) => p !== product)
+                                  )
+                                }
+                              />
+                            </td>
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                              {item.name}
+                              {product.name}
                               <div className="mt-0.5 text-gray-500">
-                                {item.quantity_amount} {unitsMap && unitsMap[item.quantity_unit]}
+                                {product.quantity_amount} {unitsMap && unitsMap[product.quantity_unit]}
                               </div>
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.is_essential ? 'yes' : 'no'}</td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.expires_at || 'not specified'}</td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.vendor || ''}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.expires_at || 'not specified'}</td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.vendor || ''}</td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button
                                 type="button"
-                                onClick={() => selectProduct(item)}
+                                onClick={() => selectProduct(product)}
                                 className="text-indigo-600 hover:text-indigo-900">
-                                Edit<span className="sr-only">,{item.name}</span>
+                                Edit<span className="sr-only">,{product.name}</span>
                               </button>
                             </td>
                           </tr>
@@ -343,6 +468,9 @@ export default function Pantry() {
         title="New product"
         subtitle={`Fillout the information below to add a product to ${title}`}>
         <ProductEditor
+          userId={pantry.user_id}
+          createCategory={createCategory}
+          onCategorySelect={onCategorySelect}
           product={currentProduct}
           categories={categories}
           units={units}

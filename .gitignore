@@ -36,5 +36,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-#webstorm
+# webstorm
 .idea/
+
+# vscode
+.vscode/launch.json
