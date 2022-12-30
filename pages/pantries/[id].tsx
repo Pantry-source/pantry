@@ -28,7 +28,7 @@ export default function Pantry() {
   const [indeterminate, setIndeterminate] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState([])
 
-  const [filterValues, setFilterValues] = useState([]);
+  const [categoryIds, setCategoryIds] = useState([]);
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -312,12 +312,11 @@ export default function Pantry() {
   // }
 
   function updateFilters(filter) {
-    const filterValue = +filter.value;
-    cl('filteValue',filter.value,filterValue)
-    filterValues.includes(filterValue)
-      ? setFilterValues(filterValues => 
-        filterValues.filter(value => value !== filterValue))
-      : setFilterValues(filterValues => [...filterValues, filterValue]);
+    const categoryId = +filter.value;
+    categoryIds.includes(categoryId)
+      ? setCategoryIds(ids => 
+        ids.filter(id => id !== categoryId))
+      : setCategoryIds(ids => [...ids, categoryId]);
   }
 
   const products = pantry.products
@@ -416,9 +415,9 @@ export default function Pantry() {
                   </thead>
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
-                      category.products && (filterValues.length === 0 || filterValues.includes(category.id)) &&
+                      category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) &&
                       <Fragment key={category.name}>
-                        { cl(filterValues.includes(category.id),filterValues,category.id) }
+                        { cl(categoryIds.includes(category.id),categoryIds,category.id) }
                         <tr className="border-t border-gray-200">
                           <td className='bg-gray-50'></td>
                           <th
