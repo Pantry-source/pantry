@@ -28,6 +28,8 @@ export default function Pantry() {
   const [indeterminate, setIndeterminate] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState([])
 
+  const [filterValues, setFilterValues] = useState([]);
+
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
@@ -183,9 +185,9 @@ export default function Pantry() {
         .eq('id', product.id)
         .single();
 
-        setSelectedProduct(products => [])
-      }
-      fetchPantry();
+      setSelectedProduct(products => [])
+    }
+    fetchPantry();
   }
 
   async function createCategory(category) {
@@ -215,6 +217,7 @@ export default function Pantry() {
     return <h1>loading...</h1>;
   }
 
+
   const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
     let categoryName = categoriesMap[product.category_id]
     categoryAndProducts[categoryName]
@@ -223,47 +226,51 @@ export default function Pantry() {
     return categoryAndProducts;
   }, {});
 
+  const categoriesWithProducts = categories.map(category => {
+    category.products = currentProducts[category.name] || null;
+    return category;
+  });
   /** selects filter options for essential products */
-  function selectEssentialProducts(category) {
-    const essentialProducts = category.products.reduce((essentialProducts, product) => {
-      if (product.is_essential) {
-        essentialProducts.push(product)
-      }
-      return category.products = essentialProducts;
-    }, [])
-    console.log('essentialProducts', essentialProducts)
-    if (essentialProducts.length > 0) return essentialProducts;
-  }
+  // function selectEssentialProducts(category) {
+  //   const essentialProducts = category.products.reduce((essentialProducts, product) => {
+  //     if (product.is_essential) {
+  //       essentialProducts.push(product)
+  //     }
+  //     return category.products = essentialProducts;
+  //   }, [])
+  //   console.log('essentialProducts', essentialProducts)
+  //   if (essentialProducts.length > 0) return essentialProducts;
+  // }
 
   /** selects filter options for Out Of Stock products */
-  function selectOosProducts(category) {
-    const oosProducts = category.products.reduce((oosProducts, product) => {
-      if (product.quantity_amount === 0) {
-        oosProducts.push(product)
-      }
-      return category.products = oosProducts;
-    }, [])
-    if (oosProducts.length > 0) return oosProducts;
-  }
+  // function selectOosProducts(category) {
+  //   const oosProducts = category.products.reduce((oosProducts, product) => {
+  //     if (product.quantity_amount === 0) {
+  //       oosProducts.push(product)
+  //     }
+  //     return category.products = oosProducts;
+  //   }, [])
+  //   if (oosProducts.length > 0) return oosProducts;
+  // }
 
-  function isFilterPropertiesEmpty() {
-    return Object.keys(filterProperties).length === 0
-  }
+  // function isFilterPropertiesEmpty() {
+  //   return Object.keys(filterProperties).length === 0
+  // }
 
   /** builds product list by chosen category options & filter options */
-  const categoriesWithProducts = categories.filter(category => {
+  // const categoriesWithProducts = categories.filter(category => {
 
 
-    //REMOVE
-    //selects all products
-    // if (isFilterPropertiesEmpty()) {
-    //   category.products = currentProducts[category.name] || null;
-    //   return category;
-    // }
+  //REMOVE
+  //selects all products
+  // if (isFilterPropertiesEmpty()) {
+  //   category.products = currentProducts[category.name] || null;
+  //   return category;
+  // }
 
 
-    //REMOVE
-    //selects by category option
+  //REMOVE
+  //selects by category option
   //   if (filterProperties[category.name]
   //     && !(filterProperties['Out Of Stock'] && category.products)
   //     && !(filterProperties.Essential && category.products)) {
@@ -279,7 +286,7 @@ export default function Pantry() {
   //   if ((filterProperties.Essential && category.products && filterProperties[category.name])) {
   //     return selectEssentialProducts(category);
   //   }
-  })
+  // })
 
   const { description, title } = pantry;
   function addProducts() {
@@ -301,8 +308,17 @@ export default function Pantry() {
   //       return copy;
   //     })
   //     : setFilterProperties(filterProperties =>
-  //       ({ ...filterProperties, [filter.label]: filter.value }));
+  //       ({ ...filterProperties, [filter.label]: filterValue }));
   // }
+
+  function updateFilters(filter) {
+    const filterValue = +filter.value;
+    cl('filteValue',filter.value,filterValue)
+    filterValues.includes(filterValue)
+      ? setFilterValues(filterValues => 
+        filterValues.filter(value => value !== filterValue))
+      : setFilterValues(filterValues => [...filterValues, filterValue]);
+  }
 
   const products = pantry.products
 
@@ -374,6 +390,7 @@ export default function Pantry() {
                   </div>
                 )}
                 <Filter
+                  updateFilters={updateFilters}
                   validCategories={categories.filter(category => category.products)} />
                 <table className="min-w-full">
                   <thead className="bg-white">
@@ -399,8 +416,9 @@ export default function Pantry() {
                   </thead>
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
-                      category.products &&
+                      category.products && (filterValues.length === 0 || filterValues.includes(category.id)) &&
                       <Fragment key={category.name}>
+                        { cl(filterValues.includes(category.id),filterValues,category.id) }
                         <tr className="border-t border-gray-200">
                           <td className='bg-gray-50'></td>
                           <th

@@ -49,7 +49,7 @@ export default function Filter({ updateFilters, validCategories }) {
     let value = e.target.value;
     let name = e.target.name;
     let isChecked = e.target.checked
-
+    // cl('e',e.target)
     //massaging data to be sent to activeFilters
     let validFilter = { value: e.target.value, label: e.target.name };
 
@@ -110,14 +110,15 @@ export default function Filter({ updateFilters, validCategories }) {
   }
 
   const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
+    // cl('category====',category)
     convertToCategoryOptionsFormat.push({
-      value: category.name.toLowerCase().split(' ').join('-'),
+      value: +category.id,
       label: category.name,
       checked: false
     });
     return convertToCategoryOptionsFormat;
   }, [])
-
+// cl('category options',categoryOptions)
   const categorySection =
   {
     id: 'category',
@@ -274,6 +275,7 @@ export default function Filter({ updateFilters, validCategories }) {
                 <Popover.Group className="-mx-4 flex items-center divide-x divide-gray-200">
                   {[categorySection, filterSection].map((section, sectionIdx) => (
                     <Popover key={section.name} className="relative inline-block px-4 text-left">
+                      {/* {cl('section====',section)} */}
                       <Popover.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                         <span>{section.name}</span>
                         <span className="ml-1.5 rounded bg-gray-200 py-0.5 px-1.5 text-xs font-semibold tabular-nums text-gray-700">
@@ -302,6 +304,8 @@ export default function Filter({ updateFilters, validCategories }) {
                           <form className="space-y-4">
                             {(section.name === 'Filters' ? filters : categories).map((option, optionIdx) => (
                               <div key={option.value} className="flex items-center">
+                                {/* { cl('option', option)} */}
+                                {/* {cl('sectioin',section)} */}
                                 <input
                                   id={`filter-${section.id}-${optionIdx}`}
                                   // name={`${section.id}[]`}
