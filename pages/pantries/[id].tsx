@@ -29,6 +29,7 @@ export default function Pantry() {
   const [selectedProduct, setSelectedProduct] = useState([])
 
   const [categoryIds, setCategoryIds] = useState([]);
+  const [filters, setFilters] = useState([]);
 
   function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -217,7 +218,6 @@ export default function Pantry() {
     return <h1>loading...</h1>;
   }
 
-
   const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
     let categoryName = categoriesMap[product.category_id]
     categoryAndProducts[categoryName]
@@ -230,63 +230,6 @@ export default function Pantry() {
     category.products = currentProducts[category.name] || null;
     return category;
   });
-  /** selects filter options for essential products */
-  // function selectEssentialProducts(category) {
-  //   const essentialProducts = category.products.reduce((essentialProducts, product) => {
-  //     if (product.is_essential) {
-  //       essentialProducts.push(product)
-  //     }
-  //     return category.products = essentialProducts;
-  //   }, [])
-  //   console.log('essentialProducts', essentialProducts)
-  //   if (essentialProducts.length > 0) return essentialProducts;
-  // }
-
-  /** selects filter options for Out Of Stock products */
-  // function selectOosProducts(category) {
-  //   const oosProducts = category.products.reduce((oosProducts, product) => {
-  //     if (product.quantity_amount === 0) {
-  //       oosProducts.push(product)
-  //     }
-  //     return category.products = oosProducts;
-  //   }, [])
-  //   if (oosProducts.length > 0) return oosProducts;
-  // }
-
-  // function isFilterPropertiesEmpty() {
-  //   return Object.keys(filterProperties).length === 0
-  // }
-
-  /** builds product list by chosen category options & filter options */
-  // const categoriesWithProducts = categories.filter(category => {
-
-
-  //REMOVE
-  //selects all products
-  // if (isFilterPropertiesEmpty()) {
-  //   category.products = currentProducts[category.name] || null;
-  //   return category;
-  // }
-
-
-  //REMOVE
-  //selects by category option
-  //   if (filterProperties[category.name]
-  //     && !(filterProperties['Out Of Stock'] && category.products)
-  //     && !(filterProperties.Essential && category.products)) {
-  //     category.products = currentProducts[category.name] || null;
-  //     return category;
-  //   }
-  //   //select out of stock products
-  //   if (filterProperties['Out Of Stock'] && category.products && filterProperties[category.name]) {
-  //     return selectOosProducts(category);
-  //   }
-  //   //select essential products
-
-  //   if ((filterProperties.Essential && category.products && filterProperties[category.name])) {
-  //     return selectEssentialProducts(category);
-  //   }
-  // })
 
   const { description, title } = pantry;
   function addProducts() {
@@ -294,29 +237,27 @@ export default function Pantry() {
     setIsAddingProducts(true);
   }
 
-
-  //REMOVE
-  //NOTE: consider using Set data structure?
-  /** Retrieves activeFilters from Filter and updates FilterProperties state 
-   */
-  // function updateFilters(filter) {
-  //   filterProperties[filter.label]
-  //     ? setFilterProperties(current => {
-  //       const copy = { ...current };
-  //       delete copy[filter.label];
-  //       setFilterProperties(copy);
-  //       return copy;
-  //     })
-  //     : setFilterProperties(filterProperties =>
-  //       ({ ...filterProperties, [filter.label]: filterValue }));
-  // }
-
-  function updateFilters(filter) {
+  /** retrives category ID from Filter.tsx and add/removes from categoryIDs */
+  function updateCategoryIds(filter) {
     const categoryId = +filter.value;
     categoryIds.includes(categoryId)
-      ? setCategoryIds(ids => 
+      ? setCategoryIds(ids =>
         ids.filter(id => id !== categoryId))
       : setCategoryIds(ids => [...ids, categoryId]);
+  }
+
+  /** retrives Filter value from Filter.tsx and add/removes from filters */
+  function updateFilterIds(filter) {
+    filters.includes(filter)
+      ? setFilters(filters =>
+        filters.filter(f => f !== filter))
+      : setFilters(filters => [...filters, filter]);
+  }
+
+  /** checks filters for filter attributes, all products that return true render*/
+  function checkFilters(product) {
+    if (filters.includes('is_essential')) return product.is_essential;
+    if (filters.includes('quantity_amount')) return !!product.quantity_amount;
   }
 
   const products = pantry.products
@@ -389,7 +330,8 @@ export default function Pantry() {
                   </div>
                 )}
                 <Filter
-                  updateFilters={updateFilters}
+                  updateCategoryIds={updateCategoryIds}
+                  updateFilters={updateFilterIds}
                   validCategories={categories.filter(category => category.products)} />
                 <table className="min-w-full">
                   <thead className="bg-white">
@@ -415,9 +357,8 @@ export default function Pantry() {
                   </thead>
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
-                      category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) &&
+                      category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) && 
                       <Fragment key={category.name}>
-                        { cl(categoryIds.includes(category.id),categoryIds,category.id) }
                         <tr className="border-t border-gray-200">
                           <td className='bg-gray-50'></td>
                           <th
@@ -428,6 +369,7 @@ export default function Pantry() {
                           </th>
                         </tr>
                         {category.products.map((product) => (
+                          (filters.length === 0 || checkFilters(product)) &&
                           <tr
                             key={product.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
@@ -435,6 +377,7 @@ export default function Pantry() {
                               {selectedProduct.includes(product) && (
                                 <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
                               )}
+                              {cl('product', product)}
                               <input
                                 type="checkbox"
                                 className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"

@@ -23,19 +23,17 @@ const filterSection =
   id: 'filters',
   name: 'Filters',
   options: [
-    { value: 'isEssential', label: 'Essential', checked: false },
-    { value: 'isOutOfStock', label: 'Out Of Stock', checked: false },
-    { value: 'isExpiring', label: 'Expiring Soon', checked: false },
+    { value: 'is_essential', label: 'Essential', checked: false },
+    { value: 'quantity_amount', label: 'Out Of Stock', checked: false },
+    { value: 'expires_at', label: 'Expiring Soon', checked: false },
   ],
 }
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
-// filter {value: 'fruit', label: 'fruit'}
-//filter {value: 'fruit', label: 'fruit'}
 
-export default function Filter({ updateFilters, validCategories }) {
+export default function Filter({ updateCategoryIds, updateFilters, validCategories }) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
   const [filters, setFilters] = useState(filterSection.options);
@@ -45,15 +43,14 @@ export default function Filter({ updateFilters, validCategories }) {
    * if it's checked/unchecked
   */
   function onChange(e) {
-    let field = e.target.id.split('-')[1]; // category or filter
+    let field = e.target.id.split('-')[1]; // category or filters
     let value = e.target.value;
     let name = e.target.name;
     let isChecked = e.target.checked
     // cl('e',e.target)
     //massaging data to be sent to activeFilters
     let validFilter = { value: e.target.value, label: e.target.name };
-
-    updateFilters(validFilter)
+    field === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
 
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
     if (!isChecked) setActiveFilters(currentFilters =>
@@ -106,11 +103,10 @@ export default function Filter({ updateFilters, validCategories }) {
     toggleCheckbox(e, field, value)
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
-    updateFilters(filter)
+    updateCategoryIds(filter)
   }
 
   const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
-    // cl('category====',category)
     convertToCategoryOptionsFormat.push({
       value: +category.id,
       label: category.name,
@@ -118,7 +114,6 @@ export default function Filter({ updateFilters, validCategories }) {
     });
     return convertToCategoryOptionsFormat;
   }, [])
-// cl('category options',categoryOptions)
   const categorySection =
   {
     id: 'category',
