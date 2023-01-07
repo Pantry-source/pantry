@@ -21,7 +21,6 @@ export default function Pantry() {
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [createdCategory, setCreatedCategory] = useState(null);
 
   const checkbox = useRef()
   const [checked, setChecked] = useState(false)
@@ -255,9 +254,14 @@ export default function Pantry() {
   }
 
   /** checks filters for filter attributes, all products that return true render*/
-  function checkFilters(product) {
+  function isFilterMatching(product) {
     if (filters.includes('is_essential')) return product.is_essential;
-    if (filters.includes('quantity_amount')) return !!product.quantity_amount;
+    if (filters.includes('quantity_amount')) return !product.quantity_amount;
+  }
+
+  /** checks products properties for existing filter attribute to render category name */
+  function isCategoryRendering(category){
+    return category.products.some(product => product.is_essential || !product.quantity_amount);
   }
 
   const products = pantry.products
@@ -332,7 +336,8 @@ export default function Pantry() {
                 <Filter
                   updateCategoryIds={updateCategoryIds}
                   updateFilters={updateFilterIds}
-                  validCategories={categories.filter(category => category.products)} />
+                  validCategories={categories.filter(category => category.products)} 
+                  />
                 <table className="min-w-full">
                   <thead className="bg-white">
                     <tr>
@@ -358,7 +363,9 @@ export default function Pantry() {
                   <tbody className="bg-white">
                     {categoriesWithProducts.map((category, productIdx) => (
                       category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) && 
+                      (filters.length === 0 || isCategoryRendering(category)) &&
                       <Fragment key={category.name}>
+                        {cl('category',category)}
                         <tr className="border-t border-gray-200">
                           <td className='bg-gray-50'></td>
                           <th
@@ -369,7 +376,7 @@ export default function Pantry() {
                           </th>
                         </tr>
                         {category.products.map((product) => (
-                          (filters.length === 0 || checkFilters(product)) &&
+                          (filters.length === 0 || isFilterMatching(product)) &&
                           <tr
                             key={product.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
