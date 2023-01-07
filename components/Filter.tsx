@@ -69,11 +69,10 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
 
   /** toggles checkbox for category or filter option  */
   function toggle(e, setState, field, value) {
-    cl('>>>>>>',value)
     
     setState((field) =>
       field.map((option) =>
-        option.value === +value
+        option.value === (isNaN(value) ? value : +value)
           ? { ...option, checked: e.target.checked || false }
           : option
       )
