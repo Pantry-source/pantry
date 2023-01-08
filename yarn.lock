@@ -107,9 +107,9 @@
     "cross-fetch" "^3.0.6"
 
 "@supabase/postgrest-js@^0.36.0":
-  "integrity" "sha512-KOnhVy8tEr/qNnvOLpFqwOkt7ilRDFMXY+JJfmLjS3+eZuna1G57w4zb3L0SdY6BL7AKnfzP5BG3yHTAuJPSww=="
-  "resolved" "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-0.36.0.tgz"
-  "version" "0.36.0"
+  "integrity" "sha512-ZKQT+5ISWdsiSPDoVLnt/fiY82fUFw3lYLc2aMhx5tS3Zj6cChsWlK7NxH6ZZzo9Re/Pa/h4EoOzDZiDPywqxQ=="
+  "resolved" "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-0.36.2.tgz"
+  "version" "0.36.2"
   dependencies:
     "cross-fetch" "^3.0.6"
 
