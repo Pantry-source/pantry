@@ -4,10 +4,6 @@ import { supabase } from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
-
-function cl(...a) {
-  console.log(a)
-}
 import PillButton from '../../components/PillButton'
 
 export default function Pantry() {
