@@ -61,6 +61,7 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
 
   /** toggles checkbox for filter options depending on which field is passed */
   function toggleCheckbox(e, field, value) {
+
     if (field === 'category') toggle(e, setCategories, categories, value);
 
     if (field === 'filters') toggle(e, setFilters, filters, value);
@@ -69,7 +70,7 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
 
   /** toggles checkbox for category or filter option  */
   function toggle(e, setState, field, value) {
-    
+
     setState((field) =>
       field.map((option) =>
         option.value === (isNaN(value) ? value : +value)
@@ -94,14 +95,15 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
   /** removes active filter & retrieves value from active filter to uncheck option */
   function remove(e, filter) {
 
-    let categoryProperties = retrieveOptionProperties(categorySection, filter.value);
-    let filterProperties = retrieveOptionProperties(filterSection, filter.value);
+    const categoryProperties = retrieveOptionProperties(categorySection, +filter.value);
+    const filterProperties = retrieveOptionProperties(filterSection, filter.value);
 
-    let { field, value } = Object.keys(categoryProperties).length === 0
+    const { field, value } = Object.keys(categoryProperties).length === 0
       ? filterProperties
       : categoryProperties;
-
+    
     toggleCheckbox(e, field, value)
+
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
     updateCategoryIds(filter)
