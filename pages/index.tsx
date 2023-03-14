@@ -25,7 +25,6 @@ export default function Home() {
           <Link key={pantry.id} href={`/pantries/${pantry.id}`}>
             <div className="cursor-pointer border-b border-gray-300	mt-8 pb-4">
               <h2 className="text-xl font-semibold">{pantry.title}</h2>
-              <p className="text-gray-500 mt-2">Author: {pantry.user_email}</p>
             </div>
           </Link>)
         )
