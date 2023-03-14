@@ -18,13 +18,13 @@ function CreatePantry() {
   }
   async function createNewPantry() {
     if (!title || !description || !user) return
-    const { id, email } = user
+    const { id } = user
     const newPantryId = uuid()
     pantry.id = newPantryId
     const { data } = await supabase
       .from('pantries')
       .insert([
-          { title, description, user_id: id, user_email: email }
+          { title, description, user_id: id }
       ])
       .single()
     router.push(`/pantries/${data.id}`)
