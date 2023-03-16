@@ -1,30 +1,26 @@
 import { useState, useEffect } from 'react';
 
 function PillButton({ id, quantity, unit, updateQuantity }) {
-  const [amount, setAmount] = useState(quantity);
 
   function increment() {
-    setAmount(amount => amount + 1.0);
+    updateQuantity(id, quantity + 1.0);
   }
 
   function decrement() {
-    setAmount(amount => amount - (amount < 1.0 ? amount : 1.0));
+    updateQuantity(id, quantity - (quantity < 1.0 ? quantity : 1.0));
   }
-
-  useEffect(() => updateQuantity(id, amount), [amount])
-
 
   return (
 
     <div className='rounded-full' style={{ backgroundColor: 'transparent', border: '1px solid rgba(0, 0, 0, 0.05)', width: 'fit-content' }}>
       <button
-        disabled={amount ? false : true}
+        disabled={quantity ? false : true}
         onClick={decrement}
         type="button"
         name="decrement-button"
         className="h-5 w-5 hover:text-black inline-flex items-center rounded-full p-5 hover:font-bold focus:outline-none focus:ring-offset-2"
         style={{ justifyContent: 'center', fontSize: '1.2500em', paddingTop: '0'}}>
-        {amount ? '-' : ''}
+        {quantity ? '-' : ''}
       </button>
       <button
         type="button"
