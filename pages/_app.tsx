@@ -1,52 +1,28 @@
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { supabase } from '../api'
+import Navigation from '../components/Navigation';
+import { useState } from 'react'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import type { Database } from '../types/generated/supabase';
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async () => checkUser()
-    )
-    checkUser()
-    return () => {
-      authListener?.unsubscribe()
-    };
-  }, [])
-  async function checkUser() {
-    const user = supabase.auth.user()
-    setUser(user)
-  }
+
+function MyApp({ Component, pageProps }: AppProps<{
+  initialSession: Session
+}>) {
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>());
   return (
+    <SessionContextProvider
+      supabaseClient={supabaseClient}
+      initialSession={pageProps.initialSession}
+    >
     <div>
-      <nav className="p-6 border-b border-gray-300">
-        <Link href="/">
-          <span className="mr-6 cursor-pointer">Home</span>
-        </Link>
-        {
-          user && (
-            <Link href="/my-pantries">
-              <span className="mr-6 cursor-pointer">My Pantries</span>
-            </Link>
-          )
-        }
-        {
-          user && (
-            <Link href="/create-pantry">
-              <span className="mr-6 cursor-pointer">Create Pantry</span>
-            </Link>
-          )
-        }
-        <Link href="/profile">
-          <span className="mr-6 cursor-pointer">Profile</span>
-        </Link>
-      </nav>
+      <Navigation />
       <div className="py-8 px-10">
         <Component {...pageProps} />
       </div>
     </div>
+    </SessionContextProvider>
     )
 }
 

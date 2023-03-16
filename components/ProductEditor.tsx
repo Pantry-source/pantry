@@ -4,6 +4,17 @@ import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid'
 import { PlusIcon as PlusIconOutline } from '@heroicons/react/24/outline'
 import { text } from "stream/consumers";
 import Combobox from "./Combobox";
+import * as categoryApi from '../modules/supabase/category';
+import * as quantityUnitApi from '../modules/supabase/quantityUnit';
+
+type ProductEditorProps = {
+  createCategory: (categoryName: string) => Promise<void>,
+  onCategorySelect: (category: categoryApi.Category) => Promise<void>,
+  categories: categoryApi.Category[],
+  units: quantityUnitApi.QuantityUnit[],
+  userId: string,
+  onProductChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+};
 
 export default function ProductEditor({
   createCategory,
@@ -13,7 +24,7 @@ export default function ProductEditor({
   onProductChange,
   product,
   errorMessages
-}) {
+}: ProductEditorProps) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
   const { name = '', quantity_amount = '', quantity_unit = '', vendor = '' } = product;
   return (

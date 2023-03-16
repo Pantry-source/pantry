@@ -1,29 +1,33 @@
 import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../../api';
+import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
+import * as pantryApi from '../../modules/supabase/pantry';
+import * as categoryApi from '../../modules/supabase/category';
+import * as quantityUnitApi from '../../modules/supabase/quantityUnit';
+
+type QuantityUnitMap = Map<number, string> | {};
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [units, setUnits] = useState(null);
-  const [unitsMap, setUnitsMap] = useState(null);
+  const [pantry, setPantry] = useState<pantryApi.Pantry>();
+  const [categories, setCategories] = useState<categoryApi.Category[]>([]);
+  const [units, setUnits] = useState<quantityUnitApi.QuantityUnit[]>([]);
+  const [unitsMap, setUnitsMap] = useState<QuantityUnitMap>({});
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [createdCategory, setCreatedCategory] = useState(null);
 
   const checkbox = useRef()
   const [checked, setChecked] = useState(false)
   const [indeterminate, setIndeterminate] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState([])
 
-  function onProductChange(e) {
+  function onProductChange(e: React.ChangeEvent<HTMLInputElement>) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
     setCurrentProduct(() => ({
@@ -33,10 +37,10 @@ export default function Pantry() {
   }
 
   /** adds selected Category id to currentProduct */
-  function onCategoryChange(id) {
+  function onCategoryChange(categoryId: number) {
     setCurrentProduct(() => ({
       ...currentProduct,
-      'category_id': id
+      'category_id': categoryId
     }));
   }
 
@@ -63,29 +67,23 @@ export default function Pantry() {
 
   async function fetchCategories() {
     setIsCategoriesLoading(true);
-    const response = await supabase
-      .from('categories')
-      .select(`*`);
-    const { error, data } = response;
+    const { error, data } = await categoryApi.fetchAll();
     if (!error && data) {
       setCategories(data);
       setIsCategoriesLoading(false);
     }
-    return response;
   }
 
   async function fetchQuantityUnits() {
     setIsUnitMapLoading(true);
-    const response = await supabase
-      .from('quantity_units')
-      .select(`*`);
+    const response = await quantityUnitApi.fetchAll();
     const { error, data } = response;
     if (!error && data) {
       setUnits(data);
-      setUnitsMap(data.reduce((previous, category) => {
+      setUnitsMap(data.reduce((previous, unit) => {
         return {
           ...previous,
-          [category.id]: category.name
+          [unit.id]: unit.name
         };
       }, {}));
       setIsUnitMapLoading(false);
@@ -111,7 +109,7 @@ export default function Pantry() {
   /** Receives selected option(category object) from Combobox
    * if category id === false, fetch id for newly created category
     */
-  async function onCategorySelect(category) {
+  async function onCategorySelect(category: categoryApi.Category) {
     if (category.id) {
       onCategoryChange(category.id);
     }
@@ -123,6 +121,7 @@ export default function Pantry() {
       .select('*')
       .eq('name', product.name)
       .single();
+    console.log(data);
     setCurrentProduct(data);
     setIsAddingProducts(true);
   }
@@ -173,21 +172,15 @@ export default function Pantry() {
       fetchPantry();
   }
 
-  async function createCategory(category) {
-    const response = await supabase
-      .from('categories')
-      .insert([
-        { user_id: pantry.user_id, name: category },
-      ])
-      .single();
+  async function createCategory(categoryName: string) {
+    const response = await categoryApi.create(categoryName, pantry.user_id);
     const { data, error } = response;
     if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error])
+      setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
       fetchCategories();
+      onCategoryChange(data.id);
     }
-    onCategoryChange(data.id)
-    return data
   }
 
   function addProducts() {
@@ -222,7 +215,7 @@ export default function Pantry() {
     fetchQuantityUnits();
   }, [id])
 
-  if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
+  if (!pantry || isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
     return <h1>loading...</h1>;
   }
 

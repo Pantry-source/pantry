@@ -1,27 +1,29 @@
-import { Auth, Typography, Button } from "@supabase/ui";
-const { Text } = Typography
-import { supabase } from '../api'
-
-function Profile(props) {
-    const { user } = Auth.useUser();
-    if (user)
-      return (
-        <>
-          <Text>Signed in: {user.email}</Text>
-          <Button block onClick={() => props.supabaseClient.auth.signOut()}>
-            Sign out
-          </Button>
-        </>
-      );
-    return props.children 
-}
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function AuthProfile() {
+  const user = useUser()
+  const supabaseClient = useSupabaseClient()
+  if (!user) {
     return (
-        <Auth.UserContextProvider supabaseClient={supabase}>
-          <Profile supabaseClient={supabase}>
-            <Auth supabaseClient={supabase} />
-          </Profile>
-        </Auth.UserContextProvider>
+      <Auth
+        redirectTo="http://localhost:3000/"
+        appearance={{ theme: ThemeSupa }}
+        supabaseClient={supabaseClient}
+        providers={['google', 'github']}
+        socialLayout="horizontal"
+      />
     )
+  }
+  return (
+    <>
+      <p>Signed in: {user.email}</p>
+      <button
+        type="button"
+        className="mb-4 bg-green-600 text-white px-8 py-2 rounded-lg"
+        onClick={() => supabaseClient.auth.signOut()}
+      >Sign out</button>
+    </>
+  )
 }

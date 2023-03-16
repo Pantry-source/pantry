@@ -8,7 +8,7 @@ interface SlideOverProps {
   onClose: () => void,
   onSubmit: () => void,
   open: boolean,
-  children: Element
+  children: JSX.Element
 }
 
 export default function SlideOver({ children, open = false, onClose, onSubmit, title, subtitle = '', isExistingProduct }: SlideOverProps) {
