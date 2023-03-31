@@ -6,9 +6,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Dropdown({ options, onSelect, createOption }) {
+export default function Dropdown({ options, onSelect, createOption, preselectedValue = {} }) {
   const [query, setQuery] = useState('')
-  const [selected, setSelected] = useState({})
+  const [selected, setSelected] = useState(preselectedValue)
 
   const filteredOptions =
     query === ''
@@ -16,7 +16,7 @@ export default function Dropdown({ options, onSelect, createOption }) {
       : options.reduce((currentOptions, option) => {
         let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
         if (isOptionAvailable) currentOptions.push(option);
-        //renders "+ create category" option if query value doesn't exist. eg: category doesn't exist"
+        //renders "+ create" option if query value doesn't exist in the dropdown options
         if (currentOptions.length < 1
           && !isOptionAvailable
         ) currentOptions.push({ id: undefined, name: '+ create....' });

@@ -1,9 +1,10 @@
-import { SyntheticEvent, useState } from 'react'
+import { useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import "easymde/dist/easymde.min.css"
-import { supabase } from '../api'
+import { useUser } from '@supabase/auth-helpers-react'
+import * as pantryApi from '../modules/supabase/pantry';
 
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false })
 const initialState = { id: '', title: '', description: '' }
@@ -12,7 +13,7 @@ function CreatePantry() {
   const [pantry, setPantry] = useState(initialState)
   const { title, description } = pantry
   const router = useRouter()
-  const user = supabase.auth.user();
+  const user = useUser()
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     setPantry(() => ({ ...pantry, [e.target.name]: e.target.value }))
   }
@@ -21,13 +22,10 @@ function CreatePantry() {
     const { id } = user
     const newPantryId = uuid()
     pantry.id = newPantryId
-    const { data } = await supabase
-      .from('pantries')
-      .insert([
-          { title, description, user_id: id }
-      ])
-      .single()
-    router.push(`/pantries/${data.id}`)
+    const { data } = await pantryApi.create(title, description, id);
+    if (data) {
+      router.push(`/pantries/${data.id}`);
+    }
   }
   return (
     <div>

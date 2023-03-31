@@ -2,31 +2,32 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import "easymde/dist/easymde.min.css"
-import { supabase } from '../../api'
+import supabase from '../../api'
+import { stringify } from 'querystring'
+import * as pantryApi from '../../modules/supabase/pantry';
 
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false })
 
 function EditPantry() {
-  const [pantry, setPantry] = useState(null)
-  const router = useRouter()
-  const { id } = router.query
+  const [pantry, setPantry] = useState<pantryApi.Pantry>();
+  const router = useRouter();
+  const { id } = router.query;
+
+  // string[] | string | undefined is the router.query type so its not the best to work with. Convert to string | undefined
+  const pantryId = Array.isArray(id) ? id[0] : id;
 
   useEffect(() => {
     fetchPantry()
     async function fetchPantry() {
-      if (!id) return
-      const { data } = await supabase
-        .from('pantries')
-        .select()
-        .filter('id', 'eq', id)
-        .single()
-      setPantry(data)
+      if (!pantryId) return
+      const { data } = await pantryApi.fetchById(pantryId);
+      if (data) {
+        setPantry(data);
+      }
     }
   }, [id])
-  if (!pantry) return null
-  function onChange(e) {
-    setPantry(() => ({ ...pantry, [e.target.name]: e.target.value }))
-  }
+  
+  if (!pantry) return null;
   const { title, description } = pantry
   async function updateCurrentPantry() {
     if (!title || !description) return
@@ -42,7 +43,7 @@ function EditPantry() {
     <div>
       <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">Edit pantry</h1>
       <input
-        onChange={onChange}
+        onChange={value => setPantry({ ...pantry, title: value })}
         name="title"
         placeholder="Title"
         value={pantry.title}

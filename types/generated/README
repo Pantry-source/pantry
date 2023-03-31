@@ -1,0 +1,8 @@
+# Generated Types
+
+Types in this folder should not be modified manually. They are generated, see below on how to generate.
+
+## Supabase
+
+1. Log in using `npx supabase login`
+2. Run `npx supabase gen types typescript --project-id "$project_id from .env" --schema public > types/generated/supabase.ts`

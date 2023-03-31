@@ -1,31 +1,35 @@
 import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../../api';
+import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
 import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
-import PillButton from '../../components/PillButton'
+import PillButton from '../../components/PillButton';
+import * as pantryApi from '../../modules/supabase/pantry';
+import * as categoryApi from '../../modules/supabase/category';
+import * as quantityUnitApi from '../../modules/supabase/quantityUnit';
+
+type QuantityUnitMap = Map<number, string> | {};
+
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [categoriesMap, setCategoriesMap] = useState(null);
-  const [units, setUnits] = useState(null);
-  const [unitsMap, setUnitsMap] = useState(null);
+  const [pantry, setPantry] = useState<pantryApi.Pantry>();
+  const [categories, setCategories] = useState<categoryApi.Category[]>([]);
+  const [units, setUnits] = useState<quantityUnitApi.QuantityUnit[]>([]);
+  const [unitsMap, setUnitsMap] = useState<QuantityUnitMap>({});
   const [currentProduct, setCurrentProduct] = useState({});
   const [isAddingProducts, setIsAddingProducts] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-  const [createdCategory, setCreatedCategory] = useState(null);
 
   const checkbox = useRef()
   const [checked, setChecked] = useState(false)
   const [indeterminate, setIndeterminate] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState([])
 
-  function onProductChange(e) {
+  function onProductChange(e: React.ChangeEvent<HTMLInputElement>) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
     setCurrentProduct(() => ({
@@ -35,10 +39,10 @@ export default function Pantry() {
   }
 
   /** adds selected Category id to currentProduct */
-  function onCategoryChange(id) {
+  function onCategoryChange(categoryId: number) {
     setCurrentProduct(() => ({
       ...currentProduct,
-      'category_id': id
+      'category_id': categoryId
     }));
   }
 
@@ -46,62 +50,46 @@ export default function Pantry() {
   const { id } = router.query;
 
   async function fetchPantry() {
-    const response = await supabase
+    if (id) {
+      setIsPantryLoading(true);
+      const response = await supabase
       .from('pantries')
       .select(`*, products(*)`)
       .filter('id', 'eq', id)
       .order(`id`, { foreignTable: 'products' })
       .single();
-    const { error, data } = response;
-    try {
-      if (error) throw new Error("no pantry data");
-      setPantry(data);
-      setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
-      setIsPantryLoading(false);
-    } catch (error) {
-      setIsPantryLoading(true);
+      const { error, data } = response;
+      if (!error) {
+        setPantry(data);
+        setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
+        setIsPantryLoading(false);
+      }
+      return response;
     }
-    return response;
   }
 
   async function fetchCategories() {
-    const response = await supabase
-      .from('categories')
-      .select(`*`);
-    const { error, data } = response;
-    try {
-      if (error) throw new Error("no categories data");
+    setIsCategoriesLoading(true);
+    const { error, data } = await categoryApi.fetchAll();
+    if (!error && data) {
       setCategories(data);
-      setCategoriesMap(data?.reduce((previous, category) => {
-        return {
-          ...previous,
-          [category.id]: category.name
-        };
-      }, {}));
       setIsCategoriesLoading(false);
-    } catch (error) {
-      setIsCategoriesLoading(true);
     }
-    return response;
   }
 
   async function fetchQuantityUnits() {
-    const response = await supabase
-      .from('quantity_units')
-      .select(`*`);
+    setIsUnitMapLoading(true);
+    const response = await quantityUnitApi.fetchAll();
     const { error, data } = response;
-    try {
-      if (error) throw new Error("no quantity units data");
+    if (!error && data) {
       setUnits(data);
-      setUnitsMap(data?.reduce((previous, category) => {
+      setUnitsMap(data.reduce((previous, unit) => {
         return {
           ...previous,
-          [category.id]: category.name
+          [unit.id]: unit.name
         };
       }, {}));
       setIsUnitMapLoading(false);
-    } catch (error) {
-      setIsUnitMapLoading(true);
     }
     return response;
   }
@@ -124,7 +112,7 @@ export default function Pantry() {
   /** Receives selected option(category object) from Combobox
    * if category id === false, fetch id for newly created category
     */
-  async function onCategorySelect(category) {
+  async function onCategorySelect(category: categoryApi.Category) {
     if (category.id) {
       onCategoryChange(category.id);
     }
@@ -136,6 +124,7 @@ export default function Pantry() {
       .select('*')
       .eq('name', product.name)
       .single();
+    console.log(data);
     setCurrentProduct(data);
     setIsAddingProducts(true);
   }
@@ -194,57 +183,24 @@ export default function Pantry() {
       fetchPantry();
   }
 
-  async function createCategory(category) {
-    const response = await supabase
-      .from('categories')
-      .insert([
-        { user_id: pantry.user_id, name: category },
-      ])
-      .single();
+  async function createCategory(categoryName: string) {
+    const response = await categoryApi.create(categoryName, pantry.user_id);
     const { data, error } = response;
     if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error])
+      setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
       fetchCategories();
+      onCategoryChange(data.id);
     }
-    onCategoryChange(data.id)
-    return data
   }
 
-  useEffect(() => {
-    fetchPantry();
-    fetchCategories();
-    fetchQuantityUnits();
-  }, [id])
-
-  if (isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
-    return <h1>loading...</h1>;
-  }
-
-  // retrieves products and assigns products array to corresponding category key
-  const currentProducts = pantry.products.reduce((categoryAndProducts, product) => {
-    let categoryName = categoriesMap[product.category_id]
-    categoryAndProducts[categoryName]
-      ? categoryAndProducts[categoryName].push(product)
-      : categoryAndProducts[categoryName] = [product];
-    return categoryAndProducts;
-  }, {});
-
-  const categoriesWithProducts = categories.map(category => {
-    category.products = currentProducts[category.name] || null;
-    return category;
-  });
-
-  const { description, title } = pantry;
   function addProducts() {
     setCurrentProduct(() => ({ 'pantry_id': pantry.id, "is_essential": false }));
     setIsAddingProducts(true);
   }
 
-  const products = pantry.products
-
   function toggleAll() {
-    setSelectedProduct(checked || indeterminate ? [] : products)
+    setSelectedProduct(checked || indeterminate ? [] : pantry.products)
     setChecked(!checked && !indeterminate)
     setIndeterminate(false)
   }
@@ -263,6 +219,28 @@ export default function Pantry() {
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
+
+  useEffect(() => {
+    fetchPantry();
+    fetchCategories();
+    fetchQuantityUnits();
+  }, [id])
+
+  if (!pantry || isPantryLoading || isCategoriesLoading || isUnitMapLoading) {
+    return <h1>loading...</h1>;
+  }
+
+  const { description, products, title } = pantry;
+  const categoriesWithProducts = categories.reduce((previous, category) => {
+    const productsInCategory = products.filter(p => p.category_id === category.id);
+    if (productsInCategory.length) {
+      previous.push({
+        ...category,
+        products: productsInCategory
+      });
+    }
+    return previous;
+  }, []);
 
   return (
     <div>
@@ -310,7 +288,7 @@ export default function Pantry() {
                     </button>
                   </div>
                 )}
-                <Filter validCategories={categories.filter(category => category.products)} />
+                <Filter validCategories={categoriesWithProducts} />
                 <table className="min-w-full">
                   <thead className="bg-white text-gray-500">
                     <tr>

@@ -4,9 +4,19 @@ import { PlusIcon as PlusIconMini } from '@heroicons/react/20/solid'
 import { PlusIcon as PlusIconOutline } from '@heroicons/react/24/outline'
 import { text } from "stream/consumers";
 import Combobox from "./Combobox";
+import * as categoryApi from '../modules/supabase/category';
+import * as quantityUnitApi from '../modules/supabase/quantityUnit';
+
+type ProductEditorProps = {
+  createCategory: (categoryName: string) => Promise<void>,
+  onCategorySelect: (category: categoryApi.Category) => Promise<void>,
+  categories: categoryApi.Category[],
+  units: quantityUnitApi.QuantityUnit[],
+  userId: string,
+  onProductChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+};
 
 export default function ProductEditor({
-  userId,
   createCategory,
   onCategorySelect,
   categories,
@@ -14,17 +24,9 @@ export default function ProductEditor({
   onProductChange,
   product,
   errorMessages
-}) {
-  // const [isAddingCategory, setIsAddingCategory] = useState(false);
+}: ProductEditorProps) {
   const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
-  const categoryOptions = categories.reduce((userCategoryOptions, category) => {
-    if (userId === category.user_id || category.user_id === null) {
-      userCategoryOptions.push(category)
-    }
-    return userCategoryOptions;
-  }, []);
-  const defaultUnitId = units[0].id, defaultCategory = undefined;
-  const { name = '', quantity_amount = '', quantity_unit = '', category_id = defaultCategory, vendor = '' } = product;
+  const { name = '', quantity_amount = '', quantity_unit = '', vendor = '' } = product;
   return (
     <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
 
@@ -125,7 +127,8 @@ export default function ProductEditor({
         <div className="sm:col-span-2">
 
           <Combobox
-            options={categoryOptions}
+            options={categories}
+            preselectedValue={categories.find(category => category.id === product.category_id)}
             onSelect={onCategorySelect}
             createOption={createCategory}
           />
