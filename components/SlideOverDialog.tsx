@@ -6,7 +6,7 @@ interface SlideOverProps {
   title: string,
   subtitle?: string,
   onClose: () => void,
-  onSubmit: () => void,
+  onSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void,
   open: boolean,
   children: JSX.Element
 }
