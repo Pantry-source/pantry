@@ -12,7 +12,6 @@ import supabase from '../api';
 type ProductEditorProps = {
   isOpen: boolean,
   onCancelProductEditing: () => void,
-  onCategoryCreate: () => Promise<void>,
   onProductSave: () => void,
   pantry: pantryApi.Pantry,
   selectedProduct?: productApi.Product,
@@ -26,7 +25,6 @@ export default function ProductEditor({
   categories,
   isOpen,
   onCancelProductEditing,
-  onCategoryCreate,
   onProductSave,
   pantry,
   selectedProduct,
@@ -34,8 +32,9 @@ export default function ProductEditor({
 }: ProductEditorProps) {
   const [errorMessages, setErrorMessages] = useState<PostgrestError[]>([]);
   const [currentProduct, setCurrentProduct] = useState<ProductPartial>(selectedProduct || {});
+  const [newCategories, setNewCategories] = useState<categoryApi.Category[]>([]);
+  const allCategories = [...categories, ...newCategories];
   useEffect(() => {
-    console.log('setting current product to', selectedProduct || {});
     setCurrentProduct(selectedProduct || {});
   }, [selectedProduct]);
 
@@ -56,31 +55,56 @@ export default function ProductEditor({
   }
 
   async function createProduct() {
-    console.log(currentProduct);
-    if (currentProduct &&
-      currentProduct.category_id !== undefined &&
-      currentProduct.name &&
-      currentProduct.quantity_amount !== undefined &&
-      currentProduct.quantity_unit &&
-      currentProduct.is_essential !== undefined) {
-      const { data, error } = await supabase
-        .from('products')
-        .insert([{
-          is_essential: currentProduct.is_essential,
-          quantity_unit: currentProduct.quantity_unit,
-          quantity_amount: currentProduct.quantity_amount,
-          category_id: currentProduct.category_id,
-          name: currentProduct.name,
-          vendor: currentProduct.vendor,
-          expires_at: currentProduct.expires_at,
-          pantry_id: pantry.id
-         }]);
-      if (error) {
-        setErrorMessages(errorMessages => [...errorMessages, error]);
-      } else {
-        onProductSave();
+    const errors = [];
+    const requiredFields: { field: keyof ProductPartial, validationError: string}[] = [
+      {
+        field: 'name',
+        validationError: 'Please enter a name'
+      },
+      {
+        field: 'quantity_unit',
+        validationError: 'Please select quantity unit'
+      },
+      {
+        field: 'category_id',
+        validationError: 'Please select a category'
       }
-    } 
+    ];
+    for (const requiredField of requiredFields) {
+      if (currentProduct[requiredField.field] === undefined) {
+        errors.push({
+          message: requiredField.validationError,
+          details: '', hint: '', code: ''
+        });
+      }
+    }
+    if (errors.length) {
+      setErrorMessages(errors);
+    } else {
+
+      // we have to check these again because typescript does no understand the above validation
+      if (currentProduct.category_id !== undefined &&
+        currentProduct.name &&
+        currentProduct.quantity_unit !== undefined) {
+        const { data, error } = await supabase
+          .from('products')
+          .insert([{
+            is_essential: currentProduct?.is_essential || false,
+            quantity_unit: currentProduct.quantity_unit,
+            quantity_amount: currentProduct?.quantity_amount || 0,
+            category_id: currentProduct.category_id,
+            name: currentProduct.name,
+            vendor: currentProduct.vendor,
+            expires_at: currentProduct.expires_at,
+            pantry_id: pantry.id
+          }]);
+        if (error) {
+          setErrorMessages(errorMessages => [...errorMessages, error]);
+        } else {
+          onProductSave();
+        }
+      }
+    }
   }
 
   async function updateProduct() {
@@ -115,7 +139,6 @@ export default function ProductEditor({
     setErrorMessages([])
   }
 
-  
     /** Receives selected option(category object) from Combobox
      * if category id === false, fetch id for newly created category
       */
@@ -139,10 +162,12 @@ export default function ProductEditor({
     if (error) {
       setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
-      onCategoryCreate();
       onCategoryChange(data.id);
+      setNewCategories([ ...newCategories, data ]);
+      return data;
     }
   }
+
   return (
     <SlideOver
         isExistingProduct={currentProduct?.id !== undefined}
@@ -249,8 +274,8 @@ export default function ProductEditor({
           </div>
           <div className="sm:col-span-2">
             <Combobox
-              options={categories}
-              preselectedValue={currentProduct && categories.find(category => category.id === currentProduct.category_id)}
+              options={allCategories}
+              preselectedValue={allCategories.find(category => category.id === currentProduct.category_id)}
               onSelect={onCategorySelect}
               createOption={createCategory}
             />

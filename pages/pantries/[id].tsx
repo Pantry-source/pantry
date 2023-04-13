@@ -86,6 +86,7 @@ export default function Pantry() {
 
   function onProductSave() {
     fetchPantry();
+    fetchCategories();
     setCurrentProduct(undefined);
     setIsProductEditorOpen(false);
   }
@@ -282,7 +283,6 @@ export default function Pantry() {
         categories={categories}
         isOpen={isProductEditorOpen}
         onCancelProductEditing={onCancelProductEditing}
-        onCategoryCreate={fetchCategories}
         onProductSave={onProductSave}
         pantry={pantry}
         selectedProduct={currentProduct}
