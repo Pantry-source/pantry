@@ -54,9 +54,11 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                       active ? 'bg-indigo-600 text-white' : 'text-gray-900'
                     )
                   }
-                  onClick={() => {
-                    createOption(query);
-                    setSelected({ name: query });
+                  onClick={async () => {
+                    const newOption = await createOption(query);
+                    if (newOption) {
+                      setSelected(newOption);
+                    }
                   }}>
                   {option.name}
                 </Combobox.Option>
@@ -85,7 +87,6 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                     </>
                   )}
                 </Combobox.Option>
-
             ))}
           </Combobox.Options>
         )}

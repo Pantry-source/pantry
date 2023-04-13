@@ -2,49 +2,28 @@ import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
-import SlideOver from '../../components/SlideOverDialog';
 import Filter from '../../components/Filter';
 import PillButton from '../../components/PillButton';
 import * as pantryApi from '../../modules/supabase/pantry';
+import * as productApi from '../../modules/supabase/product';
 import * as categoryApi from '../../modules/supabase/category';
 import * as quantityUnitApi from '../../modules/supabase/quantityUnit';
-
-type QuantityUnitMap = Map<number, string> | {};
-
 
 export default function Pantry() {
   const [pantry, setPantry] = useState<pantryApi.Pantry>();
   const [categories, setCategories] = useState<categoryApi.Category[]>([]);
   const [units, setUnits] = useState<quantityUnitApi.QuantityUnit[]>([]);
-  const [unitsMap, setUnitsMap] = useState<QuantityUnitMap>({});
-  const [currentProduct, setCurrentProduct] = useState({});
-  const [isAddingProducts, setIsAddingProducts] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
+  const [unitsMap, setUnitsMap] = useState<quantityUnitApi.QuantityUnitMap>({});
+  const [isProductEditorOpen, setIsProductEditorOpen] = useState(false);
   const [isPantryLoading, setIsPantryLoading] = useState(true);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isUnitMapLoading, setIsUnitMapLoading] = useState(true);
-
-  const checkbox = useRef()
   const [checked, setChecked] = useState(false)
   const [indeterminate, setIndeterminate] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([])
+  const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  function onProductChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
-    const value = e.target.name === 'is_essential' ? e.target.checked : e.target.value;
-    setCurrentProduct(() => ({
-      ...currentProduct,
-      [e.target.name]: value === '' ? null : value
-    }));
-  }
-
-  /** adds selected Category id to currentProduct */
-  function onCategoryChange(categoryId: number) {
-    setCurrentProduct(() => ({
-      ...currentProduct,
-      'category_id': categoryId
-    }));
-  }
+  const checkbox = useRef();
 
   const router = useRouter();
   const { id } = router.query;
@@ -61,10 +40,8 @@ export default function Pantry() {
       const { error, data } = response;
       if (!error) {
         setPantry(data);
-        setCurrentProduct(() => ({ ...currentProduct, 'pantry_id': data.id }));
         setIsPantryLoading(false);
       }
-      return response;
     }
   }
 
@@ -94,59 +71,9 @@ export default function Pantry() {
     return response;
   }
 
-  // async function fetchCategoryId() {
-  //   cl('createdCategory', createdCategory)
-  //   const { data, error } = await supabase
-  //     .from('categories')
-  //     .select('*')
-  //     .eq('name', createdCategory)
-  //     .single()
-  //   try {
-  //     if (error) throw new Error('no category id data')
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  //   return data
-  // }
-
-  /** Receives selected option(category object) from Combobox
-   * if category id === false, fetch id for newly created category
-    */
-  async function onCategorySelect(category: categoryApi.Category) {
-    if (category.id) {
-      onCategoryChange(category.id);
-    }
-  }
-
-  async function selectProduct(product) {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('name', product.name)
-      .single();
-    console.log(data);
-    setCurrentProduct(data);
-    setIsAddingProducts(true);
-  }
-
-  async function updateProduct() {
-    const { data, error } = await supabase
-      .from('products')
-      .update({
-        name: currentProduct.name,
-        quantity_amount: currentProduct.quantity_amount,
-        is_essential: currentProduct.is_essential,
-        quantity_unit: currentProduct.quantity_unit,
-        vendor: currentProduct.vendor,
-        category_id: currentProduct.category_id
-      })
-      .eq('id', currentProduct.id)
-    if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error]);
-    } else {
-      setIsAddingProducts(false);
-      fetchPantry();
-    }
+  async function editProduct(product: productApi.Product) {
+    setCurrentProduct(product);
+    setIsProductEditorOpen(true);
   }
 
   async function updateQuantity(id, currentProductQuantity) {
@@ -157,63 +84,36 @@ export default function Pantry() {
       fetchPantry();
   }
 
-  async function createProduct() {
-    const { data, error } = await supabase
-      .from('products')
-      .insert([currentProduct]);
-    if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error]);
-    } else {
-      setIsAddingProducts(false);
-      fetchPantry();
-    }
+  function onProductSave() {
+    fetchPantry();
+    fetchCategories();
+    setCurrentProduct(undefined);
+    setIsProductEditorOpen(false);
+  }
+
+  function onCancelProductEditing() {
+    setCurrentProduct(undefined);
+    setIsProductEditorOpen(false);
   }
 
   /** removes selected product(s) from database and rerenders updated category list */
   async function deleteProduct() {
-    for (let product of selectedProduct) {
+    for (let product of selectedProducts) {
       const { data, error } = await supabase
         .from('products')
         .delete()
         .eq('id', product.id)
         .single();
 
-        setSelectedProduct(products => [])
+        setSelectedProducts(products => [])
       }
       fetchPantry();
   }
 
-  async function createCategory(categoryName: string) {
-    const response = await categoryApi.create(categoryName, pantry.user_id);
-    const { data, error } = response;
-    if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error]);
-    } else {
-      fetchCategories();
-      onCategoryChange(data.id);
-    }
-  }
-
-  function addProducts() {
-    setCurrentProduct(() => ({ 'pantry_id': pantry.id, "is_essential": false }));
-    setIsAddingProducts(true);
-  }
-
   function toggleAll() {
-    setSelectedProduct(checked || indeterminate ? [] : pantry.products)
+    setSelectedProducts(checked || indeterminate ? [] : pantry.products)
     setChecked(!checked && !indeterminate)
     setIndeterminate(false)
-  }
-
-  function onSubmitProduct(e) {
-    e.preventDefault();
-    setErrorMessages([]);
-    currentProduct.id ? updateProduct() : createProduct();
-  }
-
-  function onCloseProductForm() {
-    setIsAddingProducts(false);
-    setErrorMessages([])
   }
 
   function classNames(...classes) {
@@ -253,7 +153,7 @@ export default function Pantry() {
           <div className="mt-4 mt-0 ml-16 flex-none">
             <button
               type="button"
-              onClick={addProducts}
+              onClick={() => setIsProductEditorOpen(true)}
               className="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto">
               Add Products
             </button>
@@ -273,7 +173,7 @@ export default function Pantry() {
                     checked={checked}
                     onChange={toggleAll} />
                 </div>
-                {selectedProduct.length > 0 && (
+                {selectedProducts.length > 0 && (
                   <div className="absolute top-0 left-12 flex h-12 items-center space-x-3  sm:left-16">
                     <button
                       type="button"
@@ -284,7 +184,7 @@ export default function Pantry() {
                       type="button"
                       onClick={deleteProduct}
                       className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">
-                      {pantry.products.length === selectedProduct.length ? "Delete all" : "Delete"}
+                      {pantry.products.length === selectedProducts.length ? "Delete all" : "Delete"}
                     </button>
                   </div>
                 )}
@@ -330,19 +230,19 @@ export default function Pantry() {
                             key={product.name}
                             className={classNames(productIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t')}>
                             <td className="relative w-12 pl-6 pr-3">
-                              {selectedProduct.includes(product) && (
+                              {selectedProducts.includes(product) && (
                                 <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
                               )}
                               <input
                                 type="checkbox"
                                 className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
                                 value={product.name}
-                                checked={selectedProduct.includes(product)}
+                                checked={selectedProducts.includes(product)}
                                 onChange={(e) =>
-                                  setSelectedProduct(
+                                  setSelectedProducts(
                                     e.target.checked
-                                      ? [...selectedProduct, product]
-                                      : selectedProduct.filter((p) => p !== product)
+                                      ? [...selectedProducts, product]
+                                      : selectedProducts.filter((p) => p !== product)
                                   )
                                 }
                               />
@@ -352,7 +252,6 @@ export default function Pantry() {
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               <PillButton
-
                                 unit={unitsMap[product.quantity_unit]}
                                 id={product.id}
                                 updateQuantity={updateQuantity}
@@ -364,7 +263,7 @@ export default function Pantry() {
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button
                                 type="button"
-                                onClick={() => selectProduct(product)}
+                                onClick={() => editProduct(product)}
                                 className="text-indigo-600 hover:text-indigo-900">
                                 Edit<span className="sr-only">,{product.name}</span>
                               </button>
@@ -380,24 +279,15 @@ export default function Pantry() {
           </div>
         </div>
       </div>
-      <SlideOver
-        isExistingProduct={currentProduct.id}
-        open={isAddingProducts}
-        onClose={onCloseProductForm}
-        onSubmit={(e) => onSubmitProduct(e)}
-        title="New product"
-        subtitle={`Fillout the information below to add a product to ${title}`}>
-        <ProductEditor
-          userId={pantry.user_id}
-          createCategory={createCategory}
-          onCategorySelect={onCategorySelect}
-          product={currentProduct}
-          categories={categories}
-          units={units}
-          onProductChange={onProductChange}
-          errorMessages={errorMessages}
-        />
-      </SlideOver>
+      <ProductEditor
+        categories={categories}
+        isOpen={isProductEditorOpen}
+        onCancelProductEditing={onCancelProductEditing}
+        onProductSave={onProductSave}
+        pantry={pantry}
+        selectedProduct={currentProduct}
+        units={units}
+      />
     </div>
   )
 }
