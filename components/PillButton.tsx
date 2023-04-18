@@ -1,6 +1,3 @@
-import { useState, useEffect } from 'react';
-// Found 47 errors.
-// Found 44 errors.
 
 type PillButtonProps = {
   id: number;
