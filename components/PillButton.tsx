@@ -1,13 +1,23 @@
 import { useState, useEffect } from 'react';
+// Found 47 errors.
+// Found 44 errors.
 
-function PillButton({ id, quantity, unit, updateQuantity }) {
+type PillButtonProps = {
+  id: number;
+  quantity: number;
+  unit: number;
+  updateCount: (id: number, quantity: number) => number;
+}
+
+
+function PillButton({ id, quantity, unit, updateCount }: PillButtonProps) {
 
   function increment() {
-    updateQuantity(id, quantity + 1.0);
+    updateCount(id, quantity + 1.0);
   }
 
   function decrement() {
-    updateQuantity(id, quantity - (quantity < 1.0 ? quantity : 1.0));
+    updateCount(id, quantity - (quantity < 1.0 ? quantity : 1.0));
   }
 
   return (

@@ -2,7 +2,6 @@
 
 type ErrorMessage = {
   message: string;
-  code: string;
 }
 
 type Alerts = {

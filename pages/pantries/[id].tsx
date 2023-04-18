@@ -254,7 +254,7 @@ export default function Pantry() {
                               <PillButton
                                 unit={unitsMap[product.quantity_unit]}
                                 id={product.id}
-                                updateQuantity={updateQuantity}
+                                updateCount={updateQuantity}
                                 quantity={product.quantity_amount} />
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
