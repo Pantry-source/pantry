@@ -33,7 +33,6 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
     let value = e.target.value;
     let name = e.target.name;
     let isChecked = e.target.checked
-    // cl('e',e.target)
     //massaging data to be sent to activeFilters
     let validFilter = { value: e.target.value, label: e.target.name };
     field === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
@@ -92,6 +91,7 @@ export default function Filter({ updateCategoryIds, updateFilters, validCategori
 
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
+      
     updateCategoryIds(filter)
   }
 
