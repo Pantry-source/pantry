@@ -33,9 +33,7 @@ function EditPantry() {
     if (!title || !description) return
     await supabase
       .from('pantries')
-      .update([
-          { title, description }
-      ])
+      .update({ title, description })
       .match({ id })
     router.push('/my-pantries')
   }
@@ -43,13 +41,13 @@ function EditPantry() {
     <div>
       <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">Edit pantry</h1>
       <input
-        onChange={value => setPantry({ ...pantry, title: value })}
+        onChange={event => setPantry({ ...pantry, title: event.target.value })}
         name="title"
         placeholder="Title"
         value={pantry.title}
         className="border-b pb-2 text-lg my-4 focus:outline-none w-full font-light text-gray-500 placeholder-gray-500 y-2"
-      /> 
-      <SimpleMDE value={pantry.description} onChange={value => setPantry({ ...pantry, description: value })} />
+      />
+      <SimpleMDE value={pantry?.description || undefined} onChange={value => setPantry({ ...pantry, description: value })} />
       <button
         className="mb-4 bg-blue-600 text-white font-semibold px-8 py-2 rounded-lg"
         onClick={updateCurrentPantry}>Update Pantry</button>

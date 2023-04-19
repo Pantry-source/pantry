@@ -1,3 +1,4 @@
+import classNames from '../modules/classnames'
 import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Disclosure, Menu, Popover, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -13,10 +14,6 @@ const filterSection =
     { value: 'isOutOfStock', label: 'Out Of Stock', checked: false },
     { value: 'isExpiring', label: 'Expiring Soon', checked: false },
   ],
-}
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
 }
 
 export default function Filter({ validCategories }) {

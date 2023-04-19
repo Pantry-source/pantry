@@ -1,4 +1,5 @@
-import { useEffect, useState, Fragment, useLayoutEffect, useRef } from 'react';
+import classNames from '../../modules/classnames';
+import { useEffect, useState, Fragment, useRef } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
@@ -10,7 +11,7 @@ import * as categoryApi from '../../modules/supabase/category';
 import * as quantityUnitApi from '../../modules/supabase/quantityUnit';
 
 export default function Pantry() {
-  const [pantry, setPantry] = useState<pantryApi.Pantry>();
+  const [pantry, setPantry] = useState<pantryApi.PantryWithProducts>();
   const [categories, setCategories] = useState<categoryApi.Category[]>([]);
   const [units, setUnits] = useState<quantityUnitApi.QuantityUnit[]>([]);
   const [unitsMap, setUnitsMap] = useState<quantityUnitApi.QuantityUnitMap>({});
@@ -23,23 +24,24 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([])
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const checkbox = useRef();
-
   const router = useRouter();
   const { id } = router.query;
+
+  type CategoryWithProducts = categoryApi.Category & {
+    products: productApi.Product[]
+  }
 
   async function fetchPantry() {
     if (id) {
       setIsPantryLoading(true);
-      const response = await supabase
-      .from('pantries')
-      .select(`*, products(*)`)
-      .filter('id', 'eq', id)
-      .order(`id`, { foreignTable: 'products' })
-      .single();
-      const { error, data } = response;
-      if (!error) {
+
+      // need to typecast as string because the id from Next's router query string has type "string | string[] | undefined"
+      const { error, data } = await pantryApi.fetchByIdWithProducts(id as string);
+      if (!error && data) {
         setPantry(data);
+        setIsPantryLoading(false);
+      } else {
+        // TODO: needs error handling
         setIsPantryLoading(false);
       }
     }
@@ -71,17 +73,14 @@ export default function Pantry() {
     return response;
   }
 
-  async function editProduct(product: productApi.Product) {
+  async function startEditingProduct(product: productApi.Product) {
     setCurrentProduct(product);
     setIsProductEditorOpen(true);
   }
 
-  async function updateQuantity(id, currentProductQuantity) {
-    const { data, error } = await supabase
-      .from('products')
-      .update({ quantity_amount: currentProductQuantity })
-      .eq('id', id)
-      fetchPantry();
+  async function updateProductQuantity(id: number, quantity: number) {
+    await productApi.updateQuantityAmountById(id, quantity);
+    fetchPantry();
   }
 
   function onProductSave() {
@@ -96,7 +95,7 @@ export default function Pantry() {
     setIsProductEditorOpen(false);
   }
 
-  /** removes selected product(s) from database and rerenders updated category list */
+  // removes selected product(s) from database and rerenders updated category list
   async function deleteProduct() {
     for (let product of selectedProducts) {
       const { data, error } = await supabase
@@ -111,13 +110,11 @@ export default function Pantry() {
   }
 
   function toggleAll() {
-    setSelectedProducts(checked || indeterminate ? [] : pantry.products)
-    setChecked(!checked && !indeterminate)
-    setIndeterminate(false)
-  }
-
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
+    if (pantry) {
+      setSelectedProducts(checked || indeterminate ? [] : pantry.products)
+      setChecked(!checked && !indeterminate)
+      setIndeterminate(false)
+    }
   }
 
   useEffect(() => {
@@ -131,7 +128,7 @@ export default function Pantry() {
   }
 
   const { description, products, title } = pantry;
-  const categoriesWithProducts = categories.reduce((previous, category) => {
+  const categoriesWithProducts: CategoryWithProducts[] = categories.reduce((previous, category) => {
     const productsInCategory = products.filter(p => p.category_id === category.id);
     if (productsInCategory.length) {
       previous.push({
@@ -140,7 +137,7 @@ export default function Pantry() {
       });
     }
     return previous;
-  }, []);
+  }, [] as any[]);
 
   return (
     <div>
@@ -169,7 +166,6 @@ export default function Pantry() {
                   <input
                     type="checkbox"
                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-                    ref={checkbox}
                     checked={checked}
                     onChange={toggleAll} />
                 </div>
@@ -254,8 +250,8 @@ export default function Pantry() {
                               <PillButton
                                 label={unitsMap[product.quantity_unit]}
                                 id={product.id}
-                                updateCount={updateQuantity}
-                                count={product.quantity_amount} />
+                                updateCount={updateProductQuantity}
+                                count={product?.quantity_amount || 0} />
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.expires_at || 'not specified'}</td>
@@ -263,7 +259,7 @@ export default function Pantry() {
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button
                                 type="button"
-                                onClick={() => editProduct(product)}
+                                onClick={() => startEditingProduct(product)}
                                 className="text-indigo-600 hover:text-indigo-900">
                                 Edit<span className="sr-only">,{product.name}</span>
                               </button>

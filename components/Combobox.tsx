@@ -1,10 +1,7 @@
+import classNames from '../modules/classnames';
 import { useState, useEffect } from 'react';
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react';
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
 
 export default function Dropdown({ options, onSelect, createOption, preselectedValue = {} }) {
   const [query, setQuery] = useState('')
