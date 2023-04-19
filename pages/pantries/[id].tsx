@@ -24,8 +24,6 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([])
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const checkbox = useRef();
-
   const router = useRouter();
   const { id } = router.query;
 
@@ -168,7 +166,6 @@ export default function Pantry() {
                   <input
                     type="checkbox"
                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-                    ref={checkbox}
                     checked={checked}
                     onChange={toggleAll} />
                 </div>
@@ -253,8 +250,8 @@ export default function Pantry() {
                               <PillButton
                                 label={unitsMap[product.quantity_unit]}
                                 id={product.id}
-                                updateCount={updateQuantity}
-                                count={product.quantity_amount} />
+                                updateCount={updateProductQuantity}
+                                count={product?.quantity_amount || 0} />
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.expires_at || 'not specified'}</td>
@@ -262,7 +259,7 @@ export default function Pantry() {
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <button
                                 type="button"
-                                onClick={() => editProduct(product)}
+                                onClick={() => startEditingProduct(product)}
                                 className="text-indigo-600 hover:text-indigo-900">
                                 Edit<span className="sr-only">,{product.name}</span>
                               </button>
