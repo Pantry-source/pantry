@@ -252,10 +252,10 @@ export default function Pantry() {
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               <PillButton
-                                unit={unitsMap[product.quantity_unit]}
+                                label={unitsMap[product.quantity_unit]}
                                 id={product.id}
-                                updateQuantity={updateQuantity}
-                                quantity={product.quantity_amount} />
+                                updateCount={updateQuantity}
+                                count={product.quantity_amount} />
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.is_essential ? 'yes' : 'no'}</td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{product.expires_at || 'not specified'}</td>
