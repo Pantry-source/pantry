@@ -10,6 +10,7 @@ import * as productApi from '../../modules/supabase/product';
 import * as categoryApi from '../../modules/supabase/category';
 import * as quantityUnitApi from '../../modules/supabase/quantityUnit';
 
+
 export default function Pantry() {
   const [pantry, setPantry] = useState<pantryApi.PantryWithProducts>();
   const [categories, setCategories] = useState<categoryApi.Category[]>([]);
