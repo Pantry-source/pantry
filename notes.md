@@ -26,7 +26,6 @@ create policy "Individuals view their own pantries." on pantries for
     select using (auth.uid() = user_id);
 ```
 
-
 Guide on making recipes app https://stormotion.io/blog/how-to-build-a-cooking-or-recipe-app/
 
 Design
@@ -37,7 +36,6 @@ https://urbanplate.co/
 https://dribbble.com/shots/4666898-Cooklist-App-Design (nice recipe page)
 https://www.behance.net/gallery/129238371/Pantry-App-UI-Design (Full grocery management concept app)
 https://dribbble.com/shots/11102515-Pet-Pantry (nice product entry form page)
-
 
 Data
 https://urbanplate.co/the-pantry/

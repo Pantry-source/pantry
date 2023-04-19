@@ -1,28 +1,27 @@
 import classNames from '../modules/classnames';
 import { useState, useEffect } from 'react';
-import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 
 export default function Dropdown({ options, onSelect, createOption, preselectedValue = {} }) {
-  const [query, setQuery] = useState('')
-  const [selected, setSelected] = useState(preselectedValue)
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(preselectedValue);
 
   const filteredOptions =
     query === ''
       ? options
       : options.reduce((currentOptions, option) => {
-        let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
-        if (isOptionAvailable) currentOptions.push(option);
-        //renders "+ create" option if query value doesn't exist in the dropdown options
-        if (currentOptions.length < 1
-          && !isOptionAvailable
-        ) currentOptions.push({ id: undefined, name: '+ create....' });
-        return currentOptions;
-      }, []);
+          const isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
+          if (isOptionAvailable) currentOptions.push(option);
+          //renders "+ create" option if query value doesn't exist in the dropdown options
+          if (currentOptions.length < 1 && !isOptionAvailable)
+            currentOptions.push({ id: undefined, name: '+ create....' });
+          return currentOptions;
+        }, []);
 
   useEffect(() => {
     onSelect(selected);
-  }, [selected])
+  }, [selected]);
 
   return (
     <Combobox as="div" value={selected} onChange={setSelected}>
@@ -39,9 +38,8 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
 
         {filteredOptions.length > 0 && (
           <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {filteredOptions.map(option => (
-              option.id === undefined
-                ?
+            {filteredOptions.map((option) =>
+              option.id === undefined ? (
                 <Combobox.Option
                   key="create"
                   value={option}
@@ -56,10 +54,11 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                     if (newOption) {
                       setSelected(newOption);
                     }
-                  }}>
+                  }}
+                >
                   {option.name}
                 </Combobox.Option>
-                :
+              ) : (
                 <Combobox.Option
                   key={option.id}
                   value={option}
@@ -68,26 +67,30 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                       'relative cursor-default select-none py-2 pl-3 pr-9',
                       active ? 'bg-indigo-600 text-white' : 'text-gray-900'
                     )
-                  }>
+                  }
+                >
                   {({ active, selected }) => (
                     <>
                       <span className={classNames('block truncate', selected && 'font-semibold')}>{option.name}</span>
 
                       {selected && (
                         <span
-                          className={classNames('absolute inset-y-0 right-0 flex items-center pr-4',
+                          className={classNames(
+                            'absolute inset-y-0 right-0 flex items-center pr-4',
                             active ? 'text-white' : 'text-indigo-600'
-                          )}>
+                          )}
+                        >
                           {/* <CheckIcon className="h-5 w-5" aria-hidden="true" /> */}
                         </span>
                       )}
                     </>
                   )}
                 </Combobox.Option>
-            ))}
+              )
+            )}
           </Combobox.Options>
         )}
       </div>
     </Combobox>
-  )
+  );
 }
