@@ -6,7 +6,7 @@ import * as categoryApi from '../modules/supabase/category';
 
 type DropdownProps = {
   options: categoryApi.Category[];
-  preselectedValue: categoryApi.Category;
+  preselectedValue: categoryApi.Category | undefined;
   onSelect: (category: categoryApi.Category) => void;
   createOption: (categoryName: string) => Promise<categoryApi.Category | undefined>;
 }
