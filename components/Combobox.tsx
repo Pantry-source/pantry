@@ -4,14 +4,26 @@ import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react';
 import * as categoryApi from '../modules/supabase/category';
 
-export default function Dropdown({ options, onSelect, createOption, preselectedValue = {} }) {
-  const [query, setQuery] = useState('')
-  const [selected, setSelected] = useState(preselectedValue)
+type DropdownProps = {
+  options: categoryApi.Category[];
+  preselectedValue: categoryApi.Category;
+  onSelect: (category: categoryApi.Category) => void;
+  createOption: (categoryName: string) => Promise<categoryApi.Category | undefined>;
+}
+
+type Option = {
+  name: string;
+}
+
+
+export default function Dropdown({ options, onSelect, createOption, preselectedValue = { created_at: '', id: 0, name: '', user_id:'' } }: DropdownProps) {
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(preselectedValue);
 
   const filteredOptions =
     query === ''
       ? options
-      : options.reduce((currentOptions, option) => {
+      : options.reduce<categoryApi.Category[]>((currentOptions, option) => {
         let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
         if (isOptionAvailable) currentOptions.push(option);
         //renders "+ create" option if query value doesn't exist in the dropdown options
@@ -32,8 +44,8 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
         <Combobox.Input
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(option) => option?.name}
-        />
+          displayValue={(option: Option) => option.name}
+          />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
         </Combobox.Button>
@@ -72,7 +84,7 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                   }>
                   {({ active, selected }) => (
                     <>
-                      <span className={classNames('block truncate', selected && 'font-semibold')}>{option.name}</span>
+                      <span className={classNames('block truncate', (selected && 'font-semibold').toString())}>{option.name}</span>
 
                       {selected && (
                         <span
