@@ -35,7 +35,7 @@ function CreatePantry() {
         name="title"
         placeholder="Title"
         value={pantry.title}
-        className="border-b pb-2 text-lg my-4 focus:outline-none w-full font-light text-gray-500 placeholder-gray-500 y-2"
+        className="border-b pb-2 text-lg my-4 focus:outline-none w-full font-light text-stone-500 placeholder-gray-500 y-2"
       /> 
       <SimpleMDE
         value={pantry.description}
@@ -43,7 +43,7 @@ function CreatePantry() {
       />
       <button
         type="button"
-        className="mb-4 bg-green-600 text-white font-semibold px-8 py-2 rounded-lg"
+        className="mb-4 bg-cyan-600 text-white font-semibold px-8 py-2 rounded-lg"
         onClick={createNewPantry}
       >Create Pantry</button>
     </div>
