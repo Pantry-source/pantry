@@ -27,10 +27,6 @@ export default function Pantry() {
   const router = useRouter();
   const { id } = router.query;
 
-  type CategoryWithProducts = categoryApi.Category & {
-    products: productApi.Product[]
-  }
-
   async function fetchPantry() {
     if (id) {
       setIsPantryLoading(true);
@@ -128,7 +124,7 @@ export default function Pantry() {
   }
 
   const { description, products, title } = pantry;
-  const categoriesWithProducts: CategoryWithProducts[] = categories.reduce((previous, category) => {
+  const categoriesWithProducts: categoryApi.CategoryWithProducts[] = categories.reduce((previous, category) => {
     const productsInCategory = products.filter(p => p.category_id === category.id);
     if (productsInCategory.length) {
       previous.push({
