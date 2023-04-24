@@ -7,7 +7,6 @@ export type Pantry = Database['public']['Tables']['pantries']['Row'];
 export type PantryWithProducts = Pantry & { products: Product[]};
 
 export async function create(title: string, description: string, userId: string) {
-    const newPantryId = uuid();
     return await supabase
       .from('pantries')
       .insert([
@@ -18,7 +17,7 @@ export async function create(title: string, description: string, userId: string)
 }
 
 export async function deleteById(id: number) {
-    await supabase
+    return await supabase
       .from('pantries')
       .delete()
       .match({ id })

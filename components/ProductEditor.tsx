@@ -34,11 +34,11 @@ export default function ProductEditor({
 }: ProductEditorProps) {
   const [errorMessages, setErrorMessages] = useState<PostgrestError[]>([]);
   const [currentProduct, setCurrentProduct] = useState<ProductPartial>(selectedProduct || {});
-  const [newCategories, setNewCategories] = useState<categoryApi.Category[]>([]);
   const [isEditingCategories, setIsEditingCategories] = useState(false);
+  // used to keep track of pre-fetched and newly added categories
+  const [allCategories, setAllCategories] = useState<categoryApi.Category[]>(categories);
 
   const isExistingProduct = currentProduct?.id !== undefined;
-  const allCategories = [...categories, ...newCategories];
   useEffect(() => {
     setCurrentProduct(selectedProduct || {});
   }, [selectedProduct]);
@@ -168,9 +168,13 @@ export default function ProductEditor({
       setErrorMessages(errorMessages => [...errorMessages, error]);
     } else {
       onCategoryChange(data.id);
-      setNewCategories([ ...newCategories, data ]);
+      setAllCategories([ ...allCategories, data ])
       return data;
     }
+  }
+
+  function onCategoryDelete(category: categoryApi.Category) {
+    setAllCategories(allCategories.filter(c => c.id !== category.id));
   }
 
   function renderCategoryManager() {
@@ -186,7 +190,7 @@ export default function ProductEditor({
         leaveTo="opacity-0"
       >
       <div className="space-y-1 px-4 pb-2 sm:space-y-0 sm:px-6 sm:py-5">
-        <CategoryManager categories={categories} />
+        <CategoryManager categories={allCategories} onCategoryDelete={onCategoryDelete} />
       </div>
     </Transition>
     );
