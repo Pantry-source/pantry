@@ -213,7 +213,7 @@ export default function ProductEditor({
         doneAction={getDialogDoneAction()}
         open={isOpen}
         onClose={isEditingCategories ? onDoneManagingCategories : onClose}
-        onSubmit={onSubmit}
+        onSubmit={isEditingCategories ? onDoneManagingCategories :onSubmit}
         title={getDialogTitle()}
         subtitle={isEditingCategories ? '' : `Fillout the information below to add a product to ${pantry.title}`}>
       <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
