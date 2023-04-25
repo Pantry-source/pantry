@@ -25,7 +25,7 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
       : options.reduce<Partial<categoryApi.Category>[]>((currentOptions, option) => {
         let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
         if (isOptionAvailable) currentOptions.push(option);
-        {console.log(option)}
+
         //renders "+ create" option if query value doesn't exist in the dropdown options
         if (currentOptions.length < 1
           && !isOptionAvailable
