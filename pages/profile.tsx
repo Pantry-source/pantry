@@ -21,7 +21,7 @@ export default function AuthProfile() {
       <p>Signed in: {user.email}</p>
       <button
         type="button"
-        className="mb-4 bg-green-600 text-white px-8 py-2 rounded-lg"
+        className="mb-4 bg-cyan-600 text-white px-8 py-2 rounded-lg"
         onClick={() => supabaseClient.auth.signOut()}
       >
         Sign out

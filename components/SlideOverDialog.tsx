@@ -1,25 +1,17 @@
-import { Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
 
 interface SlideOverProps {
-  isExistingProduct: boolean;
-  title: string;
-  subtitle?: string;
-  onClose: () => void;
-  onSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  open: boolean;
-  children: JSX.Element;
+  isExistingProduct: boolean,
+  title: string,
+  subtitle?: string,
+  onClose: () => void,
+  onSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void,
+  open: boolean,
+  children: JSX.Element
 }
 
-export default function SlideOver({
-  children,
-  open = false,
-  onClose,
-  onSubmit,
-  title,
-  subtitle = '',
-  isExistingProduct
-}: SlideOverProps) {
+export default function SlideOver({ children, open = false, onClose, onSubmit, title, subtitle = '', isExistingProduct }: SlideOverProps) {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -40,15 +32,19 @@ export default function SlideOver({
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-xl">
                   <form className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                     <div className="flex-1">
+
                       {/* Header */}
                       <div className="bg-gray-50 py-6 px-4 sm:px-6">
                         <div className="flex items-start justify-between space-x-3">
                           <div className="space-y-1">
-                            <Dialog.Title className="text-lg font-medium text-gray-900">{title}</Dialog.Title>
-                            {subtitle ? <p className="text-sm text-gray-500">{subtitle}</p> : null}
+                            <Dialog.Title className="text-lg font-medium text-stone-900">{title}</Dialog.Title>
+                            {subtitle ? <p className="text-sm text-stone-500">{subtitle}</p> : null}
                           </div>
                           <div className="flex h-7 items-center">
-                            <button type="button" className="text-gray-400 hover:text-gray-500" onClick={onClose}>
+                            <button
+                              type="button"
+                              className="text-stone-400 hover:text-stone-500"
+                              onClick={onClose}>
                               <span className="sr-only">Close panel</span>
                             </button>
                           </div>
@@ -56,6 +52,7 @@ export default function SlideOver({
                       </div>
 
                       {children}
+
                     </div>
 
                     {/* Footer */}
@@ -63,17 +60,15 @@ export default function SlideOver({
                       <div className="flex justify-end space-x-3">
                         <button
                           type="button"
-                          className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                          onClick={onClose}
-                        >
+                          className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                          onClick={onClose}>
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                          onClick={onSubmit}
-                        >
-                          {isExistingProduct ? 'Update' : 'Save'}
+                          className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                          onClick={onSubmit}>
+                          {isExistingProduct ? "Update" : "Save"}
                         </button>
                       </div>
                     </div>
