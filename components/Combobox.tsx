@@ -9,13 +9,18 @@ type DropdownProps = {
   preselectedValue: categoryApi.Category | undefined;
   onSelect: (category: categoryApi.Category) => void;
   createOption: (categoryName: string) => Promise<categoryApi.Category | undefined>;
-}
+};
 
 type Option = {
   name: string;
-}
+};
 
-export default function Dropdown({ options, onSelect, createOption, preselectedValue = { created_at: '', id: 0, name: '', user_id:'' } }: DropdownProps) {
+export default function Dropdown({
+  options,
+  onSelect,
+  createOption,
+  preselectedValue = { created_at: '', id: 0, name: '', user_id: '' }
+}: DropdownProps) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(preselectedValue);
 
@@ -23,15 +28,14 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
     query === ''
       ? options
       : options.reduce<Partial<categoryApi.Category>[]>((currentOptions, option) => {
-        let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
-        if (isOptionAvailable) currentOptions.push(option);
+          const isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
+          if (isOptionAvailable) currentOptions.push(option);
 
-        //renders "+ create" option if query value doesn't exist in the dropdown options
-        if (currentOptions.length < 1
-          && !isOptionAvailable
-        ) currentOptions.push({ id: undefined, name: '+ create....' });
-        return currentOptions;
-      }, []); 
+          //renders "+ create" option if query value doesn't exist in the dropdown options
+          if (currentOptions.length < 1 && !isOptionAvailable)
+            currentOptions.push({ id: undefined, name: '+ create....' });
+          return currentOptions;
+        }, []);
 
   useEffect(() => {
     onSelect(selected);
@@ -45,7 +49,7 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(option: Option) => option.name}
-          />
+        />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon className="h-5 w-5 text-stone-400" aria-hidden="true" />
         </Combobox.Button>
