@@ -161,7 +161,7 @@ export default function Pantry() {
                 <div className="flex-none pl-6 pr-3 w-12">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-stone-600 focus:ring-cyan-500"
+                    className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
                     checked={checked}
                     onChange={toggleAll}
                   />
@@ -273,7 +273,7 @@ export default function Pantry() {
                                 )}
                                 <input
                                   type="checkbox"
-                                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-stone-600 focus:ring-cyan-500 sm:left-6"
+                                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
                                   value={product.name}
                                   checked={selectedProducts.includes(product)}
                                   onChange={(e) =>
