@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { AlertFormList } from "./AlertComponents";
-import Combobox from "./Combobox";
+import { useEffect, useState } from 'react';
+import { AlertFormList } from './AlertComponents';
+import Combobox from './Combobox';
 import * as categoryApi from '../modules/supabase/category';
 import * as quantityUnitApi from '../modules/supabase/quantityUnit';
 import * as pantryApi from '../modules/supabase/pantry';
@@ -10,13 +10,13 @@ import SlideOver from './SlideOverDialog';
 import supabase from '../api';
 
 type ProductEditorProps = {
-  isOpen: boolean,
-  onCancelProductEditing: () => void,
-  onProductSave: () => void,
-  pantry: pantryApi.Pantry,
-  selectedProduct?: productApi.Product,
-  categories: categoryApi.Category[],
-  units: quantityUnitApi.QuantityUnit[],
+  isOpen: boolean;
+  onCancelProductEditing: () => void;
+  onProductSave: () => void;
+  pantry: pantryApi.Pantry;
+  selectedProduct?: productApi.Product;
+  categories: categoryApi.Category[];
+  units: quantityUnitApi.QuantityUnit[];
 };
 
 type ProductPartial = Partial<productApi.Product>;
@@ -38,7 +38,11 @@ export default function ProductEditor({
     setCurrentProduct(selectedProduct || {});
   }, [selectedProduct]);
 
-  const unitOptions = units.map(unit => <option value={unit.id} key={unit.id}>{unit.name}</option>);
+  const unitOptions = units.map((unit) => (
+    <option value={unit.id} key={unit.id}>
+      {unit.name}
+    </option>
+  ));
 
   function onProductChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
@@ -56,7 +60,7 @@ export default function ProductEditor({
 
   async function createProduct() {
     const errors = [];
-    const requiredFields: { field: keyof ProductPartial, validationError: string}[] = [
+    const requiredFields: { field: keyof ProductPartial; validationError: string }[] = [
       {
         field: 'name',
         validationError: 'Please enter a name'
@@ -74,21 +78,23 @@ export default function ProductEditor({
       if (currentProduct[requiredField.field] === undefined) {
         errors.push({
           message: requiredField.validationError,
-          details: '', hint: '', code: ''
+          details: '',
+          hint: '',
+          code: ''
         });
       }
     }
     if (errors.length) {
       setErrorMessages(errors);
     } else {
-
       // we have to check these again because typescript does no understand the above validation
-      if (currentProduct.category_id !== undefined &&
+      if (
+        currentProduct.category_id !== undefined &&
         currentProduct.name &&
-        currentProduct.quantity_unit !== undefined) {
-        const { data, error } = await supabase
-          .from('products')
-          .insert([{
+        currentProduct.quantity_unit !== undefined
+      ) {
+        const { data, error } = await supabase.from('products').insert([
+          {
             is_essential: currentProduct?.is_essential || false,
             quantity_unit: currentProduct.quantity_unit,
             quantity_amount: currentProduct?.quantity_amount || 0,
@@ -97,9 +103,10 @@ export default function ProductEditor({
             vendor: currentProduct.vendor,
             expires_at: currentProduct.expires_at,
             pantry_id: pantry.id
-          }]);
+          }
+        ]);
         if (error) {
-          setErrorMessages(errorMessages => [...errorMessages, error]);
+          setErrorMessages((errorMessages) => [...errorMessages, error]);
         } else {
           onProductSave();
         }
@@ -119,9 +126,9 @@ export default function ProductEditor({
           vendor: currentProduct.vendor,
           category_id: currentProduct.category_id
         })
-        .eq('id', currentProduct.id)
+        .eq('id', currentProduct.id);
       if (error) {
-        setErrorMessages(errorMessages => [...errorMessages, error]);
+        setErrorMessages((errorMessages) => [...errorMessages, error]);
       } else {
         onProductSave();
       }
@@ -136,23 +143,23 @@ export default function ProductEditor({
 
   function onClose() {
     onCancelProductEditing();
-    setErrorMessages([])
+    setErrorMessages([]);
   }
 
-    /** Receives selected option(category object) from Combobox
-     * if category id === false, fetch id for newly created category
-      */
-    async function onCategorySelect(category: categoryApi.Category) {
-      if (category.id) {
-        onCategoryChange(category.id);
-      }
+  /** Receives selected option(category object) from Combobox
+   * if category id === false, fetch id for newly created category
+   */
+  async function onCategorySelect(category: categoryApi.Category) {
+    if (category.id) {
+      onCategoryChange(category.id);
     }
-  
+  }
+
   /** adds selected Category id to currentProduct */
   function onCategoryChange(categoryId: number) {
     setCurrentProduct(() => ({
       ...currentProduct,
-      'category_id': categoryId
+      category_id: categoryId
     }));
   }
 
@@ -160,30 +167,28 @@ export default function ProductEditor({
     const response = await categoryApi.create(categoryName, pantry.user_id);
     const { data, error } = response;
     if (error) {
-      setErrorMessages(errorMessages => [...errorMessages, error]);
+      setErrorMessages((errorMessages) => [...errorMessages, error]);
     } else {
       onCategoryChange(data.id);
-      setNewCategories([ ...newCategories, data ]);
+      setNewCategories([...newCategories, data]);
       return data;
     }
   }
 
   return (
     <SlideOver
-        isExistingProduct={currentProduct?.id !== undefined}
-        open={isOpen}
-        onClose={onClose}
-        onSubmit={onSubmit}
-        title="New product"
-        subtitle={`Fillout the information below to add a product to ${pantry.title}`}>
+      isExistingProduct={currentProduct?.id !== undefined}
+      open={isOpen}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      title="New product"
+      subtitle={`Fillout the information below to add a product to ${pantry.title}`}
+    >
       <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-
         {/* Product name */}
         <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
           <div>
-            <label
-              htmlFor="product-name"
-              className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+            <label htmlFor="product-name" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
               Product name
             </label>
           </div>
@@ -216,7 +221,8 @@ export default function ProductEditor({
                     aria-describedby="is-essential-description"
                     type="checkbox"
                     className="h-4 w-4 border-gray-300 text-cyan-600 focus:ring-cyan-500"
-                    defaultChecked={currentProduct?.is_essential} />
+                    defaultChecked={currentProduct?.is_essential}
+                  />
                 </div>
                 <div className="pl-7 text-sm">
                   <label htmlFor="is-essential" className="font-medium text-stone-900">
@@ -245,7 +251,8 @@ export default function ProductEditor({
               onChange={onProductChange}
               id="amount"
               className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-              placeholder="0" />
+              placeholder="0"
+            />
             <div className="absolute inset-y-0 right-0 flex items-center">
               <label htmlFor="unit" className="sr-only">
                 Unit
@@ -255,8 +262,9 @@ export default function ProductEditor({
                 name="quantity_unit"
                 onChange={onProductChange}
                 value={currentProduct?.quantity_unit}
-                className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-stone-500 sm:text-sm rounded-md">
-                <option value=''>Select Unit</option>
+                className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-stone-500 sm:text-sm rounded-md"
+              >
+                <option value="">Select Unit</option>
                 {unitOptions}
               </select>
             </div>
@@ -266,29 +274,24 @@ export default function ProductEditor({
         {/* Category */}
         <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
           <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+            <label htmlFor="category" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
               Category
             </label>
           </div>
           <div className="sm:col-span-2">
             <Combobox
               options={allCategories}
-              preselectedValue={allCategories.find(category => category.id === currentProduct.category_id)}
+              preselectedValue={allCategories.find((category) => category.id === currentProduct.category_id)}
               onSelect={onCategorySelect}
               createOption={createCategory}
             />
           </div>
         </div>
 
-
         {/* Vendor */}
         <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
           <div>
-            <label
-              htmlFor="vendor"
-              className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+            <label htmlFor="vendor" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
               Vendor
             </label>
           </div>
@@ -299,11 +302,12 @@ export default function ProductEditor({
               value={currentProduct?.vendor || ''}
               onChange={onProductChange}
               id="vendor"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm" />
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+            />
           </div>
         </div>
         {errorMessages[0] && <AlertFormList errorMessages={errorMessages} />}
       </div>
     </SlideOver>
   );
-};
+}

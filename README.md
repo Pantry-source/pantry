@@ -28,7 +28,6 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the main page.
 
-
 ## Debugging
 
 To debug the locally running application using VSCode, create a file `.vscode/launch.json` with the following configuration:
@@ -63,7 +62,6 @@ To debug the locally running application using VSCode, create a file `.vscode/la
   ]
 }
 ```
-
 
 ## Deployment
 
