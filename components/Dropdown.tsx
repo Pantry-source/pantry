@@ -3,16 +3,34 @@ import { useState, useEffect } from 'react';
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 
-export default function Dropdown({ options, onSelect, createOption, preselectedValue = {} }) {
+type DropdownProps = {
+  options: DropdownOption[];
+  preselectedValue: DropdownOption | undefined;
+  onSelect: (option: DropdownOption) => void;
+  createOption: (optionName: string) => Promise<DropdownOption | undefined>;
+};
+
+export type DropdownOption = {
+  name: string;
+  id?: number;
+};
+
+export default function Dropdown({
+  options,
+  onSelect,
+  createOption,
+  preselectedValue = { id: 0, name: ''}
+}: DropdownProps) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(preselectedValue);
 
   const filteredOptions =
     query === ''
       ? options
-      : options.reduce((currentOptions, option) => {
+      : options.reduce<DropdownOption[]>((currentOptions, option) => {
           const isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
           if (isOptionAvailable) currentOptions.push(option);
+
           //renders "+ create" option if query value doesn't exist in the dropdown options
           if (currentOptions.length < 1 && !isOptionAvailable)
             currentOptions.push({ id: undefined, name: '+ create....' });
@@ -30,7 +48,7 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
         <Combobox.Input
           className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(option) => option?.name}
+          displayValue={(option: DropdownOption) => option.name}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon className="h-5 w-5 text-stone-400" aria-hidden="true" />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertFormList } from './AlertComponents';
-import Combobox from './Combobox';
+import Combobox, { DropdownOption } from './Dropdown';
 import * as categoryApi from '../modules/supabase/category';
 import * as quantityUnitApi from '../modules/supabase/quantityUnit';
 import * as pantryApi from '../modules/supabase/pantry';
@@ -149,7 +149,7 @@ export default function ProductEditor({
   /** Receives selected option(category object) from Combobox
    * if category id === false, fetch id for newly created category
    */
-  async function onCategorySelect(category: categoryApi.Category) {
+  async function onCategorySelect(category: DropdownOption) {
     if (category.id) {
       onCategoryChange(category.id);
     }
