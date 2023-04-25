@@ -15,7 +15,6 @@ type Option = {
   name: string;
 }
 
-
 export default function Dropdown({ options, onSelect, createOption, preselectedValue = { created_at: '', id: 0, name: '', user_id:'' } }: DropdownProps) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(preselectedValue);
@@ -23,15 +22,16 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
   const filteredOptions =
     query === ''
       ? options
-      : options.reduce<categoryApi.Category[]>((currentOptions, option) => {
+      : options.reduce<Partial<categoryApi.Category>[]>((currentOptions, option) => {
         let isOptionAvailable = option.name.toLowerCase().includes(query.toLowerCase());
         if (isOptionAvailable) currentOptions.push(option);
+        {console.log(option)}
         //renders "+ create" option if query value doesn't exist in the dropdown options
         if (currentOptions.length < 1
           && !isOptionAvailable
         ) currentOptions.push({ id: undefined, name: '+ create....' });
         return currentOptions;
-      }, []);
+      }, []); 
 
   useEffect(() => {
     onSelect(selected);
@@ -84,7 +84,7 @@ export default function Dropdown({ options, onSelect, createOption, preselectedV
                   }>
                   {({ active, selected }) => (
                     <>
-                      <span className={classNames('block truncate', (selected && 'font-semibold').toString())}>{option.name}</span>
+                      <span className={classNames('block truncate', selected && 'font-semibold')}>{option.name}</span>
 
                       {selected && (
                         <span
