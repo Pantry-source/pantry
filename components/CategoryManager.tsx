@@ -1,6 +1,7 @@
 import * as categoryApi from '../modules/supabase/category';
 import classNames from '../modules/classnames';
 import { Disclosure } from '@headlessui/react';
+import { useState } from 'react';
 
 type CategoryManagerProps = {
     categories: categoryApi.Category[],
@@ -8,6 +9,17 @@ type CategoryManagerProps = {
 }
 
 export default function CategoryManager({ categories, onCategoryDelete }: CategoryManagerProps) {
+
+    type CategoryEditStatus = { [id: categoryApi.Category['id']]: ('unchanged' | 'saving' | 'error' | 'updated') };
+
+    const initialStatuses: CategoryEditStatus = categories.reduce((acc, category) => {
+        acc[category.id] = 'unchanged';
+        return acc;
+    }, {} as CategoryEditStatus);
+
+    const [categoryStatus, setCategoryStatus] = useState<CategoryEditStatus>(initialStatuses);
+
+    console.log(categories);
 
     async function deleteCategory(category: categoryApi.Category, disclosureClose: () => void) {
         const { error } = await categoryApi.deleteById(category.id);

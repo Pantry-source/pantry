@@ -283,14 +283,14 @@ export default function ProductEditor({
                     Category
                   </label>
                 </div>
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 space-y-2">
                   <Combobox
                     options={allCategories}
                     preselectedValue={allCategories.find(category => category.id === currentProduct.category_id)}
                     onSelect={onCategorySelect}
                     createOption={createCategory}
                   />
-                  <div className="py-4">
+                  <div>
                     <a href="#" className="text-sm font-medium leading-6 text-cyan-700" onClick={() => {setIsEditingCategories(true)}}>
                       Manage categories <span aria-hidden="true">&rarr;</span>
                     </a>
