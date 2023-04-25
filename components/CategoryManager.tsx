@@ -1,25 +1,26 @@
-import * as categoryApi from '../modules/supabase/category';
+import {Category, deleteById} from '../modules/supabase/category';
 import classNames from '../modules/classnames';
 import { Disclosure } from '@headlessui/react';
 import { useState } from 'react';
 
 type CategoryManagerProps = {
-  categories: categoryApi.Category[];
-  onCategoryDelete: (category: categoryApi.Category) => void;
+  categories: Category[];
+  onCategoryDelete: (category: Category) => void;
 };
-type CategoryEditStatus = { [id: categoryApi.Category['id']] : {
+
+type CategoryEditStatus = { [id: Category['id']] : {
   status: 'unchanged' | 'saving' | 'saved' | 'error';
   message?: string
 }};
 
 export default function CategoryManager({ categories, onCategoryDelete }: CategoryManagerProps) {
   const [categoryStatuses, setCategoryStatuses] = useState<CategoryEditStatus>({});
-  async function deleteCategory(category: categoryApi.Category, disclosureClose: () => void) {
+  async function deleteCategory(category: Category, disclosureClose: () => void) {
     setCategoryStatuses({
       ...categoryStatuses,
       [category.id]: { status: 'saving' }
     });
-    const { error } = await categoryApi.deleteById(category.id);
+    const { error } = await deleteById(category.id);
     if (!error) {
       setCategoryStatuses({
         ...categoryStatuses,
@@ -49,14 +50,14 @@ export default function CategoryManager({ categories, onCategoryDelete }: Catego
     }
   }
 
-  function clearCategoryStatus(id: categoryApi.Category["id"]) {
+  function clearCategoryStatus(id: Category["id"]) {
     setCategoryStatuses({
       ...categoryStatuses,
       [id]: { status: 'unchanged' }
     });
   }
 
-  function renderCustomCategory(category: categoryApi.Category) {
+  function renderCustomCategory(category: Category) {
     const hasSaveError = categoryStatuses[category.id] && categoryStatuses[category.id].status === 'error';
     const disclosureColor = hasSaveError ? 'red' : 'yellow';
     return (
@@ -110,7 +111,7 @@ export default function CategoryManager({ categories, onCategoryDelete }: Catego
     );
   }
 
-  function renderDefaultCategory(category: categoryApi.Category) {
+  function renderDefaultCategory(category: Category) {
     return (
       <li className="flex items-center justify-between py-3" key={category.id}>
         <div className="flex items-start gap-x-2">
