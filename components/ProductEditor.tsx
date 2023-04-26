@@ -8,6 +8,8 @@ import * as productApi from '../modules/supabase/product';
 import { PostgrestError } from '@supabase/supabase-js';
 import SlideOver from './SlideOverDialog';
 import supabase from '../api';
+import { Transition } from '@headlessui/react';
+import CategoryManager from './CategoryManager';
 
 type ProductEditorProps = {
   isOpen: boolean;
@@ -32,8 +34,11 @@ export default function ProductEditor({
 }: ProductEditorProps) {
   const [errorMessages, setErrorMessages] = useState<PostgrestError[]>([]);
   const [currentProduct, setCurrentProduct] = useState<ProductPartial>(selectedProduct || {});
-  const [newCategories, setNewCategories] = useState<categoryApi.Category[]>([]);
-  const allCategories = [...categories, ...newCategories];
+  const [isEditingCategories, setIsEditingCategories] = useState(false);
+  // used to keep track of pre-fetched and newly added categories
+  const [allCategories, setAllCategories] = useState<categoryApi.Category[]>(categories);
+
+  const isExistingProduct = currentProduct?.id !== undefined;
   useEffect(() => {
     setCurrentProduct(selectedProduct || {});
   }, [selectedProduct]);
@@ -170,143 +175,197 @@ export default function ProductEditor({
       setErrorMessages((errorMessages) => [...errorMessages, error]);
     } else {
       onCategoryChange(data.id);
-      setNewCategories([...newCategories, data]);
+      setAllCategories([...allCategories, data]);
       return data;
     }
   }
 
+  function onCategoryDelete(category: categoryApi.Category) {
+    setAllCategories(allCategories.filter((c) => c.id !== category.id));
+  }
+
+  function renderCategoryManager() {
+    return (
+      <Transition
+        appear={true}
+        show={true}
+        enter="transition-opacity duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-150"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <div className="space-y-1 px-4 pb-2 sm:space-y-0 sm:px-6 sm:py-5">
+          <CategoryManager categories={allCategories} onCategoryDelete={onCategoryDelete} />
+        </div>
+      </Transition>
+    );
+  }
+
+  function getDialogTitle() {
+    return isEditingCategories ? 'Categories' : isExistingProduct ? 'Edit Product' : 'New Product';
+  }
+
+  function getDialogDoneAction() {
+    return isEditingCategories ? 'Done' : isExistingProduct ? 'Update' : 'Save';
+  }
+
+  function onDoneManagingCategories() {
+    setIsEditingCategories(false);
+  }
+
   return (
     <SlideOver
-      isExistingProduct={currentProduct?.id !== undefined}
+      doneAction={getDialogDoneAction()}
       open={isOpen}
-      onClose={onClose}
-      onSubmit={onSubmit}
-      title="New product"
-      subtitle={`Fillout the information below to add a product to ${pantry.title}`}
+      onClose={isEditingCategories ? onDoneManagingCategories : onClose}
+      onSubmit={isEditingCategories ? onDoneManagingCategories : onSubmit}
+      title={getDialogTitle()}
+      subtitle={isEditingCategories ? '' : `Fillout the information below to add a product to ${pantry.title}`}
     >
       <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-        {/* Product name */}
-        <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-          <div>
-            <label htmlFor="product-name" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
-              Product name
-            </label>
-          </div>
-          <div className="sm:col-span-2">
-            <input
-              type="text"
-              name="name"
-              id="product-name"
-              value={currentProduct?.name}
-              onChange={onProductChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
-            />
-          </div>
-        </div>
+        {isEditingCategories ? (
+          renderCategoryManager()
+        ) : (
+          <form>
+            {/* Product name */}
+            <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+              <div>
+                <label htmlFor="product-name" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+                  Product name
+                </label>
+              </div>
+              <div className="sm:col-span-2">
+                <input
+                  type="text"
+                  name="name"
+                  id="product-name"
+                  value={currentProduct?.name}
+                  onChange={onProductChange}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                />
+              </div>
+            </div>
 
-        {/* Is Essential */}
-        <fieldset className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-          <legend className="sr-only">Is Essential</legend>
-          <div className="text-sm font-medium text-stone-900" aria-hidden="true">
-            Is Essential
-          </div>
-          <div className="space-y-5 sm:col-span-2">
-            <div className="space-y-5 sm:mt-0">
-              <div className="relative flex items-start">
-                <div className="absolute flex h-5 items-center">
-                  <input
-                    id="is-essential"
-                    name="is_essential"
-                    onChange={onProductChange}
-                    aria-describedby="is-essential-description"
-                    type="checkbox"
-                    className="h-4 w-4 border-gray-300 text-cyan-600 focus:ring-cyan-500"
-                    defaultChecked={currentProduct?.is_essential}
-                  />
-                </div>
-                <div className="pl-7 text-sm">
-                  <label htmlFor="is-essential" className="font-medium text-stone-900">
-                    Yes
+            {/* Quantity */}
+            <div className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+              <label htmlFor="amount" className="block text-sm font-medium text-stone-700">
+                Quantity
+              </label>
+
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <input
+                  type="text"
+                  name="quantity_amount"
+                  value={currentProduct?.quantity_amount || ''}
+                  onChange={onProductChange}
+                  id="amount"
+                  className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+                  placeholder="0"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <label htmlFor="unit" className="sr-only">
+                    Unit
                   </label>
-                  <p id="is-essential-description" className="text-stone-500">
-                    Will be marked as &quot;out of stock&quot; when runs out
-                  </p>
+                  <select
+                    id="unit"
+                    name="quantity_unit"
+                    onChange={onProductChange}
+                    value={currentProduct?.quantity_unit}
+                    className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-stone-500 sm:text-sm rounded-md"
+                  >
+                    <option value="">Select Unit</option>
+                    {unitOptions}
+                  </select>
                 </div>
               </div>
             </div>
-          </div>
-        </fieldset>
 
-        {/* Quantity */}
-        <div className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-          <label htmlFor="amount" className="block text-sm font-medium text-stone-700">
-            Quantity
-          </label>
-
-          <div className="mt-1 relative rounded-md shadow-sm">
-            <input
-              type="text"
-              name="quantity_amount"
-              value={currentProduct?.quantity_amount || ''}
-              onChange={onProductChange}
-              id="amount"
-              className="focus:ring-cyan-500 focus:border-cyan-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-              placeholder="0"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center">
-              <label htmlFor="unit" className="sr-only">
-                Unit
-              </label>
-              <select
-                id="unit"
-                name="quantity_unit"
-                onChange={onProductChange}
-                value={currentProduct?.quantity_unit}
-                className="focus:ring-cyan-500 focus:border-cyan-500 h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-stone-500 sm:text-sm rounded-md"
-              >
-                <option value="">Select Unit</option>
-                {unitOptions}
-              </select>
+            {/* Category */}
+            <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+                  Category
+                </label>
+              </div>
+              <div className="sm:col-span-2 space-y-2">
+                <Combobox
+                  options={allCategories}
+                  preselectedValue={allCategories.find((category) => category.id === currentProduct.category_id)}
+                  onSelect={onCategorySelect}
+                  createOption={createCategory}
+                />
+                <div>
+                  <a
+                    href="#"
+                    className="text-sm font-medium leading-6 text-cyan-700"
+                    onClick={() => {
+                      setIsEditingCategories(true);
+                    }}
+                  >
+                    Manage categories <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Category */}
-        <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
-              Category
-            </label>
-          </div>
-          <div className="sm:col-span-2">
-            <Combobox
-              options={allCategories}
-              preselectedValue={allCategories.find((category) => category.id === currentProduct.category_id)}
-              onSelect={onCategorySelect}
-              createOption={createCategory}
-            />
-          </div>
-        </div>
+            {/* Is Essential */}
+            <fieldset className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+              <legend className="sr-only">Is Essential</legend>
+              <div className="text-sm font-medium text-stone-900" aria-hidden="true">
+                Is Essential
+              </div>
+              <div className="space-y-5 sm:col-span-2">
+                <div className="space-y-5 sm:mt-0">
+                  <div className="relative flex items-start">
+                    <div className="absolute flex h-5 items-center">
+                      <input
+                        id="is-essential"
+                        name="is_essential"
+                        onChange={onProductChange}
+                        aria-describedby="is-essential-description"
+                        type="checkbox"
+                        className="h-4 w-4 border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                        defaultChecked={currentProduct?.is_essential}
+                      />
+                    </div>
+                    <div className="pl-7 text-sm">
+                      <label htmlFor="is-essential" className="font-medium text-stone-900">
+                        Yes
+                      </label>
+                      <p id="is-essential-description" className="text-stone-500">
+                        Will be marked as &quot;out of stock&quot; when runs out
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
 
-        {/* Vendor */}
-        <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-          <div>
-            <label htmlFor="vendor" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
-              Vendor
-            </label>
-          </div>
-          <div className="sm:col-span-2">
-            <input
-              type="text"
-              name="vendor"
-              value={currentProduct?.vendor || ''}
-              onChange={onProductChange}
-              id="vendor"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
-            />
-          </div>
-        </div>
-        {errorMessages[0] && <AlertFormList errorMessages={errorMessages} />}
+            {/* Vendor */}
+            <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+              <div>
+                <label htmlFor="vendor" className="block text-sm font-medium text-stone-900 sm:mt-px sm:pt-2">
+                  Vendor
+                </label>
+              </div>
+              <div className="sm:col-span-2">
+                <input
+                  type="text"
+                  name="vendor"
+                  value={currentProduct?.vendor || ''}
+                  onChange={onProductChange}
+                  id="vendor"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Feedback */}
+            {errorMessages[0] && <AlertFormList errorMessages={errorMessages} />}
+          </form>
+        )}
       </div>
     </SlideOver>
   );

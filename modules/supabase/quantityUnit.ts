@@ -7,5 +7,5 @@ export type QuantityUnitMap = Record<QuantityUnit['id'], QuantityUnit['name']>;
 let QuantityUnitMapTest: QuantityUnitMap = { 123: 'test' };
 
 export async function fetchAll() {
-  return supabase.from('quantity_units').select(`*`);
+  return await supabase.from('quantity_units').select(`*`);
 }
