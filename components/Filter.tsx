@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, ReactEventHandler, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import MultiSelect from './MultiSelect';
 
@@ -19,7 +19,7 @@ export default function Filter({ validCategories }) {
   const [categories, setCategories] = useState([] as any[]);
 
   /** updates activeFilters by selected category or filters */
-  function onChange(e) {
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     console.log(e.target);
     const field = e.target.id.split('-')[1]; // category or filter
     const value = e.target.value;

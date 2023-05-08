@@ -2,6 +2,24 @@
 import { Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
+type MultiSelectProps = {
+  sectionOptions: Section[];
+  selectOptions: any[];
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+type Section = {
+  id: string;
+  name: string;
+  options: Option[];
+}
+
+type Option = {
+  value: string;
+  label: string;
+  checked: boolean;
+}
+
 /** Multiselect component drops down a list of fields for selection
  * 
  * Props:
@@ -9,9 +27,8 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
  * 
  */
 
-function MultiSelect({ sectionOptions, selectOptions, handleChange }) {
-  console.log('SECTIONOPTIONS', sectionOptions)
-  console.log('SELECTOPTIONS', selectOptions)
+function MultiSelect({ sectionOptions, selectOptions, handleChange }: MultiSelectProps) {
+
   return (
     <div>
       <div className="flow-root pr-4">
