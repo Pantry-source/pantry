@@ -1,7 +1,18 @@
 import { Fragment, ReactEventHandler, useEffect, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import MultiSelect from './MultiSelect';
+import * as categoryApi from '../modules/supabase/category';
 
+
+type ValidCategoriesProp = {
+  validCategories: categoryApi.Category[];
+}
+
+type Option = {
+   value: string; 
+    label: string; 
+    checked: boolean; 
+}
 const filterSection = {
   id: 'filters',
   name: 'Filters',
@@ -12,7 +23,7 @@ const filterSection = {
   ]
 };
 
-export default function Filter({ validCategories }) {
+export default function Filter({ validCategories }: ValidCategoriesProp) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([] as any[]);
   const [filters, setFilters] = useState(filterSection.options);
@@ -43,7 +54,7 @@ export default function Filter({ validCategories }) {
     }
   }
 
-  const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
+  const categoryOptions = validCategories.reduce<Option[]>((convertToCategoryOptionsFormat, category) => {
     convertToCategoryOptionsFormat.push({
       value: category.name.toLowerCase().split(' ').join('-'),
       label: category.name,

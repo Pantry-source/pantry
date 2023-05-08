@@ -20,10 +20,12 @@ type Option = {
   checked: boolean;
 }
 
-/** Multiselect component drops down a list of fields for selection
+/** Multiselect component drops down a list of options for selection.
  * 
  * Props:
- * - options 
+ * - sectionOptions => {[],[],..}
+ * - selectOptions  => {[],[],..}
+ * - handleChange => handles selection of options
  * 
  */
 
