@@ -49,7 +49,7 @@ export default function ProductEditor({
     </option>
   ));
 
-  function onProductChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function onProductChange(e) {
     // for boolean product attributes use "checked" property of input instead of "value" so that the value is boolean and not string
     let value: string | boolean | null = null;
     if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
