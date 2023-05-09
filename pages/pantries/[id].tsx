@@ -25,10 +25,6 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const [categoryIds, setCategoryIds] = useState([]);
-  const [filters, setFilters] = useState([]);
-
-
   const router = useRouter();
   const { id } = router.query;
 
@@ -116,23 +112,6 @@ export default function Pantry() {
     }
   }
 
-  /** retrives category ID from Filter.tsx and add/removes from categoryIDs */
-  function updateCategoryIds(filter:any) {
-    const categoryId = +filter.value;
-    categoryIds.includes(categoryId)
-      ? setCategoryIds(ids =>
-        ids.filter(id => id !== categoryId))
-      : setCategoryIds(ids => [...ids, categoryId]);
-  }
-
-  /** retrives Filter value from Filter.tsx and add/removes from filters */
-  function updateFilterIds(filter:any) {
-    filters.includes(filter)
-      ? setFilters(filters =>
-        filters.filter(f => f !== filter))
-      : setFilters(filters => [...filters, filter]);
-  }
-
   useEffect(() => {
     fetchPantry();
     fetchCategories();
@@ -212,11 +191,7 @@ export default function Pantry() {
                     <h2 id="filter-heading" className="sr-only">
                       Filters
                     </h2>
-                    <Filter
-                      updateCategoryIds={updateCategoryIds}
-                      updateFilters={updateFilterIds}
-                      validCategories={categories.filter(category => category.products)}
-                    /> 
+                    <Filter validCategories={categoriesWithProducts} />
                     {activeFilters.length > 0 && (
                       <div className="bg-gray-100">
                         <div className="mx-auto max-w-1xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
