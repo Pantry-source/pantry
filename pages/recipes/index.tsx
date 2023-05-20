@@ -4,6 +4,8 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useUser, useSessionContext, useSupabaseClient } from '@supabase/auth-helpers-react';
 import EmptyState from '../../components/EmptyState';
+import classNames from '../../modules/classnames';
+import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 
 const collections = [
   {
@@ -204,6 +206,40 @@ export default function Home() {
   return (
     <div>
       <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">My Recipes</h1>
+      <div>
+        <h2 className="text-sm font-medium text-gray-500">Collections</h2>
+        <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          {collections.map((project) => (
+            <li key={project.name} className="col-span-1 flex rounded-md shadow-sm">
+              <div
+                className={classNames(
+                  'bg-pink-600',
+                  'flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white'
+                )}
+              >
+                {project.name[0]}
+              </div>
+              <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white">
+                <div className="flex-1 truncate px-4 py-2 text-sm">
+                  <a href={''} className="font-medium text-gray-900 hover:text-gray-600">
+                    {project.name}
+                  </a>
+                  <p className="text-gray-500">{project.recipes.length} Recipes</p>
+                </div>
+                <div className="flex-shrink-0 pr-2">
+                  <button
+                    type="button"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    <span className="sr-only">Open options</span>
+                    <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
       {recipes.map((recipe, index) => (
         <div key={index} className="border-b border-gray-300 mt-8 pb-4">
           <h2 className="text-2xl">{recipe.name}</h2>
