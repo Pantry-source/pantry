@@ -19,8 +19,10 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false }: Props)
         tools: EDITOR_TOOLS,
         readOnly,
         data: initialData,
+        minHeight: 0, // sets bottom padding to 0
         async onChange(api, event) {
           const data = await api.saver.save();
+          console.log('data change', data);
           onChange(data);
         },
       });
@@ -36,7 +38,7 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false }: Props)
   }, []);
 
 
-  return <div className="prose max-w-full" id={holder} />;
+  return <div className="max-w-full" id={holder} />;
 };
 
 export default memo(EditorBlock);

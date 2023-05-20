@@ -216,31 +216,9 @@ export default function Home() {
     return <li key={i} className='lowercase'>{ingredientSentence}</li>
   }
 
-  /*
-  {
-  "time": 1684604156576,
-  "blocks": [
-    {
-      "id": "4IToht84_F",
-      "type": "list",
-      "data": {
-        "style": "ordered",
-        "items": [
-          "Do this and that",
-          "Even more stuff to do",
-          "Okay good job."
-        ]
-      }
-    }
-  ],
-  "version": "2.27.0"
-}
-  */
-
   function renderDirections(recipe) {
-    
     return (
-      <div className="container max-w-4xl">
+      <div className="container max-w-4xl pl-4">
         <RecipeEditor readOnly initialData={formatOrderedtListData(recipe.directions.steps)} onChange={setData} holder={`recipe-directions-${recipe.id}`} />
       </div>
     );
@@ -248,7 +226,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">My Recipes</h1>
+      <h1 className="text-xl font-semibold tracking-wide mt-6 mb-2 sr-only">My Recipes</h1>
       <div>
         <h2 className="text-sm font-medium text-gray-500">Collections</h2>
         <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
@@ -284,15 +262,15 @@ export default function Home() {
         </ul>
       </div>
       {recipes.map((recipe, index) => (
-        <div key={index} className="border-b border-gray-300 mt-8 pb-4">
-          <h2 className="text-2xl">{recipe.name}</h2>
-          <h3 className="text-xl">Ingredients</h3>
+        <div key={index} className="border-b border-gray-300 mt-8 pb-4 prose">
+          <h3 className="text-large">{recipe.name}</h3>
+          <h4 className="text-medium">Ingredients</h4>
           <ul className="list-disc">
             {
               recipe.ingredients.map(renderIngredient)
             }
           </ul>
-          <h3 className="text-xl">Directions</h3>
+          <h4 className="text-medium">Directions</h4>
             {
               renderDirections(recipe)
             }
