@@ -1,17 +1,29 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Auth } from '@supabase/auth-ui-react';
+import { OutputData } from "@editorjs/editorjs";
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import dynamic from "next/dynamic";
 import { useUser, useSessionContext, useSupabaseClient } from '@supabase/auth-helpers-react';
 import EmptyState from '../../components/EmptyState';
 import classNames from '../../modules/classnames';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { formatOrderedtListData } from '../../modules/editor/utils';
+
+const RecipeEditor = dynamic(() => import("../../components/RecipeEditor"), {
+  ssr: false,
+});
 
 const collections = [
   {
     id: 0,
     name: 'Essentials',
     recipes: [0]
+  },
+  {
+    id: 0,
+    name: 'Indian food',
+    recipes: [0, 1]
   }
 ];
 
@@ -42,7 +54,7 @@ const initialRecipes = [
     }
   },
   {
-    id: 0,
+    id: 1,
     name: "Garam Masala",
     ingredients: [
       {
@@ -153,6 +165,7 @@ export default function Home() {
   const supabaseClient = useSupabaseClient();
   const { isLoading, session, error } = useSessionContext();
   const [ recipes, setRecipes ] = useState(initialRecipes);
+  const [data, setData] = useState<OutputData>();
   // const [pantries, setPantries] = useState<pantryApi.Pantry[]>([]);
   const user = useUser();
   useEffect(() => {
@@ -203,6 +216,36 @@ export default function Home() {
     return <li key={i} className='lowercase'>{ingredientSentence}</li>
   }
 
+  /*
+  {
+  "time": 1684604156576,
+  "blocks": [
+    {
+      "id": "4IToht84_F",
+      "type": "list",
+      "data": {
+        "style": "ordered",
+        "items": [
+          "Do this and that",
+          "Even more stuff to do",
+          "Okay good job."
+        ]
+      }
+    }
+  ],
+  "version": "2.27.0"
+}
+  */
+
+  function renderDirections(recipe) {
+    
+    return (
+      <div className="container max-w-4xl">
+        <RecipeEditor readOnly initialData={formatOrderedtListData(recipe.directions.steps)} onChange={setData} holder={`recipe-directions-${recipe.id}`} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-3xl font-semibold tracking-wide mt-6 mb-2">My Recipes</h1>
@@ -250,11 +293,9 @@ export default function Home() {
             }
           </ul>
           <h3 className="text-xl">Directions</h3>
-          <ol className="list-decimal">
-          {
-            recipe.directions.steps.map((step, i) => <li key={i}>{step}</li>)
-          }
-          </ol>
+            {
+              renderDirections(recipe)
+            }
         </div>
       ))}
     </div>
