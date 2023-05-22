@@ -1,44 +1,36 @@
-import React, { memo, useEffect, useRef } from "react";
-import EditorJS, { OutputData } from "@editorjs/editorjs";
-import { EDITOR_TOOLS } from "../modules/editor/tools";
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import { formatOrderedListData } from "../modules/editor/utils";
 
-type Props = {
-  initialData?: OutputData;
-  onChange(val: OutputData): void;
-  holder: string;
-  readOnly?: boolean
-};
+const TextEditor = dynamic(() => import("./TextEditor"), {
+  ssr: false,
+});
 
-const EditorBlock = ({ initialData, onChange, holder, readOnly = false }: Props) => {
-  const ref = useRef<EditorJS>();
 
-  useEffect(() => {
-    if (!ref.current) {
-      const editor = new EditorJS({
-        holder: holder,
-        tools: EDITOR_TOOLS,
-        readOnly,
-        data: initialData,
-        minHeight: 0, // sets bottom padding to 0
-        async onChange(api, event) {
-          const data = await api.saver.save();
-          console.log('data change', data);
-          onChange(data);
-        },
-      });
-      ref.current = editor;
-    }
+export default function RecipeEditor({ recipe }) {
+  const [directions, setDirections] = useState({});
+  const [readOnly, setReadOnly] = useState(true);
 
-    // handles destroying editor
-    return () => {
-      if (ref.current && ref.current.destroy) {
-        ref.current.destroy();
+  function renderIngredient(ingredient, i) {
+    let ingredientSentence = ingredient.variants.reduce((result, variant, index) => {
+      if (result.length) {
+        result.push(<span key={index} className='font-semibold'> or </span>);
       }
-    };
-  }, []);
+      result.push(`${variant.quantity_amount_min} ${variant.quantity_unit.name !== 'count' ? variant.quantity_unit.name : ''} ${variant.name}`);
+      variant.description && result.push(`, ${variant.description}`);
+      variant.preparation && result.push(`, ${variant.preparation}`);
+      return result;
+    }, []);
+    return <li key={i} className='lowercase'>{ingredientSentence}</li>
+  }
 
-
-  return <div className="max-w-full" id={holder} />;
-};
-
-export default memo(EditorBlock);
+  return (
+    <div className='prose pl-4'>
+      <h2>{recipe.name}</h2>
+      <h3>Ingredients</h3>
+      <ul>{ recipe.ingredients.map(renderIngredient) }</ul>
+      <h3>Directions</h3>
+      <TextEditor readOnly={readOnly} initialData={formatOrderedListData(recipe.directions.steps)} onChange={setDirections} holder={`recipe-directions-${recipe.id}`} />
+    </div>
+  );
+}

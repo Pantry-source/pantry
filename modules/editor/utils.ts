@@ -1,4 +1,4 @@
-export function formatOrderedtListData(data: String[]) {
+export function formatOrderedListData(data: String[]) {
     return {
         blocks: [{
             type : "list",
