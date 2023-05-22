@@ -1,22 +1,24 @@
 import React, { memo, useEffect, useRef } from "react";
-import EditorJS, { OutputData } from "@editorjs/editorjs";
-import { EDITOR_TOOLS } from "../modules/editor/tools";
+import EditorJS, { EditorConfig, OutputData } from "@editorjs/editorjs";
+import { DEFAULT_EDITOR_TOOLS } from "../modules/editor/tools";
 
 type Props = {
   initialData?: OutputData;
   onChange(val: OutputData): void;
   holder: string;
-  readOnly?: boolean
+  readOnly?: boolean,
+  tools?: EditorConfig["tools"]
 };
 
-const EditorBlock = ({ initialData, onChange, holder, readOnly = false }: Props) => {
+const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = DEFAULT_EDITOR_TOOLS }: Props) => {
   const ref = useRef<EditorJS>();
 
   useEffect(() => {
     if (!ref.current) {
       const editor = new EditorJS({
-        holder: holder,
-        tools: EDITOR_TOOLS,
+        holder,
+        tools,
+        inlineToolbar: true,
         readOnly,
         data: initialData,
         minHeight: 0, // sets bottom padding to 0

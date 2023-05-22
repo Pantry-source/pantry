@@ -1,6 +1,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { formatOrderedListData } from "../modules/editor/utils";
+import { formatIngredientData, formatOrderedListData } from "../modules/editor/utils";
+import { INGREDIENTS_EDITOR_TOOLS } from "../modules/editor/tools";
 
 const TextEditor = dynamic(() => import("./TextEditor"), {
   ssr: false,
@@ -9,26 +10,13 @@ const TextEditor = dynamic(() => import("./TextEditor"), {
 
 export default function RecipeEditor({ recipe }) {
   const [directions, setDirections] = useState({});
-  const [readOnly, setReadOnly] = useState(true);
-
-  function renderIngredient(ingredient, i) {
-    let ingredientSentence = ingredient.variants.reduce((result, variant, index) => {
-      if (result.length) {
-        result.push(<span key={index} className='font-semibold'> or </span>);
-      }
-      result.push(`${variant.quantity_amount_min} ${variant.quantity_unit.name !== 'count' ? variant.quantity_unit.name : ''} ${variant.name}`);
-      variant.description && result.push(`, ${variant.description}`);
-      variant.preparation && result.push(`, ${variant.preparation}`);
-      return result;
-    }, []);
-    return <li key={i} className='lowercase'>{ingredientSentence}</li>
-  }
-
+  const [ingredients, setIngredients] = useState({});
+  const [readOnly, setReadOnly] = useState(false);
   return (
     <div className='prose pl-4'>
       <h2>{recipe.name}</h2>
       <h3>Ingredients</h3>
-      <ul>{ recipe.ingredients.map(renderIngredient) }</ul>
+      <TextEditor readOnly={readOnly} tools={INGREDIENTS_EDITOR_TOOLS} initialData={formatIngredientData(recipe.ingredients)} onChange={setIngredients} holder={`recipe-ingredients-${recipe.id}`} />
       <h3>Directions</h3>
       <TextEditor readOnly={readOnly} initialData={formatOrderedListData(recipe.directions.steps)} onChange={setDirections} holder={`recipe-directions-${recipe.id}`} />
     </div>

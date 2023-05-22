@@ -3,42 +3,16 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useUser, useSessionContext, useSupabaseClient } from '@supabase/auth-helpers-react';
 import EmptyState from '../../components/EmptyState';
-import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import RecipeBrowser from '../../components/RecipeBrowser';
 import ModalDialog from '../../components/ModalDialog';
 import RecipeEditor from '../../components/RecipeEditor';
-
-
-const collections = [
-  {
-    id: 0,
-    name: 'Essentials',
-    recipes: [0]
-  },
-  {
-    id: 0,
-    name: 'Indian food',
-    recipes: [0, 1]
-  }
-];
 
 const initialRecipes = [
   {
     id: 0,
     name: "Ghee",
     ingredients: [
-      {
-        variants: [
-          {
-            name: "Butter",
-            quantity_amount_min: 4,
-            quantity_amount_max: 8,
-            quantity_unit: {
-              name: 'stick'
-            }
-          }
-        ]
-      }
+      "4 to 8 sticks of butter"
     ],
     directions: {
       steps: [
@@ -52,99 +26,13 @@ const initialRecipes = [
     id: 1,
     name: "Garam Masala",
     ingredients: [
-      {
-        variants: [
-          {
-            name: "Coriander Seeds",
-            quantity_amount_min: 2,
-            quantity_unit: {
-              name: 'tbsp'
-            }
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Cumin Seeds",
-            quantity_amount_min: 1,
-            quantity_unit: {
-              name: 'tsp'
-            }
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Whole Cloves",
-            quantity_amount_min: 0.5,
-            quantity_unit: {
-              name: 'tsp'
-            }
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Cardamom Seeds",
-            quantity_amount_min: 0.5,
-            quantity_unit: {
-              name: 'tsp'
-            },
-            description: "from green or white pods"
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Bay leaves",
-            quantity_amount_min: 2,
-            quantity_unit: {
-              name: 'count'
-            }
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Ground cayenne pepper",
-            quantity_amount_min: 0.5,
-            quantity_unit: {
-              name: 'tsp'
-            }
-          },
-          {
-            name: "Red pepper flakes",
-            quantity_amount_min: 0.5,
-            quantity_unit: {
-              name: 'tsp'
-            }
-          },
-          {
-            name: "Dried red chiles",
-            quantity_amount_min: 3,
-            quantity_unit: {
-              name: 'count'
-            }
-          }
-        ]
-      },
-      {
-        variants: [
-          {
-            name: "Cinnamon stick",
-            quantity_amount_min: 1,
-            quantity_unit: {
-              name: 'count'
-            },
-            preparation: "broken up"
-          }
-        ]
-      },
+      "2 tbsp Coriander Seeds",
+      "1 tsp Cumin Seeds",
+      "1/2 tsp Whole Cloves",
+      "1/2 tsp Cardamom Seeds",
+      "2 Bay leaves",
+      "1/2 tsp Ground cayenne pepper or 1/2 tsp Red pepper flakes",
+      "1 Cinnamon stick, broken up"
     ],
     directions: {
       steps: [
@@ -198,36 +86,6 @@ export default function Recipes() {
 
   return (
     <div className='h-full flex flex-col'>
-      <h1 className="text-xl font-semibold tracking-wide mt-6 mb-2 sr-only">My Recipes</h1>
-      <div className="flex-none">
-        <h2 className="text-sm font-medium text-gray-500">Collections</h2>
-        <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-          {collections.map((collection) => (
-            <li key={collection.name} className="col-span-1 flex rounded-md shadow-sm">
-              <div className="bg-pink-600 flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white">
-                {collection.name[0]}
-              </div>
-              <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white">
-                <div className="flex-1 truncate px-4 py-2 text-sm">
-                  <a href={''} className="font-medium text-gray-900 hover:text-gray-600">
-                    {collection.name}
-                  </a>
-                  <p className="text-gray-500">{collection.recipes.length} Recipes</p>
-                </div>
-                <div className="flex-shrink-0 pr-2">
-                  <button
-                    type="button"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
-                    <span className="sr-only">Open options</span>
-                    <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      
       <h2 className="text-sm font-medium text-gray-500 mt-10 mb-5">All Recipes</h2>
       <div className='flex-1'>
         <RecipeBrowser recipes={recipes} onRecipeViewClick={viewRecipe}/>

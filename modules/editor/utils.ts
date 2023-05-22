@@ -9,3 +9,15 @@ export function formatOrderedListData(data: String[]) {
         },]
     };
 }
+
+export function formatIngredientData(data: String[]) {
+  return {
+      blocks: [{
+          type : "ingredient",
+          data : {
+              style : "unordered",
+              items : data
+          }
+      },]
+  };
+}

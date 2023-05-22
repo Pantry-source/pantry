@@ -1,19 +1,5 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-import { Fragment, useState } from 'react'
-import { Combobox, Dialog, Transition } from '@headlessui/react'
+import { useState } from 'react'
+import { Combobox } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { UsersIcon } from '@heroicons/react/24/outline'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
@@ -32,16 +18,7 @@ export default function RecipeBrowser({recipes, onRecipeViewClick}) {
         })
 
   function renderIngredient(ingredient, i) {
-    let ingredientSentence = ingredient.variants.reduce((result, variant, index) => {
-        if (result.length) {
-        result.push(<span key={index} className='font-semibold'> or </span>);
-        }
-        result.push(`${variant.quantity_amount_min} ${variant.quantity_unit.name !== 'count' ? variant.quantity_unit.name : ''} ${variant.name}`);
-        variant.description && result.push(`, ${variant.description}`);
-        variant.preparation && result.push(`, ${variant.preparation}`);
-        return result;
-    }, []);
-    return <li key={i} className='lowercase'>{ingredientSentence}</li>
+    return <li key={i} className='lowercase'>{ingredient}</li>
   }
 
   return (
