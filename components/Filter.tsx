@@ -8,9 +8,9 @@ type ValidCategoriesProp = {
 }
 
 type Option = {
-   value: string; 
-    label: string; 
-    checked: boolean; 
+  value: string;
+  label: string;
+  checked: boolean;
 }
 const filterSection = {
   id: 'filters',
@@ -22,51 +22,146 @@ const filterSection = {
   ]
 };
 
-export default function Filter({ validCategories }: ValidCategoriesProp) {
+export default function Filter({ validCategories, updateFilters, updateCategoryIds }: ValidCategoriesProp) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([] as any[]);
   const [filters, setFilters] = useState(filterSection.options);
   const [categories, setCategories] = useState([] as any[]);
 
-  /** updates activeFilters by selected category or filters */
-  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log(e.target);
-    const field = e.target.id.split('-')[1]; // category or filter
-    const value = e.target.value;
-    const name = e.target.name;
-    const isChecked = e.target.checked;
+  // /** updates activeFilters by selected category or filters */
+  // function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+  //   console.log(e.target);
+  //   const field = e.target.id.split('-')[1]; // category or filter
+  //   const value = e.target.value;
+  //   const name = e.target.name;
+  //   const isChecked = e.target.checked;
 
-    const validFilter = { value: e.target.value, label: e.target.name };
+  //   const validFilter = { value: e.target.value, label: e.target.name };
+
+  //   if (isChecked) setActiveFilters([...activeFilters, validFilter]);
+  //   // updates category filter
+  //   if (field === 'category') {
+  //     setCategories((categories) =>
+  //       categories.map((option) => (option.value === value ? { ...option, checked: e.target.checked } : option))
+  //     );
+  //   }
+  //   // updates filter
+  //   if (field === 'filters') {
+  //     setFilters((filters) =>
+  //       filters.map((option) => (option.value === value ? { ...option, checked: e.target.checked } : option))
+  //     );
+  //   }
+  // }
+
+  // const categoryOptions = validCategories.reduce<Option[]>((convertToCategoryOptionsFormat, category) => {
+  //   convertToCategoryOptionsFormat.push({
+  //     value: category.name.toLowerCase().split(' ').join('-'),
+  //     label: category.name,
+  //     checked: false
+  //   });
+  //   return convertToCategoryOptionsFormat;
+  // }, []);
+
+  // const categorySection = {
+  //   id: 'category',
+  //   name: 'Category',
+  //   options: categoryOptions
+  // };
+
+  // useEffect(() => {
+  //   setCategories(categoryOptions);
+  // }, []);
+  // ############################################################################################################
+  // ############################################################################################################
+  // ############################################################################################################
+  // ############################################################################################################
+  // #####################
+
+
+  /** updates activeFilters by selected category or filters then adds/removes filter
+ * if it's checked/unchecked
+*/
+  function onChange(e) {
+    let field = e.target.id.split('-')[1]; // category or filters
+    let value = e.target.value;
+    let name = e.target.name;
+    let isChecked = e.target.checked
+    //massaging data to be sent to activeFilters
+    let validFilter = { value: e.target.value, label: e.target.name };
+    field === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
 
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
-    // updates category filter
-    if (field === 'category') {
-      setCategories((categories) =>
-        categories.map((option) => (option.value === value ? { ...option, checked: e.target.checked } : option))
-      );
-    }
-    // updates filter
-    if (field === 'filters') {
-      setFilters((filters) =>
-        filters.map((option) => (option.value === value ? { ...option, checked: e.target.checked } : option))
-      );
-    }
+    if (!isChecked) setActiveFilters(currentFilters =>
+      currentFilters.filter(f => f.value !== value))
+
+    toggleCheckbox(event, field, value);
   }
 
-  const categoryOptions = validCategories.reduce<Option[]>((convertToCategoryOptionsFormat, category) => {
+  /** toggles checkbox for filter options depending on which field is passed */
+  function toggleCheckbox(e, field, value) {
+
+    if (field === 'category') toggle(e, setCategories, categories, value);
+
+    if (field === 'filters') toggle(e, setFilters, filters, value);
+
+  }
+
+  /** toggles checkbox for category or filter option  */
+  function toggle(e, setState, field, value) {
+
+    setState((field) =>
+      field.map((option) =>
+        option.value === (isNaN(value) ? value : +value)
+          ? { ...option, checked: e.target.checked || false }
+          : option
+      )
+    )
+  };
+
+  /** massages data:retrieves and adds option ID from corresponding activeFilter value*/
+  function retrieveOptionProperties(optionSection, value) {
+    const optionProperties = optionSection.options.reduce((properties, option) => {
+      if (option.value === value) {
+        properties['value'] = option.value,
+          properties['field'] = optionSection.id;
+      }
+      return properties;
+    }, {})
+    return optionProperties
+  }
+
+  /** removes active filter & retrieves value from active filter to uncheck option */
+  function remove(e, filter) {
+
+    const categoryProperties = retrieveOptionProperties(categorySection, +filter.value);
+    const filterProperties = retrieveOptionProperties(filterSection, filter.value);
+
+    const { field, value } = Object.keys(categoryProperties).length === 0
+      ? filterProperties
+      : categoryProperties;
+
+    toggleCheckbox(e, field, value)
+
+    setActiveFilters(currentFilters =>
+      currentFilters.filter((f) => f.value !== filter.value))
+
+    updateCategoryIds(filter)
+  }
+
+  const categoryOptions = validCategories.reduce((convertToCategoryOptionsFormat, category) => {
     convertToCategoryOptionsFormat.push({
-      value: category.name.toLowerCase().split(' ').join('-'),
+      value: +category.id,
       label: category.name,
       checked: false
     });
     return convertToCategoryOptionsFormat;
-  }, []);
-
-  const categorySection = {
+  }, [])
+  const categorySection =
+  {
     id: 'category',
     name: 'Category',
     options: categoryOptions
-  };
+  }
 
   useEffect(() => {
     setCategories(categoryOptions);
@@ -79,7 +174,7 @@ export default function Filter({ validCategories }: ValidCategoriesProp) {
         Filters
       </h2>
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex items-center justify-end px-4 sm:px-6 lg:px-8">
         <Menu as="div" className="relative inline-block text-left">
           <Transition
             as={Fragment}
@@ -124,6 +219,38 @@ export default function Filter({ validCategories }: ValidCategoriesProp) {
         <MultiSelect sectionOptions={[categorySection]} selectOptions={categories} handleChange={onChange} />
         <MultiSelect sectionOptions={[filterSection]} selectOptions={filters} handleChange={onChange} />
       </div>
+      {/* Active filters */}
+      {activeFilters.length > 0 && <div className="bg-gray-100">
+        <div className="mx-auto px-4 py-3 sm:flex sm:items-center sm:px-6 lg:px-8">
+          <h3 className="text-sm font-medium text-gray-500">
+            Filters
+            <span className="sr-only">, active</span>
+          </h3>
+          <div aria-hidden="true" className="hidden h-5 w-px bg-gray-300 sm:ml-4 sm:block" />
+          <div className="mt-2 sm:ml-4 sm:mt-0">
+            <div className="-m-1 flex flex-wrap items-center">
+
+              {/* pill button */}
+              {activeFilters.map((activeFilter) => (
+                <span
+                  key={activeFilter.value}
+                  className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900">
+                  <span>{activeFilter.label}</span>
+                  <button
+                    onClick={(e) => remove(e, activeFilter)}
+                    type="button"
+                    className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500">
+                    <span className="sr-only">Remove filter for{activeFilter.label}</span>
+                    <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                      <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>}
     </div>
   );
 }

@@ -116,7 +116,7 @@ export default function Pantry() {
     }
   }
 
-  /** retrives category ID from Filter.tsx and add/removes from categoryIDs */
+  /** retrives category ID from Filter.tsx to add/removes from categoryIDs */
   function updateCategoryIds(filter:any) {
     const categoryId = +filter.value;
     categoryIds.includes(categoryId)
@@ -125,7 +125,7 @@ export default function Pantry() {
       : setCategoryIds(ids => [...ids, categoryId]);
   }
 
-  /** retrives Filter value from Filter.tsx and add/removes from filters */
+  /** retrives Filter value from Filter.tsx to add/removes from filters */
   function updateFilterIds(filter:any) {
     filters.includes(filter)
       ? setFilters(filters =>
@@ -155,7 +155,7 @@ export default function Pantry() {
     return previous;
   }, [] as any[]);
 
-  const activeFilters: { value: string; label: string }[] = [];
+  // const activeFilters: { value: string; label: string }[] = [];
 
   return (
     <div>
@@ -178,7 +178,7 @@ export default function Pantry() {
           </div>
           <div className="inline-block min-w-full py-2 align-middle">
             <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <div className="flex items-center border-b border-gray-200">
+              <div className="flex-row items-center border-b border-gray-200">
                 <div className="flex-none pl-6 pr-3 w-12">
                   <input
                     type="checkbox"
@@ -206,7 +206,7 @@ export default function Pantry() {
                     </div>
                   )}
                 </div>
-                <div className="flex-none py-4 text-sm">
+                <div className="flex-none  py-4 text-sm">
                   <section aria-labelledby="filter-heading">
                     {/* sr-only means only show this to screen-readers */}
                     <h2 id="filter-heading" className="sr-only">
@@ -215,9 +215,9 @@ export default function Pantry() {
                     <Filter
                       updateCategoryIds={updateCategoryIds}
                       updateFilters={updateFilterIds}
-                      validCategories={categories.filter(category => category.products)}
+                      validCategories={categoriesWithProducts}
                     /> 
-                    {activeFilters.length > 0 && (
+                    {/* {activeFilters.length > 0 && (
                       <div className="bg-gray-100">
                         <div className="mx-auto max-w-1xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
                           <h3 className="text-sm font-medium text-stone-500">
@@ -250,7 +250,7 @@ export default function Pantry() {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </section>
                 </div>
               </div>
@@ -277,9 +277,10 @@ export default function Pantry() {
                   </tr>
                 </thead>
                 <tbody>
+                  {console.log('categoriesWithProducts>>>>>>>>>>>',categoriesWithProducts)}
                   {categoriesWithProducts.map(
                     (category) =>
-                      category.products && (
+                      !categoryIds.includes(category.id) && (
                         <Fragment key={category.name}>
                           <tr className="border-t border-gray-200 bg-gray-50">
                             <th
