@@ -197,6 +197,7 @@ export default function Pantry() {
                         Out Of Stock
                       </button>
                       <button
+                      
                         type="button"
                         onClick={deleteProduct}
                         className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
