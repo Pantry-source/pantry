@@ -5,6 +5,8 @@ import * as categoryApi from '../modules/supabase/category';
 
 type ValidCategoriesProp = {
   validCategories: categoryApi.Category[];
+  updateFilters: (filter: string) => void;
+  updateCategoryIds: (filter: { value: string; label: string; }) => void;
 }
 
 type Option = {
@@ -81,7 +83,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   /** updates activeFilters by selected category or filters then adds/removes filter
  * if it's checked/unchecked
 */
-  function onChange(e) {
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     let field = e.target.id.split('-')[1]; // category or filters
     let value = e.target.value;
     let name = e.target.name;
@@ -98,7 +100,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   /** toggles checkbox for filter options depending on which field is passed */
-  function toggleCheckbox(e, field, value) {
+  function toggleCheckbox(e: React.ChangeEvent<HTMLInputElement>, field: string, value: string) {
 
     if (field === 'category') toggle(e, setCategories, categories, value);
 
@@ -107,9 +109,9 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   /** toggles checkbox for category or filter option  */
-  function toggle(e, setState, field, value) {
+  function toggle(e: React.ChangeEvent<HTMLInputElement>, setState: (field:string) => void, field: string, value: string) {
 
-    setState((field) =>
+    setState((field:string) =>
       field.map((option) =>
         option.value === (isNaN(value) ? value : +value)
           ? { ...option, checked: e.target.checked || false }

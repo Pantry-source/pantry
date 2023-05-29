@@ -117,7 +117,7 @@ export default function Pantry() {
   }
 
   /** retrives category ID from Filter.tsx to add/removes from categoryIDs */
-  function updateCategoryIds(filter:any) {
+  function updateCategoryIds(filter: { value: string, label: string }) {
     const categoryId = +filter.value;
     categoryIds.includes(categoryId)
       ? setCategoryIds(ids =>
@@ -126,7 +126,7 @@ export default function Pantry() {
   }
 
   /** retrives Filter value from Filter.tsx to add/removes from filters */
-  function updateFilterIds(filter:any) {
+  function updateFilterIds(filter: string) {
     filters.includes(filter)
       ? setFilters(filters =>
         filters.filter(f => f !== filter))
@@ -216,41 +216,7 @@ export default function Pantry() {
                       updateCategoryIds={updateCategoryIds}
                       updateFilters={updateFilterIds}
                       validCategories={categoriesWithProducts}
-                    /> 
-                    {/* {activeFilters.length > 0 && (
-                      <div className="bg-gray-100">
-                        <div className="mx-auto max-w-1xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
-                          <h3 className="text-sm font-medium text-stone-500">
-                            Filters
-                            <span className="sr-only">, active</span>
-                          </h3>
-
-                          <div aria-hidden="true" className="hidden h-5 w-px bg-gray-300 sm:ml-4 sm:block" />
-
-                          <div className="mt-2 sm:mt-0 sm:ml-4">
-                            <div className="-m-1 flex flex-wrap items-center">
-                              {activeFilters.map((activeFilter) => (
-                                <span
-                                  key={activeFilter.value}
-                                  className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-stone-900"
-                                >
-                                  <span>{activeFilter.label}</span>
-                                  <button
-                                    type="button"
-                                    className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-stone-400 hover:bg-gray-200 hover:text-stone-500"
-                                  >
-                                    <span className="sr-only">Remove filter for {activeFilter.label}</span>
-                                    <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
-                                      <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
-                                    </svg>
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )} */}
+                    />
                   </section>
                 </div>
               </div>
@@ -277,7 +243,7 @@ export default function Pantry() {
                   </tr>
                 </thead>
                 <tbody>
-                  {console.log('categoriesWithProducts>>>>>>>>>>>',categoriesWithProducts)}
+                  {console.log('categoriesWithProducts>>>>>>>>>>>', categoriesWithProducts)}
                   {categoriesWithProducts.map(
                     (category) =>
                       !categoryIds.includes(category.id) && (
