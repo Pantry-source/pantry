@@ -15,12 +15,6 @@ type Option = {
   checked: boolean;
 }
 
-type Field = {
-  checked: boolean;
-  label: string;
-  value: string | number;
-}
-
 type FilterSection = {
   id: string;
   name: string;
@@ -72,7 +66,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   /** toggles checkbox for category or filter option  */
-  function toggle(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, setState: Dispatch<SetStateAction<any[]>>, field: Field[], value?: string | number) {
+  function toggle(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, setState: Dispatch<SetStateAction<any[]>>, field: Option[], value?: string | number) {
     setState(() =>
       field.map((option) =>
         option.value === (isNaN(+value!) ? value : +value!)
