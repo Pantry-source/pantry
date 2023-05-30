@@ -155,7 +155,10 @@ export default function Pantry() {
     return previous;
   }, [] as any[]);
 
-  // const activeFilters: { value: string; label: string }[] = [];
+  /** checks products properties for existing filter attribute to render category name */
+  function isCategoryRendering(category) {
+    return category.products.some(product => product.is_essential || !product.quantity_amount);
+  }
 
   return (
     <div>
@@ -243,10 +246,11 @@ export default function Pantry() {
                   </tr>
                 </thead>
                 <tbody>
-                  {console.log('categoriesWithProducts>>>>>>>>>>>', categoriesWithProducts)}
-                  {categoriesWithProducts.map(
-                    (category) =>
-                      !categoryIds.includes(category.id) && (
+                  {categoriesWithProducts.map((category) => (
+                      category.products &&
+                      category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) && 
+                      (filters.length === 0 || isCategoryRendering(category)) &&
+                      // !categoryIds.includes(category.id) (
                         <Fragment key={category.name}>
                           <tr className="border-t border-gray-200 bg-gray-50">
                             <th

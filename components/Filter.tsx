@@ -37,9 +37,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   const [filters, setFilters] = useState<Option[]>(filterSection.options);
   const [categories, setCategories] = useState([] as any[]);
 
-  /** updates activeFilters by selected category or filters then adds/removes filter
- * if it's checked/unchecked
-*/
+  /** updates activeFilters by selected category or filters then adds/removes filter if it's checked/unchecked */
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     let field = e.target.id.split('-')[1]; // category or filters
     let value = e.target.value;
