@@ -25,8 +25,8 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const [categoryIds, setCategoryIds] = useState([]);
-  const [filters, setFilters] = useState([]);
+  const [categoryIds, setCategoryIds] = useState<number[]>([]);
+  const [filters, setFilters] = useState<string[]>([]);
 
 
   const router = useRouter();
@@ -156,7 +156,7 @@ export default function Pantry() {
   }, [] as any[]);
 
   /** checks products properties for existing filter attribute to render category name */
-  function isCategoryRendering(category) {
+  function isCategoryRendering(category: categoryApi.CategoryWithProducts) {
     return category.products.some(product => product.is_essential || !product.quantity_amount);
   }
 

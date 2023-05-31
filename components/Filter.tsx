@@ -21,21 +21,19 @@ type FilterSection = {
   options: Option[];
 }
 
-const filterSection = {
-  id: 'filters',
-  name: 'Filters',
-  options: [
-    { value: 'isEssential', label: 'Essential', checked: false },
-    { value: 'isOutOfStock', label: 'Out Of Stock', checked: false },
-    { value: 'isExpiring', label: 'Expiring Soon', checked: false }
-  ]
-};
+const defaultFilters: Option[] = [
+  { value: 'isEssential', label: 'Essential', checked: false },
+  { value: 'isOutOfStock', label: 'Out Of Stock', checked: false },
+  { value: 'isExpiring', label: 'Expiring Soon', checked: false }
+]
+
 
 export default function Filter({ validCategories, updateFilters, updateCategoryIds }: ValidCategoriesProp) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([] as any[]);
-  const [filters, setFilters] = useState<Option[]>(filterSection.options);
+  const [filters, setFilters] = useState<Option[]>(defaultFilters);
   const [categories, setCategories] = useState([] as any[]);
+
 
   /** updates activeFilters by selected category or filters then adds/removes filter if it's checked/unchecked */
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -51,7 +49,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     if (!isChecked) setActiveFilters(currentFilters =>
       currentFilters.filter(f => f.value !== value))
 
-    toggleCheckbox(event, field, value);
+    toggleCheckbox(e, field, value);
   }
 
   /** toggles checkbox for filter options depending on which field is passed */
@@ -87,7 +85,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   /** removes active filter & retrieves value from active filter to uncheck option */
-  function remove(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, filter: {value: string, label: string}) {
+  function remove(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, filter: { value: string, label: string }) {
 
     const categoryProperties = retrieveOptionProperties(categorySection, +filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
@@ -108,16 +106,22 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     convertedToCategoryOptionsFormat.push({
       value: +category.id,
       label: category.name,
-      checked: false
+      checked: false,
     });
     return convertedToCategoryOptionsFormat;
   }, [])
-  const categorySection =
-  {
+
+  const categorySection = {
     id: 'category',
     name: 'Category',
-    options: categoryOptions
-  }
+    options: categories
+  };
+
+  const filterSection = {
+    id: 'filters',
+    name: 'Filters',
+    options: filters
+  };
 
   useEffect(() => {
     setCategories(categoryOptions);
