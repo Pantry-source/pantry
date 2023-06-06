@@ -37,12 +37,12 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
 
   /** updates activeFilters by selected category or filters then adds/removes filter if it's checked/unchecked */
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    let field = e.target.id.split('-')[1]; // category or filters
-    let value = e.target.value;
-    let name = e.target.name;
-    let isChecked = e.target.checked
+    const field = e.target.id.split('-')[1]; // category or filters
+    const value = e.target.value;
+    const name = e.target.name;
+    const isChecked = e.target.checked
     //massaging data to be sent to activeFilters
-    let validFilter = { value: e.target.value, label: e.target.name };
+    const validFilter = { value: e.target.value, label: e.target.name };
     field === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
 
     if (isChecked) setActiveFilters([...activeFilters, validFilter]);
