@@ -23,7 +23,7 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools, d
         inlineToolbar: true,
         readOnly,
         data: initialData,
-        minHeight: 100, // sets bottom padding to 0
+        minHeight: 40, // sets bottom padding to 0
         async onChange(api, event) {
           const data = await api.saver.save();
           onChange(data);

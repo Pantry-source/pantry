@@ -116,9 +116,7 @@ export default function Recipes() {
       <div className='flex-1'>
         <RecipeBrowser recipes={recipes} onRecipeViewClick={viewRecipe}/>
       </div>
-      <ModalDialog open={isRecipeEditorOpen} onClose={() => setIsRecipeEditorOpen(false)}>
-        <RecipeEditor recipe={selectedRecipe} />
-      </ModalDialog>
+      <RecipeEditor recipe={selectedRecipe} open={isRecipeEditorOpen} onClose={() => setIsRecipeEditorOpen(false)} />
     </div>
   );
 }
