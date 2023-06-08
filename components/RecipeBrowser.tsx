@@ -88,7 +88,7 @@ export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowse
                       <button
                           onClick={() => onRecipeViewClick(activeOption)}
                           type="button"
-                          className="mt-6 w-full rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          className="mt-6 w-full rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
                       >
                           View full recipe
                       </button>

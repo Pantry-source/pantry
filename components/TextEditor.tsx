@@ -7,11 +7,11 @@ type Props = {
   onChange(val: OutputData): void;
   holder: string;
   readOnly?: boolean,
-  tools?: EditorConfig["tools"],
+  tools?: string[],
   defaultBlock?: EditorConfig["defaultBlock"]
 };
 
-const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = DEFAULT_EDITOR_TOOLS, defaultBlock }: Props) => {
+const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools, defaultBlock }: Props) => {
   const ref = useRef<EditorJS>();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = 
       const editor = new EditorJS({
         defaultBlock,
         holder,
-        tools,
+        tools: tools?.length ? tools.reduce((acc,t) => { acc[t] = DEFAULT_EDITOR_TOOLS[t]; return acc; }, {}) : DEFAULT_EDITOR_TOOLS,
         inlineToolbar: true,
         readOnly,
         data: initialData,
