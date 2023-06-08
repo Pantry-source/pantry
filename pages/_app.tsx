@@ -17,7 +17,7 @@ function MyApp({
     <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
       <div className='h-screen flex flex-col'>
         <Navigation />
-        <div className="py-8 px-10 container flex-1">
+        <div className="py-8 px-10 container flex-1 mx-auto">
           <Component {...pageProps} />
         </div>
       </div>

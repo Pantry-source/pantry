@@ -7,26 +7,27 @@ type Props = {
   onChange(val: OutputData): void;
   holder: string;
   readOnly?: boolean,
-  tools?: EditorConfig["tools"]
+  tools?: EditorConfig["tools"],
+  defaultBlock?: EditorConfig["defaultBlock"]
 };
 
-const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = DEFAULT_EDITOR_TOOLS }: Props) => {
+const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = DEFAULT_EDITOR_TOOLS, defaultBlock }: Props) => {
   const ref = useRef<EditorJS>();
 
   useEffect(() => {
     if (!ref.current) {
       const editor = new EditorJS({
+        defaultBlock,
         holder,
         tools,
         inlineToolbar: true,
         readOnly,
         data: initialData,
-        minHeight: 0, // sets bottom padding to 0
+        minHeight: 100, // sets bottom padding to 0
         async onChange(api, event) {
           const data = await api.saver.save();
-          console.log('data change', data);
           onChange(data);
-        },
+        }
       });
       ref.current = editor;
     }
@@ -40,7 +41,9 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools = 
   }, []);
 
 
-  return <div className="max-w-full" id={holder} />;
+  return <div className="max-w-full relative border border-dashed border-gray-900/25 px-4 py-3 rounded-lg">
+    <div className="prose max-w-full" id={holder}></div>
+  </div>;
 };
 
 export default memo(EditorBlock);

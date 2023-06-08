@@ -3,10 +3,15 @@ import { Combobox } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { UsersIcon } from '@heroicons/react/24/outline'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import type { Recipe } from '../modules/supabase/recipe';
 import classNames from '../modules/classnames'
 
+type RecipeBrowserprops = {
+  recipes: Recipe[],
+  onRecipeViewClick: (recipe: Recipe) => void
+}
 
-export default function RecipeBrowser({recipes, onRecipeViewClick}) {
+export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowserprops) {
   const recent = recipes;
   const [query, setQuery] = useState('');
 

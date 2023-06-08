@@ -65,3 +65,12 @@ To debug the locally running application using VSCode, create a file `.vscode/la
 ## Deployment
 
 The deploys are powered by the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+
+## Typescript
+
+### Supabase types
+
+The types for all entities stored in the database are generated. After any changes to database schema it is required to re-generate types. The Supabase CLI allows to generate typesand produce the types/generated/supabase.ts file. Instructions below follow the [on the official documentation](https://supabase.com/docs/guides/api/rest/generating-types):
+
+1. Log in using `npx supabase login`
+2. Run `npx supabase gen types typescript --project-id "$project_id from .env" --schema public > types/generated/supabase.ts`

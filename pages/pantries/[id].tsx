@@ -1,5 +1,4 @@
-import classNames from '../../modules/classnames';
-import { useEffect, useState, Fragment, useRef } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
