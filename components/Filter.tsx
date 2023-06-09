@@ -10,7 +10,7 @@ type ValidCategoriesProp = {
 }
 
 type Option = {
-  value: string | number;
+  value: string;
   label: string;
   checked: boolean;
 }
@@ -27,7 +27,6 @@ const defaultFilters: Option[] = [
   { value: 'isExpiring', label: 'Expiring Soon', checked: false }
 ]
 
-
 export default function Filter({ validCategories, updateFilters, updateCategoryIds }: ValidCategoriesProp) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([] as any[]);
@@ -36,51 +35,41 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
 
 
   /** updates activeFilters by selected category or filters then adds/removes filter if it's checked/unchecked */
-  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const field = e.target.id.split('-')[1]; // category or filters
-    const value = e.target.value;
-    const name = e.target.name;
-    const isChecked = e.target.checked
+  function onChange(section: string, value: string, name: string, isChecked: boolean) {
     //massaging data to be sent to activeFilters
-    const validFilter = { value: e.target.value, label: e.target.name };
-    field === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
+    const validFilter = { value: value, label: name };
+    console.log('validFilter =',validFilter, 'checked =',isChecked)
+    section === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
 
-    if (isChecked) setActiveFilters([...activeFilters, validFilter]);
-    if (!isChecked) setActiveFilters(currentFilters =>
+    toggleOption(section, value)
+
+    //current option has been toggled to be checked, add to activeFilter
+    if (!isChecked) setActiveFilters([...activeFilters, validFilter]);
+    //current option has been toggled to be unchecked remove from activeFilter
+    if (isChecked) setActiveFilters(currentFilters =>
       currentFilters.filter(f => f.value !== value))
 
-    toggleCheckbox(e, field, value);
   }
 
-  /** toggles checkbox for filter options depending on which field is passed */
-  function toggleCheckbox(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, field: string, value?: string | number) {
-
-    if (field === 'category') toggle(e, setCategories, categories, value);
-
-    if (field === 'filters') toggle(e, setFilters, filters, value);
-
+  /** toggles checkbox for filter option depending on which section is passed */
+  function toggleOption(section: string, value: string) {
+    let currentOptions = section === 'category' ? categories : filters;
+    // let setState = section === 'category' ? setCategories : setFilters;
+    let toggledOption = currentOptions.find(option => option.value === value);
+    toggledOption.checked = !toggledOption.checked;
+    // setState([...currentOptions, toggledOption])
   }
 
-  /** toggles checkbox for category or filter option  */
-  function toggle(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, setState: Dispatch<SetStateAction<any[]>>, field: Option[], value?: string | number) {
-    setState(() =>
-      field.map((option) =>
-        option.value === (isNaN(+value!) ? value : +value!)
-          ? { ...option, checked: (e.target as HTMLInputElement).checked || false }
-          : option
-      )
-    )
-  };
 
   /** massages data:retrieves and adds option ID from corresponding activeFilter value*/
   function retrieveOptionProperties(optionSection: FilterSection, value: string | number) {
     const optionProperties = optionSection.options.reduce((properties, option) => {
       if (option.value === value) {
         properties['value'] = option.value,
-          properties['field'] = optionSection.id;
+          properties['section'] = optionSection.id;
       }
       return properties;
-    }, {} as { value: string | number, field: string })
+    }, {} as { value: string, section: string })
     return optionProperties
   }
 
@@ -90,11 +79,12 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     const categoryProperties = retrieveOptionProperties(categorySection, +filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
 
-    const { field, value } = Object.keys(categoryProperties).length === 0
+    const { section, value } = Object.keys(categoryProperties).length === 0
       ? filterProperties
       : categoryProperties;
 
-    toggleCheckbox(e, field, value)
+    // toggleCheckbox(e, section, value)
+    toggleOption(section, value)
 
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
@@ -103,8 +93,9 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   const categoryOptions = validCategories.reduce<Option[]>((convertedToCategoryOptionsFormat, category) => {
+    console.log('convertedToCategoryOptionsFormat',convertedToCategoryOptionsFormat)
     convertedToCategoryOptionsFormat.push({
-      value: +category.id,
+      value: category.id.toString(),
       label: category.name,
       checked: false,
     });
@@ -161,7 +152,9 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
         </button>
         {/* <div className="hidden sm:block"> hides filter/category section on small viewport */}
         <MultiSelect sectionOptions={categorySection} handleChange={onChange} />
+        {/* onCategoryFilterChange */}
         <MultiSelect sectionOptions={filterSection} handleChange={onChange} />
+        {/* onProductAttributeChange */}
       </div>
       {/* Active filters */}
       {activeFilters.length > 0 && <div className="bg-gray-100">

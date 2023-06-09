@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 type MultiSelectProps = {
   sectionOptions: Section;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (sectionOptionId: string, value: string, name: string, isChecked: boolean) => void;
 }
 
 type Section = {
@@ -14,7 +14,7 @@ type Section = {
 }
 
 type Option = {
-  value: string | number;
+  value: string;
   label: string;
   checked: boolean;
 }
@@ -28,7 +28,7 @@ type Option = {
  */
 
 function MultiSelect({ sectionOptions, handleChange }: MultiSelectProps) {
-
+// debugger
   return (
     <div>
       <div className="flow-root pr-4">
@@ -61,10 +61,9 @@ function MultiSelect({ sectionOptions, handleChange }: MultiSelectProps) {
                     <div key={option.value} className="flex items-center">
                       <input
                         id={`filter-${sectionOptions.id}-${optionIdx}`}
-                        // name={`${section.id}[]`}
                         name={option.label}
                         defaultValue={option.value}
-                        onChange={handleChange}
+                        onChange={()=>handleChange(sectionOptions.id, option.value, option.label, option.checked )}
                         type="checkbox"
                         defaultChecked={option.checked}
                         className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
