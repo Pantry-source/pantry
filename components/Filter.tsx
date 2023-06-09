@@ -48,16 +48,16 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     //current option has been toggled to be unchecked remove from activeFilter
     if (isChecked) setActiveFilters(currentFilters =>
       currentFilters.filter(f => f.value !== value))
-
   }
 
   /** toggles checkbox for filter option depending on which section is passed */
   function toggleOption(section: string, value: string) {
+    console.log(section,value)
     let currentOptions = section === 'category' ? categories : filters;
-    // let setState = section === 'category' ? setCategories : setFilters;
+    let setState = section === 'category' ? setCategories : setFilters;
     let toggledOption = currentOptions.find(option => option.value === value);
     toggledOption.checked = !toggledOption.checked;
-    // setState([...currentOptions, toggledOption])
+    setState([...currentOptions])
   }
 
 
@@ -75,15 +75,14 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
 
   /** removes active filter & retrieves value from active filter to uncheck option */
   function remove(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, filter: { value: string, label: string }) {
-
-    const categoryProperties = retrieveOptionProperties(categorySection, +filter.value);
+debugger
+    const categoryProperties = retrieveOptionProperties(categorySection, filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
 
     const { section, value } = Object.keys(categoryProperties).length === 0
       ? filterProperties
       : categoryProperties;
-
-    // toggleCheckbox(e, section, value)
+debugger
     toggleOption(section, value)
 
     setActiveFilters(currentFilters =>
