@@ -117,8 +117,8 @@ export default function Pantry() {
   }
 
   /** retrives category ID from Filter.tsx to add/removes from categoryIDs */
-  function updateCategoryIds(filter: { value: string, label: string }) {
-    const categoryId = +filter.value;
+  function updateCategoryIds(value: string) {
+    const categoryId = +value;
     categoryIds.includes(categoryId)
       ? setCategoryIds(ids =>
         ids.filter(id => id !== categoryId))
@@ -126,11 +126,11 @@ export default function Pantry() {
   }
 
   /** retrives Filter value from Filter.tsx to add/removes from filters */
-  function updateFilterIds(filter: string) {
-    filters.includes(filter)
+  function updateFilterIds(value: string) {
+    filters.includes(value)
       ? setFilters(filters =>
-        filters.filter(f => f !== filter))
-      : setFilters(filters => [...filters, filter]);
+        filters.filter(f => f !== value))
+      : setFilters(filters => [...filters, value]);
   }
 
   useEffect(() => {
