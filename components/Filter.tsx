@@ -6,7 +6,7 @@ import * as categoryApi from '../modules/supabase/category';
 type ValidCategoriesProp = {
   validCategories: categoryApi.Category[];
   updateFilters: (filter: string) => void;
-  updateCategoryIds: (filter: { value: string; label: string; }) => void;
+  updateCategoryIds: (filter: string) => void;
 }
 
 type Option = {
@@ -38,12 +38,12 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   function onChange(section: string, value: string, name: string, isChecked: boolean) {
     //massaging data to be sent to activeFilters
     const validFilter = { value: value, label: name };
-    console.log('validFilter =',validFilter, 'checked =',isChecked)
-    section === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter);
+    console.log('validFilter =', validFilter, 'checked =', isChecked)
+    section === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter.value);
 
     toggleOption(section, value)
 
-    //current option has been toggled to be checked, add to activeFilter
+    // current option has been toggled to be checked, add to activeFilter
     if (!isChecked) setActiveFilters([...activeFilters, validFilter]);
     //current option has been toggled to be unchecked remove from activeFilter
     if (isChecked) setActiveFilters(currentFilters =>
@@ -52,14 +52,13 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
 
   /** toggles checkbox for filter option depending on which section is passed */
   function toggleOption(section: string, value: string) {
-    console.log(section,value)
+    // console.log(section,value)
     let currentOptions = section === 'category' ? categories : filters;
     let setState = section === 'category' ? setCategories : setFilters;
     let toggledOption = currentOptions.find(option => option.value === value);
     toggledOption.checked = !toggledOption.checked;
     setState([...currentOptions])
   }
-
 
   /** massages data:retrieves and adds option ID from corresponding activeFilter value*/
   function retrieveOptionProperties(optionSection: FilterSection, value: string | number) {
@@ -74,25 +73,27 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   }
 
   /** removes active filter & retrieves value from active filter to uncheck option */
-  function remove(e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>, filter: { value: string, label: string }) {
-debugger
+  function remove(filter: { value: string, label: string }) {
     const categoryProperties = retrieveOptionProperties(categorySection, filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
+    console.log('categoryProperties=>', categoryProperties, 'filterProperties=>', filterProperties)
 
-    const { section, value } = Object.keys(categoryProperties).length === 0
-      ? filterProperties
-      : categoryProperties;
-debugger
+    const s = categoryProperties.value ? 'category' : 'filter';
+
+    const { section, value } = Object.keys(categoryProperties).length !== 0
+      ? categoryProperties
+      : filterProperties;
     toggleOption(section, value)
-
+console.log('section',section, 'filter',filter)
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
 
-    updateCategoryIds(filter)
+    // section === 'categories' ? updateCategoryIds(filter.value) : updateFilters(filter.value)
+    // updateCategoryIds(filter.value)
+    updateFilters(filter.value)
   }
 
   const categoryOptions = validCategories.reduce<Option[]>((convertedToCategoryOptionsFormat, category) => {
-    console.log('convertedToCategoryOptionsFormat',convertedToCategoryOptionsFormat)
     convertedToCategoryOptionsFormat.push({
       value: category.id.toString(),
       label: category.name,
@@ -173,7 +174,7 @@ debugger
                   className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900">
                   <span>{activeFilter.label}</span>
                   <button
-                    onClick={(e) => remove(e, activeFilter)}
+                    onClick={() => remove(activeFilter)}
                     type="button"
                     className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500">
                     <span className="sr-only">Remove filter for{activeFilter.label}</span>
