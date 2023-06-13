@@ -82,7 +82,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
       : filterProperties;
 
     toggleOption(section, value)
-    
+
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
 
@@ -91,7 +91,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
 
   const categoryOptions = validCategories.reduce<Option[]>((convertedToCategoryOptionsFormat, category) => {
     convertedToCategoryOptionsFormat.push({
-      value: category.id.toString(),
+      value: category.id.toString(),  
       label: category.name,
       checked: false,
     });
