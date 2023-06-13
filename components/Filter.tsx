@@ -38,24 +38,20 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   function onChange(section: string, value: string, name: string, isChecked: boolean) {
     //massaging data to be sent to activeFilters
     const validFilter = { value: value, label: name };
-    console.log('validFilter =', validFilter, 'checked =', isChecked)
     section === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter.value);
 
     toggleOption(section, value)
 
-    // current option has been toggled to be checked, add to activeFilter
     if (!isChecked) setActiveFilters([...activeFilters, validFilter]);
-    //current option has been toggled to be unchecked remove from activeFilter
     if (isChecked) setActiveFilters(currentFilters =>
       currentFilters.filter(f => f.value !== value))
   }
 
   /** toggles checkbox for filter option depending on which section is passed */
   function toggleOption(section: string, value: string) {
-    // console.log(section,value)
-    let currentOptions = section === 'category' ? categories : filters;
-    let setState = section === 'category' ? setCategories : setFilters;
-    let toggledOption = currentOptions.find(option => option.value === value);
+    const currentOptions = section === 'category' ? categories : filters;
+    const setState = section === 'category' ? setCategories : setFilters;
+    const toggledOption = currentOptions.find(option => option.value === value);
     toggledOption.checked = !toggledOption.checked;
     setState([...currentOptions])
   }
@@ -72,7 +68,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     return optionProperties
   }
 
-  /** removes active filter & retrieves value from active filter to uncheck option */
+  /** removes active filter, retrieves value from active filter to uncheck option, & updates filtering options */
   function remove(filter: { value: string, label: string }) {
     const categoryProperties = retrieveOptionProperties(categorySection, filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
@@ -147,10 +143,10 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
           Filter
         </button>
         {/* <div className="hidden sm:block"> hides filter/category section on small viewport */}
-        <MultiSelect sectionOptions={categorySection} handleChange={onChange} />
         {/* onCategoryFilterChange */}
-        <MultiSelect sectionOptions={filterSection} handleChange={onChange} />
+        <MultiSelect sectionOptions={categorySection} handleChange={onChange} />
         {/* onProductAttributeChange */}
+        <MultiSelect sectionOptions={filterSection} handleChange={onChange} />
       </div>
       {/* Active filters */}
       {activeFilters.length > 0 && <div className="bg-gray-100">
