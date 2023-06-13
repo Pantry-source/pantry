@@ -76,21 +76,17 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   function remove(filter: { value: string, label: string }) {
     const categoryProperties = retrieveOptionProperties(categorySection, filter.value);
     const filterProperties = retrieveOptionProperties(filterSection, filter.value);
-    console.log('categoryProperties=>', categoryProperties, 'filterProperties=>', filterProperties)
 
-    const s = categoryProperties.value ? 'category' : 'filter';
-
-    const { section, value } = Object.keys(categoryProperties).length !== 0
+    const { section, value } = categoryProperties.value
       ? categoryProperties
       : filterProperties;
+
     toggleOption(section, value)
-console.log('section',section, 'filter',filter)
+    
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
 
-    // section === 'categories' ? updateCategoryIds(filter.value) : updateFilters(filter.value)
-    // updateCategoryIds(filter.value)
-    updateFilters(filter.value)
+    section === 'category' ? updateCategoryIds(filter.value) : updateFilters(filter.value)
   }
 
   const categoryOptions = validCategories.reduce<Option[]>((convertedToCategoryOptionsFormat, category) => {
