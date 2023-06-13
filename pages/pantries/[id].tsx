@@ -155,10 +155,18 @@ export default function Pantry() {
     return previous;
   }, [] as any[]);
 
-  /** checks products properties for existing filter attribute to render category name */
-  function isCategoryRendering(category: categoryApi.CategoryWithProducts) {
-    return category.products.some(product => product.is_essential || !product.quantity_amount);
+  /** checks if category should be rendered */
+  function shouldCategoryRender(category: categoryApi.CategoryWithProducts) {
+    return (categoryIds.length === 0 || categoryIds.includes(category.id))
   }
+
+  /** checks if product should be rendered based on product attributes */
+  function filterByProductAttribute(product: productApi.Product) {
+    const isEssential = (filters.includes("isEssential")) && product.is_essential;
+    const isOutOfStock = (filters.includes("isOutOfStock")) && !product.quantity_amount
+    return filters.length === 0 || isEssential || isOutOfStock;
+  }
+
 
   return (
     <div>
@@ -247,73 +255,73 @@ export default function Pantry() {
                 </thead>
                 <tbody>
                   {categoriesWithProducts.map((category) => (
-                      category.products &&
-                      category.products && (categoryIds.length === 0 || categoryIds.includes(category.id)) && 
-                      (filters.length === 0 || isCategoryRendering(category)) &&
-                      // !categoryIds.includes(category.id) (
-                        <Fragment key={category.name}>
-                          <tr className="border-t border-gray-200 bg-gray-50">
-                            <th
-                              colSpan={7}
-                              scope="colgroup"
-                              className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+                    // category.products &&
+
+                    shouldCategoryRender(category) &&
+                    <Fragment key={category.name}>
+                      <tr className="border-t border-gray-200 bg-gray-50">
+                        <th
+                          colSpan={7}
+                          scope="colgroup"
+                          className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+                        >
+                          {category.name}
+                        </th>
+                      </tr>
+                      {category.products.map((product) => (
+                        filterByProductAttribute(product) &&
+                        <tr key={product.name} className="border-gray-200 border-t">
+                          <td className="relative w-12 pl-6 pr-3">
+                            {selectedProducts.includes(product) && (
+                              <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
+                            )}
+                            <input
+                              type="checkbox"
+                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
+                              value={product.name}
+                              checked={selectedProducts.includes(product)}
+                              onChange={(e) =>
+                                setSelectedProducts(
+                                  e.target.checked
+                                    ? [...selectedProducts, product]
+                                    : selectedProducts.filter((p) => p !== product)
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
+                            {product.name}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            <PillButton
+                              label={unitsMap[product.quantity_unit]}
+                              id={product.id}
+                              updateCount={updateProductQuantity}
+                              count={product?.quantity_amount || 0}
+                            />
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.is_essential ? 'yes' : 'no'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.expires_at || 'not specified'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.vendor || ''}
+                          </td>
+                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <button
+                              type="button"
+                              onClick={() => startEditingProduct(product)}
+                              className="text-stone-700 hover:text-stone-900"
                             >
-                              {category.name}
-                            </th>
-                          </tr>
-                          {category.products.map((product) => (
-                            <tr key={product.name} className="border-gray-200 border-t">
-                              <td className="relative w-12 pl-6 pr-3">
-                                {selectedProducts.includes(product) && (
-                                  <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
-                                )}
-                                <input
-                                  type="checkbox"
-                                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
-                                  value={product.name}
-                                  checked={selectedProducts.includes(product)}
-                                  onChange={(e) =>
-                                    setSelectedProducts(
-                                      e.target.checked
-                                        ? [...selectedProducts, product]
-                                        : selectedProducts.filter((p) => p !== product)
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
-                                {product.name}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                <PillButton
-                                  label={unitsMap[product.quantity_unit]}
-                                  id={product.id}
-                                  updateCount={updateProductQuantity}
-                                  count={product?.quantity_amount || 0}
-                                />
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.is_essential ? 'yes' : 'no'}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.expires_at || 'not specified'}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.vendor || ''}
-                              </td>
-                              <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                <button
-                                  type="button"
-                                  onClick={() => startEditingProduct(product)}
-                                  className="text-stone-700 hover:text-stone-900"
-                                >
-                                  Edit<span className="sr-only">,{product.name}</span>
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </Fragment>
-                      )
+                              Edit<span className="sr-only">,{product.name}</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
+                  )
                   )}
                 </tbody>
               </table>
