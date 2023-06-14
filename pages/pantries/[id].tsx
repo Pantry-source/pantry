@@ -116,23 +116,6 @@ export default function Pantry() {
     }
   }
 
-  /** retrives category ID from Filter.tsx to add/removes from categoryIDs */
-  function updateCategoryIds(value: string) {
-    const categoryId = value;
-    categoriesToRender.includes(categoryId)
-      ? setCategoriesToRender(ids =>
-        ids.filter(id => id !== categoryId))
-      : setCategoriesToRender(ids => [...ids, categoryId]);
-  }
-
-  /** retrives Filter value from Filter.tsx to add/removes from productAttributes */
-  function updateFilterIds(value: string) {
-    productAttributes.includes(value)
-      ? setProductAttributes(productAttributes =>
-        productAttributes.filter(f => f !== value))
-      : setProductAttributes(productAttributes => [...productAttributes, value]);
-  }
-
   function updateRenderOptions(value: string, section: string){
     const setState = section === 'category' ? setCategoriesToRender : setProductAttributes;
     const options = section === 'category' ? categoriesToRender : productAttributes;
