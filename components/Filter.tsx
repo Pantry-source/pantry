@@ -5,8 +5,7 @@ import * as categoryApi from '../modules/supabase/category';
 
 type ValidCategoriesProp = {
   validCategories: categoryApi.Category[];
-  updateFilters: (filter: string) => void;
-  updateCategoryIds: (filter: string) => void;
+  updateRenderOptions: (filter: string, section: string) => void;
 }
 
 type Option = {
@@ -27,7 +26,7 @@ const defaultFilters: Option[] = [
   { value: 'isExpiring', label: 'Expiring Soon', checked: false }
 ]
 
-export default function Filter({ validCategories, updateFilters, updateCategoryIds }: ValidCategoriesProp) {
+export default function Filter({ validCategories, updateRenderOptions }: ValidCategoriesProp) {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState([] as any[]);
   const [filters, setFilters] = useState<Option[]>(defaultFilters);
@@ -38,7 +37,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
   function onChange(section: string, value: string, name: string, isChecked: boolean) {
     //massaging data to be sent to activeFilters
     const validFilter = { value: value, label: name };
-    section === 'filters' ? updateFilters(validFilter.value) : updateCategoryIds(validFilter.value);
+    section === 'filters' ? updateRenderOptions(validFilter.value, 'filters') : updateRenderOptions(validFilter.value, 'category');
 
     toggleOption(section, value)
 
@@ -82,7 +81,7 @@ export default function Filter({ validCategories, updateFilters, updateCategoryI
     setActiveFilters(currentFilters =>
       currentFilters.filter((f) => f.value !== filter.value))
 
-    section === 'category' ? updateCategoryIds(filter.value) : updateFilters(filter.value)
+    section === 'category' ? updateRenderOptions(filter.value, 'category') : updateRenderOptions(filter.value, 'filters')
   }
 
   const categoryOptions = validCategories.reduce<Option[]>((convertedToCategoryOptionsFormat, category) => {

@@ -25,8 +25,8 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const [categoryIds, setCategoryIds] = useState<number[]>([]);
-  const [filters, setFilters] = useState<string[]>([]);
+  const [categoriesToRender, setCategoriesToRender] = useState<string[]>([]);
+  const [productAttributes, setProductAttributes] = useState<string[]>([]);
 
 
   const router = useRouter();
@@ -118,19 +118,27 @@ export default function Pantry() {
 
   /** retrives category ID from Filter.tsx to add/removes from categoryIDs */
   function updateCategoryIds(value: string) {
-    const categoryId = +value;
-    categoryIds.includes(categoryId)
-      ? setCategoryIds(ids =>
+    const categoryId = value;
+    categoriesToRender.includes(categoryId)
+      ? setCategoriesToRender(ids =>
         ids.filter(id => id !== categoryId))
-      : setCategoryIds(ids => [...ids, categoryId]);
+      : setCategoriesToRender(ids => [...ids, categoryId]);
   }
 
-  /** retrives Filter value from Filter.tsx to add/removes from filters */
+  /** retrives Filter value from Filter.tsx to add/removes from productAttributes */
   function updateFilterIds(value: string) {
-    filters.includes(value)
-      ? setFilters(filters =>
-        filters.filter(f => f !== value))
-      : setFilters(filters => [...filters, value]);
+    productAttributes.includes(value)
+      ? setProductAttributes(productAttributes =>
+        productAttributes.filter(f => f !== value))
+      : setProductAttributes(productAttributes => [...productAttributes, value]);
+  }
+
+  function updateRenderOptions(value: string, section: string){
+    const setState = section === 'category' ? setCategoriesToRender : setProductAttributes;
+    const options = section === 'category' ? categoriesToRender : productAttributes;
+    options.includes(value)
+    ? setState(ids => ids.filter(id => id !== value))
+    : setState(ids => [...ids, value])
   }
 
   useEffect(() => {
@@ -157,14 +165,14 @@ export default function Pantry() {
 
   /** checks if category should be rendered */
   function shouldCategoryRender(category: categoryApi.CategoryWithProducts) {
-    return (categoryIds.length === 0 || categoryIds.includes(category.id))
+    return (categoriesToRender.length === 0 || categoriesToRender.includes(category.id.toString()))
   }
 
   /** checks if product should be rendered based on product attributes */
   function shouldProductRender(product: productApi.Product) {
-    const isEssential = (filters.includes("isEssential")) && product.is_essential;
-    const isOutOfStock = (filters.includes("isOutOfStock")) && !product.quantity_amount
-    return filters.length === 0 || isEssential || isOutOfStock;
+    const isEssential = (productAttributes.includes("isEssential")) && product.is_essential;
+    const isOutOfStock = (productAttributes.includes("isOutOfStock")) && !product.quantity_amount
+    return productAttributes.length === 0 || isEssential || isOutOfStock;
   }
 
 
@@ -224,8 +232,7 @@ export default function Pantry() {
                       Filters
                     </h2>
                     <Filter
-                      updateCategoryIds={updateCategoryIds}
-                      updateFilters={updateFilterIds}
+                      updateRenderOptions={updateRenderOptions}
                       validCategories={categoriesWithProducts}
                     />
                   </section>
