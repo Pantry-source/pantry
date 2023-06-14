@@ -161,7 +161,7 @@ export default function Pantry() {
   }
 
   /** checks if product should be rendered based on product attributes */
-  function filterByProductAttribute(product: productApi.Product) {
+  function shouldProductRender(product: productApi.Product) {
     const isEssential = (filters.includes("isEssential")) && product.is_essential;
     const isOutOfStock = (filters.includes("isOutOfStock")) && !product.quantity_amount
     return filters.length === 0 || isEssential || isOutOfStock;
@@ -255,21 +255,22 @@ export default function Pantry() {
                 </thead>
                 <tbody>
                   {categoriesWithProducts.map((category) => (
-                    // category.products &&
-
                     shouldCategoryRender(category) &&
                     <Fragment key={category.name}>
-                      <tr className="border-t border-gray-200 bg-gray-50">
+                      {category.products.map((product,idx) =>  
+                        ((idx === 0 && shouldProductRender(product)) && 
+                        <tr className="border-t border-gray-200 bg-gray-50">
                         <th
                           colSpan={7}
                           scope="colgroup"
                           className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
-                        >
+                          >
                           {category.name}
                         </th>
                       </tr>
-                      {category.products.map((product) => (
-                        filterByProductAttribute(product) &&
+                      ))}
+                          {category.products.map((product) => 
+                           (shouldProductRender(product) &&
                         <tr key={product.name} className="border-gray-200 border-t">
                           <td className="relative w-12 pl-6 pr-3">
                             {selectedProducts.includes(product) && (
@@ -321,8 +322,7 @@ export default function Pantry() {
                         </tr>
                       ))}
                     </Fragment>
-                  )
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>
