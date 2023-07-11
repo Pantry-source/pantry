@@ -26,11 +26,10 @@ export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProp
   const user = useUser();
   const title = recipe ? 'Edit recipe' : 'Create recipe';
 
-  console.log('recipe', recipe);
-  console.log('currentRecipe', currentRecipe);
-
   useEffect(() => {
-    setRecipe(recipe);
+    if (recipe) {
+      setRecipe(recipe);
+    }
   }, [recipe]);
 
   function onIngredientsChange(updatedIngredients: OutputData) {

@@ -5,49 +5,7 @@ import { useUser, useSessionContext, useSupabaseClient } from '@supabase/auth-he
 import EmptyState from '../../components/EmptyState';
 import RecipeBrowser from '../../components/RecipeBrowser';
 import { type Recipe, fetchAll } from '../../modules/supabase/recipe';
-import ModalDialog from '../../components/ModalDialog';
 import RecipeEditor from '../../components/RecipeEditor';
-
-const initialRecipes = [
-  {
-    id: 0,
-    created_at: "2022-12-28 18:22:54.914793+00",
-    name: "Ghee",
-    ingredients: [
-      "4 to 8 sticks of butter"
-    ],
-    user_id: "57855033-6088-45c0-bc03-5a2e483d6a87",
-    directions: {
-      steps: [
-        "Warm up butter slowly in a pan with heavy bottom",
-        "Allow milk solids to separate and sink to the bottom. No need to stir",
-        "Strain and pour into a container with lid"
-      ]
-    }
-  },
-  {
-    id: 1,
-    name: "Garam Masala",
-    created_at: "2022-12-28 18:22:54.914793+00",
-    ingredients: [
-      "2 tbsp Coriander Seeds",
-      "1 tsp Cumin Seeds",
-      "1/2 tsp Whole Cloves",
-      "1/2 tsp Cardamom Seeds",
-      "2 Bay leaves",
-      "1/2 tsp Ground cayenne pepper or 1/2 tsp Red pepper flakes",
-      "1 Cinnamon stick, broken up"
-    ],
-    user_id: "57855033-6088-45c0-bc03-5a2e483d6a87",
-    directions: {
-      steps: [
-        "In a clean coffee or spice grinder, add all of the ingredients.",
-        "Grind until the spices form a medium-fine powder. Stop the grinder several times and shake it so all the seeds and bits get under the blades and grind evenly.",
-        "When you're finished, unplug the grinder. Holding the lid in place, turn the spice grinder upside down and shake the spice mixture into the lid. Pour garam masala into a small jar with a tight-fitting lid. Store in a cool, dry place for up to 4 weeks."
-      ]
-    }
-  },
-];
 
 export default function Recipes() {
   const supabaseClient = useSupabaseClient();
@@ -56,7 +14,6 @@ export default function Recipes() {
   const [isRecipeEditorOpen, setIsRecipeEditorOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe>();
   const user = useUser();
-
   async function fetchRecipes() {
     const { error, data } = await fetchAll();
     if (!error && data) {
@@ -64,7 +21,6 @@ export default function Recipes() {
     } else {
     }
   }
-
   useEffect(() => {
     if (user) {
       fetchRecipes();
@@ -92,17 +48,14 @@ export default function Recipes() {
         />
     )
   }
-
   function viewRecipe(recipe: Recipe) {
     setSelectedRecipe(recipe);
     setIsRecipeEditorOpen(true);
   }
-
   function createRecipe() {
     setSelectedRecipe(undefined);
     setIsRecipeEditorOpen(true);
   }
-
   return (
     <div className='h-full flex flex-col'>
       <div className='flex justify-between items-center'>
