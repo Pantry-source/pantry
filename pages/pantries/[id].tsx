@@ -174,7 +174,7 @@ export default function Pantry() {
       return categories;
     }, [])
 
-    let filteredCategoriesAndProducts: categoryApi.CategoryWithProducts[] = [];
+    const filteredCategoriesAndProducts: categoryApi.CategoryWithProducts[] = [];
 
     for(let category of filteredCategories){
       const filteredProducts = category.products.reduce((products: productApi.Product[], product)=>{
