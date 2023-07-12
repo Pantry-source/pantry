@@ -4,9 +4,11 @@ import type { Database, Json } from '../../types/generated/supabase';
 
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
 
+export type Ingredient = string;
+
 export type RecipeDirections = Json;
 
-export async function create(name: string, ingredients: string[], userId: string, directions?: RecipeDirections) {
+export async function create(name: string, ingredients: Ingredient[], userId: string, directions?: RecipeDirections) {
   return await supabase
     .from('recipes')
     .insert([{ directions, name, ingredients, user_id: userId }])

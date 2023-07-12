@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from "next/dynamic";
 import * as recipeApi from "../modules/supabase/recipe";
-import { formatIngredientData, parseListData } from "../modules/editor/utils";
+import { convertSupabaseJsonToEditorData, formatIngredientData, parseListData } from "../modules/editor/utils";
 import type { Recipe } from '../modules/supabase/recipe';
 import { useUser } from '@supabase/auth-helpers-react';
 import { OutputData } from '@editorjs/editorjs';
@@ -19,8 +19,11 @@ type RecipeEditorProps = {
 };
 
 export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProps) {
-  const [directions, setDirections] = useState<OutputData>(recipe?.directions);
-  const [ingredients, setIngredients] = useState<string[]>(recipe?.ingredients);
+
+  const initialDirections = convertSupabaseJsonToEditorData(recipe?.directions || null);
+
+  const [directions, setDirections] = useState<OutputData>(initialDirections);
+  const [ingredients, setIngredients] = useState<string[]>(recipe?.ingredients || []);
   const [currentRecipe, setRecipe] = useState({...recipe});
   const [readOnly, setReadOnly] = useState(false);
   const user = useUser();
@@ -40,11 +43,11 @@ export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProp
     setDirections(updatedDirections);
   }
 
-  function onRecipeChange(e) {
+  function onRecipeChange(e: React.ChangeEvent<HTMLInputElement>) {
     setRecipe({ ...currentRecipe, [e.target.name]: e.target.value });
   }
 
-  async function onSave(e) {
+  async function onSave(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
     if (!user) {
       return;
@@ -94,7 +97,7 @@ export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProp
             <label htmlFor="directions" className="block text-sm font-medium leading-6 text-gray-900 mb-2">Directions</label>
             <TextEditor
               readOnly={readOnly}
-              initialData={recipe && recipe.directions}
+              initialData={directions}
               onChange={onDirectionsChange}
               holder="recipe-directions" />
           </div>

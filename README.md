@@ -68,6 +68,14 @@ The deploys are powered by the [Vercel Platform](https://vercel.com/new?utm_medi
 
 ## Typescript
 
+To execute TypeScript files, we need to install the TypeScript compiler. To check if it was successfully installed, run `tsc -v`. It will display the TypeScript version that is present on your PC.
+
+Then to check for errors in the project, run
+
+```
+tsc
+```
+
 ### Supabase types
 
 The types for all entities stored in the database are generated. After any changes to database schema it is required to re-generate types. The Supabase CLI allows to generate typesand produce the types/generated/supabase.ts file. Instructions below follow the [on the official documentation](https://supabase.com/docs/guides/api/rest/generating-types):

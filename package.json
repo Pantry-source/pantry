@@ -25,7 +25,7 @@
     "@editorjs/header": "^2.7.0",
     "@editorjs/list": "^1.8.0",
     "@editorjs/paragraph": "^2.9.0",
-    "@headlessui/react": "^1.6.5",
+    "@headlessui/react": "^1.7.12",
     "@heroicons/react": "^2.0.13",
     "@supabase/auth-helpers-nextjs": "^0.5.6",
     "@supabase/auth-helpers-react": "^0.3.1",
