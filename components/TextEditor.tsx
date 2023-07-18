@@ -11,6 +11,27 @@ type Props = {
   defaultBlock?: EditorConfig["defaultBlock"]
 };
 
+function getTools(tools?: string[]): {
+  list?: any;
+  header?: any;
+  paragraph?: any;
+} {
+  if (tools && tools.length) {
+    let toolConfig: {
+      list?: any;
+      header?: any;
+      paragraph?: any;
+    } = {};
+    for (const tool of tools) {
+      if (tool === 'list' || tool === 'header' || tool === 'paragraph') {
+        toolConfig[tool] = DEFAULT_EDITOR_TOOLS[tool];
+      }
+    }
+    return toolConfig;
+  }
+  return DEFAULT_EDITOR_TOOLS;
+}
+
 const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools, defaultBlock }: Props) => {
   const ref = useRef<EditorJS>();
 
@@ -19,7 +40,7 @@ const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools, d
       const editor = new EditorJS({
         defaultBlock,
         holder,
-        tools: tools?.length ? tools.reduce((acc,t) => { acc[t] = DEFAULT_EDITOR_TOOLS[t]; return acc; }, {}) : DEFAULT_EDITOR_TOOLS,
+        tools: getTools(tools),
         inlineToolbar: true,
         readOnly,
         data: initialData,
