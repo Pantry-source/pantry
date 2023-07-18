@@ -17,6 +17,7 @@ export default function Recipes() {
   async function fetchRecipes() {
     const { error, data } = await fetchAll();
     if (!error && data) {
+      console.log('calling setRecipes');
       setRecipes(data);
     } else {
     }
@@ -69,7 +70,7 @@ export default function Recipes() {
       <div className='flex-1'>
         <RecipeBrowser recipes={recipes} onRecipeViewClick={viewRecipe}/>
       </div>
-      <RecipeEditor recipe={selectedRecipe} open={isRecipeEditorOpen} onClose={() => setIsRecipeEditorOpen(false)} />
+      <RecipeEditor recipe={selectedRecipe} open={isRecipeEditorOpen} onClose={() => {setIsRecipeEditorOpen(false); fetchRecipes()}} />
     </div>
   );
 }

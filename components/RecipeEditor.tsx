@@ -32,6 +32,8 @@ export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProp
   useEffect(() => {
     if (recipe) {
       setRecipe(recipe);
+      setIngredients(recipe?.ingredients || []);
+      setDirections(convertSupabaseJsonToEditorData(recipe?.directions || null));
     }
   }, [recipe]);
 
@@ -97,7 +99,7 @@ export default function RecipeEditor({ recipe, open, onClose }: RecipeEditorProp
             <label htmlFor="directions" className="block text-sm font-medium leading-6 text-gray-900 mb-2">Directions</label>
             <TextEditor
               readOnly={readOnly}
-              initialData={directions}
+              initialData={initialDirections}
               onChange={onDirectionsChange}
               holder="recipe-directions" />
           </div>

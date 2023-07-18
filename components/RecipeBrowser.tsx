@@ -26,6 +26,26 @@ export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowse
     return <li key={i} className='lowercase'>{ingredient}</li>
   }
 
+  function renderActiveRecipe(activeOption: Recipe) {
+    // activeOption is state maintained by the Combobox component
+    // use recipe state when rendering active recipe so that changes to recipes are reflected when rendering active recipe even when the same recipe remains active
+    const recipe = recipes.find(r => r.id === activeOption.id);
+    return recipe ? <div className="hidden w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
+        <h2 className="flex-none p-4 text-center mt-3 font-semibold text-gray-900">{recipe.name}</h2>
+        <div className="p-6">
+          <ul className="list-disc text-sm pl-3 prose">
+              { recipe.ingredients.map(renderIngredient)}
+          </ul>
+          <button
+              onClick={() => onRecipeViewClick(recipe)}
+              type="button"
+              className="mt-6 w-full rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">
+              View full recipe
+          </button>
+        </div>
+    </div> : null;
+  }
+
   return (
     <div className="divide-y divide-gray-100 rounded-md shadow-sm bg-white border border-gray-200 h-full flex flex-col">
       <Combobox
@@ -73,22 +93,7 @@ export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowse
                   </div>
                 </div>
 
-                {activeOption && (
-                <div className="hidden w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
-                    <h2 className="flex-none p-4 text-center mt-3 font-semibold text-gray-900">{activeOption.name}</h2>
-                    <div className="p-6">
-                      <ul className="list-disc text-sm pl-3 prose">
-                          { activeOption.ingredients.map(renderIngredient)}
-                      </ul>
-                      <button
-                          onClick={() => onRecipeViewClick(activeOption)}
-                          type="button"
-                          className="mt-6 w-full rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">
-                          View full recipe
-                      </button>
-                    </div>
-                </div>
-                )}
+                {activeOption && renderActiveRecipe(activeOption)}
             </Combobox.Options>
             )}
 
