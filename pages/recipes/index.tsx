@@ -17,7 +17,6 @@ export default function Recipes() {
   async function fetchRecipes() {
     const { error, data } = await fetchAll();
     if (!error && data) {
-      console.log('calling setRecipes');
       setRecipes(data);
     } else {
     }

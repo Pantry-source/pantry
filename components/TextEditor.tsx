@@ -35,8 +35,6 @@ function getTools(tools?: string[]): {
 const EditorBlock = ({ initialData, onChange, holder, readOnly = false, tools, defaultBlock }: Props) => {
   const ref = useRef<EditorJS>();
 
-  // console.log(getTools(tools), initialData);
-
   useEffect(() => {
     if (!ref.current) {
       const editor = new EditorJS({
