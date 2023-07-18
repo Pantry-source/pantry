@@ -154,18 +154,22 @@ export default function Pantry() {
   /** checks if product should be rendered based on product attributes */
   function shouldProductRender(product: productApi.Product) {
     if (productAttributes.length === 0) {
-
-      return products;
+      return true;
     }
-    const isEssential = (productAttributes.includes("isEssential")) && product.is_essential;
-    const isOutOfStock = (productAttributes.includes("isOutOfStock")) && !product.quantity_amount;
 
-    if (isEssential && isOutOfStock) {
-      return product
-    } else if (isEssential || isOutOfStock) {
-      return product
+    const isEssential = product.is_essential;
+    const isOutOfStock = !product.quantity_amount;
+    const includeEssentialProducts = productAttributes.includes("isEssential");
+    const includeOutOfStockProducts = productAttributes.includes("isOutOfStock");
+
+    if (includeOutOfStockProducts && includeEssentialProducts) {
+      return isEssential && isOutOfStock;
+    } else if (includeOutOfStockProducts) {
+      return isOutOfStock
+    } else if (includeEssentialProducts) {
+      return isEssential
     }
-  }
+  };
 
   /** Filters out categories and products & returns array with corresponding data ready to render */
   const filteredCategoriesWithProducts = () => {
@@ -176,12 +180,12 @@ export default function Pantry() {
 
     const filteredCategoriesAndProducts: categoryApi.CategoryWithProducts[] = [];
 
-    for(const category of filteredCategories){
-      const filteredProducts = category.products.reduce((products: productApi.Product[], product)=>{
-        if(shouldProductRender(product)) products.push(product);
+    for (const category of filteredCategories) {
+      const filteredProducts = category.products.reduce((products: productApi.Product[], product) => {
+        if (shouldProductRender(product)) products.push(product);
         return products;
-      },[])
-      if (filteredProducts.length !== 0){
+      }, [])
+      if (filteredProducts.length !== 0) {
         category.products = filteredProducts;
         filteredCategoriesAndProducts.push(category);
       }
@@ -189,179 +193,179 @@ export default function Pantry() {
     return filteredCategoriesAndProducts
   };
 
-return (
-  <div>
-    {pantry.products.length ? (
-      <div>
-        <div className="flex items-top mb-14">
-          <div className="flex-auto">
-            <h1 className="text-xl font-semibold text-stone-900">{title}</h1>
-            <p className="mt-2 text-sm text-stone-700">{description}</p>
-          </div>
-          <div className="mt-4 mt-0 ml-16 flex-none">
-            <button
-              type="button"
-              onClick={() => setIsProductEditorOpen(true)}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 sm:w-auto"
-            >
-              Add Products
-            </button>
-          </div>
-        </div>
-        <div className="inline-block min-w-full py-2 align-middle">
-          <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-            <div className="flex-row items-center border-b border-gray-200">
-              <div className="flex-none pl-6 pr-3 w-12">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
-                  checked={checked}
-                  onChange={toggleAll}
-                />
-              </div>
-              <div className="flex-auto px-3">
-                {selectedProducts.length > 0 && (
-                  <div className="flex items-center space-x-3">
-                    <button
-                      type="button"
-                      className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                    >
-                      Out Of Stock
-                    </button>
-                    <button
-                      type="button"
-                      onClick={deleteProduct}
-                      className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
-                    >
-                      {pantry.products.length === selectedProducts.length ? 'Delete all' : 'Delete'}
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div className="flex-none  py-4 text-sm">
-                <section aria-labelledby="filter-heading">
-                  {/* sr-only means only show this to screen-readers */}
-                  <h2 id="filter-heading" className="sr-only">
-                    Filters
-                  </h2>
-                  <Filter
-                    updateRenderOptions={updateRenderOptions}
-                    validCategories={categoriesWithProducts}
-                  />
-                </section>
-              </div>
+  return (
+    <div>
+      {pantry.products.length ? (
+        <div>
+          <div className="flex items-top mb-14">
+            <div className="flex-auto">
+              <h1 className="text-xl font-semibold text-stone-900">{title}</h1>
+              <p className="mt-2 text-sm text-stone-700">{description}</p>
             </div>
-            <table className="min-w-full">
-              <thead className="bg-white text-stone-500">
-                <tr>
-                  <th scope="col" className="relative w-12 pl-6 pr-3"></th>
-                  <th scope="col" className="py-3.5 px-3 text-left text-sm font-normal"></th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
-                    Quantity
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
-                    Is Essential
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
-                    Expires
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
-                    Vendor
-                  </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Edit</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCategoriesWithProducts().map((category) => (
-                  <Fragment key={category.name}>
-                    <tr className="border-t border-gray-200 bg-gray-50">
-                      <th
-                        colSpan={7}
-                        scope="colgroup"
-                        className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+            <div className="mt-4 mt-0 ml-16 flex-none">
+              <button
+                type="button"
+                onClick={() => setIsProductEditorOpen(true)}
+                className="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 sm:w-auto"
+              >
+                Add Products
+              </button>
+            </div>
+          </div>
+          <div className="inline-block min-w-full py-2 align-middle">
+            <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <div className="flex-row items-center border-b border-gray-200">
+                <div className="flex-none pl-6 pr-3 w-12">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    checked={checked}
+                    onChange={toggleAll}
+                  />
+                </div>
+                <div className="flex-auto px-3">
+                  {selectedProducts.length > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <button
+                        type="button"
+                        className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
                       >
-                        {category.name}
-                      </th>
-                    </tr>
-                    {category.products.map((product) =>
-                      <tr key={product.name} className="border-gray-200 border-t">
-                        <td className="relative w-12 pl-6 pr-3">
-                          {selectedProducts.includes(product) && (
-                            <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
-                          )}
-                          <input
-                            type="checkbox"
-                            className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
-                            value={product.name}
-                            checked={selectedProducts.includes(product)}
-                            onChange={(e) =>
-                              setSelectedProducts(
-                                e.target.checked
-                                  ? [...selectedProducts, product]
-                                  : selectedProducts.filter((p) => p !== product)
-                              )
-                            }
-                          />
-                        </td>
-                        <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
-                          {product.name}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                          <PillButton
-                            label={unitsMap[product.quantity_unit]}
-                            id={product.id}
-                            updateCount={updateProductQuantity}
-                            count={product?.quantity_amount || 0}
-                          />
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                          {product.is_essential ? 'yes' : 'no'}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                          {product.expires_at || 'not specified'}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                          {product.vendor || ''}
-                        </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <button
-                            type="button"
-                            onClick={() => startEditingProduct(product)}
-                            className="text-stone-700 hover:text-stone-900"
-                          >
-                            Edit<span className="sr-only">,{product.name}</span>
-                          </button>
-                        </td>
+                        Out Of Stock
+                      </button>
+                      <button
+                        type="button"
+                        onClick={deleteProduct}
+                        className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        {pantry.products.length === selectedProducts.length ? 'Delete all' : 'Delete'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-none  py-4 text-sm">
+                  <section aria-labelledby="filter-heading">
+                    {/* sr-only means only show this to screen-readers */}
+                    <h2 id="filter-heading" className="sr-only">
+                      Filters
+                    </h2>
+                    <Filter
+                      updateRenderOptions={updateRenderOptions}
+                      validCategories={categoriesWithProducts}
+                    />
+                  </section>
+                </div>
+              </div>
+              <table className="min-w-full">
+                <thead className="bg-white text-stone-500">
+                  <tr>
+                    <th scope="col" className="relative w-12 pl-6 pr-3"></th>
+                    <th scope="col" className="py-3.5 px-3 text-left text-sm font-normal"></th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
+                      Quantity
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
+                      Is Essential
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
+                      Expires
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-normal">
+                      Vendor
+                    </th>
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                      <span className="sr-only">Edit</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCategoriesWithProducts().map((category) => (
+                    <Fragment key={category.name}>
+                      <tr className="border-t border-gray-200 bg-gray-50">
+                        <th
+                          colSpan={7}
+                          scope="colgroup"
+                          className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+                        >
+                          {category.name}
+                        </th>
                       </tr>
-                      // )
-                    )}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
+                      {category.products.map((product) =>
+                        <tr key={product.name} className="border-gray-200 border-t">
+                          <td className="relative w-12 pl-6 pr-3">
+                            {selectedProducts.includes(product) && (
+                              <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
+                            )}
+                            <input
+                              type="checkbox"
+                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
+                              value={product.name}
+                              checked={selectedProducts.includes(product)}
+                              onChange={(e) =>
+                                setSelectedProducts(
+                                  e.target.checked
+                                    ? [...selectedProducts, product]
+                                    : selectedProducts.filter((p) => p !== product)
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
+                            {product.name}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            <PillButton
+                              label={unitsMap[product.quantity_unit]}
+                              id={product.id}
+                              updateCount={updateProductQuantity}
+                              count={product?.quantity_amount || 0}
+                            />
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.is_essential ? 'yes' : 'no'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.expires_at || 'not specified'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.vendor || ''}
+                          </td>
+                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <button
+                              type="button"
+                              onClick={() => startEditingProduct(product)}
+                              className="text-stone-700 hover:text-stone-900"
+                            >
+                              Edit<span className="sr-only">,{product.name}</span>
+                            </button>
+                          </td>
+                        </tr>
+                        // )
+                      )}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    ) : (
-      <EmptyState
-        primaryAction="Add Products"
-        onPrimaryActionClick={() => setIsProductEditorOpen(true)}
-        header={title}
-        subheading={description || ''}
-      />
-    )}
+      ) : (
+        <EmptyState
+          primaryAction="Add Products"
+          onPrimaryActionClick={() => setIsProductEditorOpen(true)}
+          header={title}
+          subheading={description || ''}
+        />
+      )}
 
-    <ProductEditor
-      categories={categories}
-      isOpen={isProductEditorOpen}
-      onCancelProductEditing={onCancelProductEditing}
-      onProductSave={onProductSave}
-      pantry={pantry}
-      selectedProduct={currentProduct}
-      units={units}
-    />
-  </div>
-);
+      <ProductEditor
+        categories={categories}
+        isOpen={isProductEditorOpen}
+        onCancelProductEditing={onCancelProductEditing}
+        onProductSave={onProductSave}
+        pantry={pantry}
+        selectedProduct={currentProduct}
+        units={units}
+      />
+    </div>
+  );
 }
