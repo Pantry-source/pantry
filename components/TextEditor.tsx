@@ -17,7 +17,7 @@ function getTools(tools?: string[]): {
   paragraph?: any;
 } {
   if (tools && tools.length) {
-    let toolConfig: {
+    const toolConfig: {
       list?: any;
       header?: any;
       paragraph?: any;

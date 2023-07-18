@@ -18,7 +18,6 @@ export default function Recipes() {
     const { error, data } = await fetchAll();
     if (!error && data) {
       setRecipes(data);
-    } else {
     }
   }
   useEffect(() => {
@@ -42,7 +41,7 @@ export default function Recipes() {
     return (
       <EmptyState
           primaryAction="Add"
-          onPrimaryActionClick={() => {}}
+          onPrimaryActionClick={createRecipe}
           header={"Recipes"}
           subheading={"Start by adding a recipe"}
         />
