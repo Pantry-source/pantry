@@ -155,7 +155,7 @@ export default function Pantry() {
     if (selectedProductAttributes.length === 0) return true;
 
     const isEssential = product.is_essential;
-    const isOutOfStock = !product.quantity_amount;
+    const isOutOfStock = product.quantity_amount === 0;
 
     if (selectedProductAttributes.includes("isOutOfStock") && selectedProductAttributes.includes("isEssential")) {
       return isEssential && isOutOfStock;
