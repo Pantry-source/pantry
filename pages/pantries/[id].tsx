@@ -25,9 +25,8 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const [categoriesToRender, setCategoriesToRender] = useState<string[]>([]);
-  const [productAttributes, setProductAttributes] = useState<string[]>([]);
-  // const [filteredCategoriesWithProducts, setFilteredCategoriesWithProducts] = useState<productApi.Product[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedProductAttributes, setSelectedProductAttributes] = useState<string[]>([]);
 
   const router = useRouter();
   const { id } = router.query;
@@ -117,8 +116,8 @@ export default function Pantry() {
   }
 
   function updateRenderOptions(value: string, section: string) {
-    const setState = section === 'category' ? setCategoriesToRender : setProductAttributes;
-    const options = section === 'category' ? categoriesToRender : productAttributes;
+    const setState = section === 'category' ? setSelectedCategories : setSelectedProductAttributes;
+    const options = section === 'category' ? selectedCategories : selectedProductAttributes;
     options.includes(value)
       ? setState(ids => ids.filter(id => id !== value))
       : setState(ids => [...ids, value])
@@ -147,50 +146,45 @@ export default function Pantry() {
   }, [] as any[]);
 
   /** checks if category should be rendered */
-  function shouldCategoryRender(category: categoryApi.CategoryWithProducts) {
-    return (categoriesToRender.length === 0 || categoriesToRender.includes(category.id.toString()))
+  function doesCategoryMatchFilters(category: categoryApi.CategoryWithProducts) {
+    if (selectedCategories.length === 0 || selectedCategories.includes(category.id.toString())) return true;
   }
 
   /** checks if product should be rendered based on product attributes */
   function shouldProductRender(product: productApi.Product) {
-    if (productAttributes.length === 0) {
-      return true;
-    }
+    if (selectedProductAttributes.length === 0) return true;
 
     const isEssential = product.is_essential;
     const isOutOfStock = !product.quantity_amount;
-    const includeEssentialProducts = productAttributes.includes("isEssential");
-    const includeOutOfStockProducts = productAttributes.includes("isOutOfStock");
 
-    if (includeOutOfStockProducts && includeEssentialProducts) {
+    if (selectedProductAttributes.includes("isOutOfStock") && selectedProductAttributes.includes("isEssential")) {
       return isEssential && isOutOfStock;
-    } else if (includeOutOfStockProducts) {
+    } else if (selectedProductAttributes.includes("isOutOfStock")) {
       return isOutOfStock
-    } else if (includeEssentialProducts) {
+    } else if (selectedProductAttributes.includes("isEssential")) {
       return isEssential
+    } else {
+      return false;
     }
   };
 
   /** Filters out categories and products & returns array with corresponding data ready to render */
   const filteredCategoriesWithProducts = () => {
-    const filteredCategories = categoriesWithProducts.reduce((categories: categoryApi.CategoryWithProducts[], category) => {
-      if (shouldCategoryRender(category)) categories.push(category);
-      return categories;
-    }, [])
-
     const filteredCategoriesAndProducts: categoryApi.CategoryWithProducts[] = [];
 
-    for (const category of filteredCategories) {
-      const filteredProducts = category.products.reduce((products: productApi.Product[], product) => {
-        if (shouldProductRender(product)) products.push(product);
-        return products;
-      }, [])
-      if (filteredProducts.length !== 0) {
-        category.products = filteredProducts;
-        filteredCategoriesAndProducts.push(category);
+    categoriesWithProducts.reduce((acc, category) => {
+      if(doesCategoryMatchFilters(category)){
+        const filteredProducts = category.products.filter((product) => {
+          return shouldProductRender(product);
+        });
+        if (filteredProducts.length !== 0) {
+          category.products = filteredProducts;
+          acc.push(category);
+        }
       }
-    }
-    return filteredCategoriesAndProducts
+      return acc;
+    }, filteredCategoriesAndProducts);
+    return filteredCategoriesAndProducts;
   };
 
   return (
