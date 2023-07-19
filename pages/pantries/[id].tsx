@@ -25,7 +25,7 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [selectedProductAttributes, setSelectedProductAttributes] = useState<string[]>([]);
 
   const router = useRouter();
@@ -116,8 +116,8 @@ export default function Pantry() {
   }
 
   function updateRenderOptions(value: string, section: string) {
-    const setState = section === 'category' ? setSelectedCategories : setSelectedProductAttributes;
-    const options = section === 'category' ? selectedCategories : selectedProductAttributes;
+    const setState = section === 'category' ? setSelectedCategoryIds : setSelectedProductAttributes;
+    const options = section === 'category' ? selectedCategoryIds : selectedProductAttributes;
     options.includes(value)
       ? setState(ids => ids.filter(id => id !== value))
       : setState(ids => [...ids, value])
@@ -147,7 +147,7 @@ export default function Pantry() {
 
   /** checks if category should be rendered */
   function doesCategoryMatchFilters(category: categoryApi.CategoryWithProducts) {
-    if (selectedCategories.length === 0 || selectedCategories.includes(category.id.toString())) return true;
+    if (selectedCategoryIds.length === 0 || selectedCategoryIds.includes(category.id.toString())) return true;
   }
 
   /** checks if product should be rendered based on product attributes */
