@@ -6,12 +6,12 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import type { Ingredient, Recipe } from '../modules/supabase/recipe';
 import classNames from '../modules/classnames'
 
-type RecipeBrowserprops = {
+type RecipeBrowserProps = {
   recipes: Recipe[],
   onRecipeViewClick: (recipe: Recipe) => void
 }
 
-export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowserprops) {
+export default function RecipeBrowser({recipes, onRecipeViewClick}: RecipeBrowserProps) {
   const recent = recipes;
   const [query, setQuery] = useState('');
 
