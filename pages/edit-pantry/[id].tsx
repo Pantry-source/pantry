@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import 'easymde/dist/easymde.min.css';
 import supabase from '../../api';
-import { stringify } from 'querystring';
 import * as pantryApi from '../../modules/supabase/pantry';
 
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false });

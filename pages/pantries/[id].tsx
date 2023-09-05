@@ -25,6 +25,9 @@ export default function Pantry() {
   const [selectedProducts, setSelectedProducts] = useState<productApi.Product[]>([]);
   const [currentProduct, setCurrentProduct] = useState<productApi.Product>();
 
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [selectedProductAttributes, setSelectedProductAttributes] = useState<string[]>([]);
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -112,6 +115,14 @@ export default function Pantry() {
     }
   }
 
+  function updateRenderOptions(value: string, section: string) {
+    const setState = section === 'category' ? setSelectedCategoryIds : setSelectedProductAttributes;
+    const options = section === 'category' ? selectedCategoryIds : selectedProductAttributes;
+    options.includes(value)
+      ? setState(ids => ids.filter(id => id !== value))
+      : setState(ids => [...ids, value])
+  }
+
   useEffect(() => {
     fetchPantry();
     fetchCategories();
@@ -134,7 +145,47 @@ export default function Pantry() {
     return previous;
   }, [] as any[]);
 
-  const activeFilters: { value: string; label: string }[] = [];
+  /** checks if category should be rendered */
+  function doesCategoryMatchFilters(category: categoryApi.CategoryWithProducts) {
+    if (selectedCategoryIds.length === 0 || selectedCategoryIds.includes(category.id.toString())) return true;
+  }
+
+  /** checks if product should be rendered based on product attributes */
+  function shouldProductRender(product: productApi.Product) {
+    if (selectedProductAttributes.length === 0) return true;
+
+    const isEssential = product.is_essential;
+    const isOutOfStock = product.quantity_amount === 0;
+
+    if (selectedProductAttributes.includes("isOutOfStock") && selectedProductAttributes.includes("isEssential")) {
+      return isEssential && isOutOfStock;
+    } else if (selectedProductAttributes.includes("isOutOfStock")) {
+      return isOutOfStock
+    } else if (selectedProductAttributes.includes("isEssential")) {
+      return isEssential
+    } else {
+      return false;
+    }
+  };
+
+  /** Filters out categories and products & returns array with corresponding data ready to render */
+  const filteredCategoriesWithProducts = () => {
+    const filteredCategoriesAndProducts: categoryApi.CategoryWithProducts[] = [];
+
+    categoriesWithProducts.reduce((acc, category) => {
+      if(doesCategoryMatchFilters(category)){
+        const filteredProducts = category.products.filter((product) => {
+          return shouldProductRender(product);
+        });
+        if (filteredProducts.length !== 0) {
+          category.products = filteredProducts;
+          acc.push(category);
+        }
+      }
+      return acc;
+    }, filteredCategoriesAndProducts);
+    return filteredCategoriesAndProducts;
+  };
 
   return (
     <div>
@@ -157,7 +208,7 @@ export default function Pantry() {
           </div>
           <div className="inline-block min-w-full py-2 align-middle">
             <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <div className="flex items-center border-b border-gray-200">
+              <div className="flex-row items-center border-b border-gray-200">
                 <div className="flex-none pl-6 pr-3 w-12">
                   <input
                     type="checkbox"
@@ -185,47 +236,16 @@ export default function Pantry() {
                     </div>
                   )}
                 </div>
-                <div className="flex-none py-4 text-sm">
+                <div className="flex-none  py-4 text-sm">
                   <section aria-labelledby="filter-heading">
                     {/* sr-only means only show this to screen-readers */}
                     <h2 id="filter-heading" className="sr-only">
                       Filters
                     </h2>
-                    <Filter validCategories={categoriesWithProducts} />
-                    {activeFilters.length > 0 && (
-                      <div className="bg-gray-100">
-                        <div className="mx-auto max-w-1xl py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8">
-                          <h3 className="text-sm font-medium text-stone-500">
-                            Filters
-                            <span className="sr-only">, active</span>
-                          </h3>
-
-                          <div aria-hidden="true" className="hidden h-5 w-px bg-gray-300 sm:ml-4 sm:block" />
-
-                          <div className="mt-2 sm:mt-0 sm:ml-4">
-                            <div className="-m-1 flex flex-wrap items-center">
-                              {activeFilters.map((activeFilter) => (
-                                <span
-                                  key={activeFilter.value}
-                                  className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-stone-900"
-                                >
-                                  <span>{activeFilter.label}</span>
-                                  <button
-                                    type="button"
-                                    className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-stone-400 hover:bg-gray-200 hover:text-stone-500"
-                                  >
-                                    <span className="sr-only">Remove filter for {activeFilter.label}</span>
-                                    <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
-                                      <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
-                                    </svg>
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    <Filter
+                      updateRenderOptions={updateRenderOptions}
+                      validCategories={categoriesWithProducts}
+                    />
                   </section>
                 </div>
               </div>
@@ -252,73 +272,71 @@ export default function Pantry() {
                   </tr>
                 </thead>
                 <tbody>
-                  {categoriesWithProducts.map(
-                    (category) =>
-                      category.products && (
-                        <Fragment key={category.name}>
-                          <tr className="border-t border-gray-200 bg-gray-50">
-                            <th
-                              colSpan={7}
-                              scope="colgroup"
-                              className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+                  {filteredCategoriesWithProducts().map((category) => (
+                    <Fragment key={category.name}>
+                      <tr className="border-t border-gray-200 bg-gray-50">
+                        <th
+                          colSpan={7}
+                          scope="colgroup"
+                          className="bg-gray-50 py-2 px-6 text-left text-m font-semibold text-stone-900"
+                        >
+                          {category.name}
+                        </th>
+                      </tr>
+                      {category.products.map((product) =>
+                        <tr key={product.name} className="border-gray-200 border-t">
+                          <td className="relative w-12 pl-6 pr-3">
+                            {selectedProducts.includes(product) && (
+                              <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
+                            )}
+                            <input
+                              type="checkbox"
+                              className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
+                              value={product.name}
+                              checked={selectedProducts.includes(product)}
+                              onChange={(e) =>
+                                setSelectedProducts(
+                                  e.target.checked
+                                    ? [...selectedProducts, product]
+                                    : selectedProducts.filter((p) => p !== product)
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
+                            {product.name}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            <PillButton
+                              label={unitsMap[product.quantity_unit]}
+                              id={product.id}
+                              updateCount={updateProductQuantity}
+                              count={product?.quantity_amount || 0}
+                            />
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.is_essential ? 'yes' : 'no'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.expires_at || 'not specified'}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
+                            {product.vendor || ''}
+                          </td>
+                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <button
+                              type="button"
+                              onClick={() => startEditingProduct(product)}
+                              className="text-stone-700 hover:text-stone-900"
                             >
-                              {category.name}
-                            </th>
-                          </tr>
-                          {category.products.map((product) => (
-                            <tr key={product.name} className="border-gray-200 border-t">
-                              <td className="relative w-12 pl-6 pr-3">
-                                {selectedProducts.includes(product) && (
-                                  <div className="absolute inset-y-0 left-0 w-0.5 bg-cyan-600" />
-                                )}
-                                <input
-                                  type="checkbox"
-                                  className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 sm:left-6"
-                                  value={product.name}
-                                  checked={selectedProducts.includes(product)}
-                                  onChange={(e) =>
-                                    setSelectedProducts(
-                                      e.target.checked
-                                        ? [...selectedProducts, product]
-                                        : selectedProducts.filter((p) => p !== product)
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="whitespace-nowrap py-4 px-3 text-sm font-medium text-stone-900">
-                                {product.name}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                <PillButton
-                                  label={unitsMap[product.quantity_unit]}
-                                  id={product.id}
-                                  updateCount={updateProductQuantity}
-                                  count={product?.quantity_amount || 0}
-                                />
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.is_essential ? 'yes' : 'no'}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.expires_at || 'not specified'}
-                              </td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-stone-500">
-                                {product.vendor || ''}
-                              </td>
-                              <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                <button
-                                  type="button"
-                                  onClick={() => startEditingProduct(product)}
-                                  className="text-stone-700 hover:text-stone-900"
-                                >
-                                  Edit<span className="sr-only">,{product.name}</span>
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </Fragment>
-                      )
-                  )}
+                              Edit<span className="sr-only">,{product.name}</span>
+                            </button>
+                          </td>
+                        </tr>
+                        // )
+                      )}
+                    </Fragment>
+                  ))}
                 </tbody>
               </table>
             </div>
