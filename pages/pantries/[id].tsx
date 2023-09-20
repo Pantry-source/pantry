@@ -1,5 +1,4 @@
-import classNames from '../../modules/classnames';
-import { useEffect, useState, Fragment, useRef } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../../api';
 import ProductEditor from '../../components/ProductEditor';
@@ -200,7 +199,7 @@ export default function Pantry() {
               <button
                 type="button"
                 onClick={() => setIsProductEditorOpen(true)}
-                className="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 sm:w-auto"
+                className="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 sm:w-auto"
               >
                 Add Products
               </button>

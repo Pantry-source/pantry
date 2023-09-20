@@ -15,9 +15,9 @@ function MyApp({
   const [supabaseClient] = useState(() => createBrowserSupabaseClient<Database>());
   return (
     <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
-      <div>
+      <div className='h-screen flex flex-col'>
         <Navigation />
-        <div className="py-8 px-10">
+        <div className="py-8 px-10 container flex-1 mx-auto">
           <Component {...pageProps} />
         </div>
       </div>

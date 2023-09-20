@@ -110,6 +110,32 @@ export interface Database {
           user_id?: string | null
         }
       }
+      recipes: {
+        Row: {
+          created_at: string
+          directions: Json | null
+          id: number
+          ingredients: string[]
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          directions?: Json | null
+          id?: number
+          ingredients: string[]
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          directions?: Json | null
+          id?: number
+          ingredients?: string[]
+          name?: string
+          user_id?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

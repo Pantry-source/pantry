@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertFormList } from './AlertComponents';
+import ErrorList from './ErrorList';
 import Combobox, { DropdownOption } from './Dropdown';
 import * as categoryApi from '../modules/supabase/category';
 import * as quantityUnitApi from '../modules/supabase/quantityUnit';
@@ -363,7 +363,7 @@ export default function ProductEditor({
             </div>
 
             {/* Feedback */}
-            {errorMessages[0] && <AlertFormList errorMessages={errorMessages} />}
+            {errorMessages[0] && <ErrorList errorMessages={errorMessages} />}
           </form>
         )}
       </div>

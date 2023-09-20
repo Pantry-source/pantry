@@ -1,14 +1,12 @@
-/* This example requires Tailwind CSS v2.0+ */
-
 type ErrorMessage = {
   message: string;
 };
 
-type Alerts = {
+type Errors = {
   errorMessages: ErrorMessage[];
 };
 
-export function AlertFormList({ errorMessages }: Alerts) {
+export default function ErrorList({ errorMessages }: Errors) {
   return (
     <div className="rounded-md bg-red-50 p-4">
       <div className="flex">
